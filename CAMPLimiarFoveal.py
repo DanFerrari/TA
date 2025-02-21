@@ -191,12 +191,8 @@ from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphi
 
 class MinhaJanela(QGraphicsView):
     def __init__(self):
-        super().__init__()    
+        super().__init__() 
 
-
-                   # contador de ciclos
-
-     
         # variáveis para controle de exibição
         self.areaTrabalhoX = 1000
         self.areaTrabalhoY = 1000
@@ -208,42 +204,49 @@ class MinhaJanela(QGraphicsView):
         # variáveis para controle de cores        
         self.tomDeCinzaArea = 120
         self.tomDeCinzaCena = 100
-        # variáveis para controle de posição       
-
+        # variáveis para controle de posição 
+        self.sairAplicacao = False
         self.distanciaPacienteTela = 200	
+        self.inicializarCena()
+        self.fixacaoDiamante()
+        self.setupLabels()
+        self.TemResposta = False
     
     
-        self.labelAngX = QLabel("AngX:0", self)
-        self.labelAngX.setStyleSheet("QLabel { color : white; font-size: 24px; }")
-        self.labelAngX.setGeometry(10, 10, 200, 30)
+    
+    def setupLabels(self):
+        # self.labelAngX = QLabel("AngX:0", self)
+        # self.labelAngX.setStyleSheet("QLabel { color : white; font-size: 24px; }")
+        # self.labelAngX.setGeometry(10, 10, 200, 30)
         
-        self.labelAngY = QLabel("AngY:0", self)
-        self.labelAngY.setStyleSheet("QLabel { color : white; font-size: 24px; }")
-        self.labelAngY.setGeometry(10, 50, 200, 30)
+        # self.labelAngY = QLabel("AngY:0", self)
+        # self.labelAngY.setStyleSheet("QLabel { color : white; font-size: 24px; }")
+        # self.labelAngY.setGeometry(10, 50, 200, 30)
         
-        self.labelIntensidade = QLabel("Intensidade:0", self)
-        self.labelIntensidade.setStyleSheet("QLabel { color : white; font-size: 24px; }")
-        self.labelIntensidade.setGeometry(10, 90, 200, 30)
         
-        self.labelNumCruz = QLabel("Número de cruzamentos:0", self)
-        self.labelNumCruz.setStyleSheet("QLabel { color : white; font-size: 24px; }")
-        self.labelNumCruz.setGeometry(10, 130, 300, 30)
-        
-        self.labelViu = QLabel("Viu:NA", self)
-        self.labelViu.setStyleSheet("QLabel { color : white; font-size: 24px; }")
-        self.labelViu.setGeometry(10, 170, 200, 30)
-        
-        self.labelStatus = QLabel("Status:NA", self)
-        self.labelStatus.setStyleSheet("QLabel { color : white; font-size: 24px; }")
-        self.labelStatus.setGeometry(10, 210, 200, 30)
+        # self.labelNumCruz = QLabel("Número de cruzamentos:0", self)
+        # self.labelNumCruz.setStyleSheet("QLabel { color : white; font-size: 24px; }")
+        # self.labelNumCruz.setGeometry(10, 130, 300, 30)
+        # self.labelStatus = QLabel("Status:NA", self)
+        # self.labelStatus.setStyleSheet("QLabel { color : white; font-size: 24px; }")
+        # self.labelStatus.setGeometry(10, 210, 200, 30)
            
-        self.labelUAV = QLabel("Última atenuação vista:0", self)
-        self.labelUAV.setStyleSheet("QLabel { color : white; font-size: 24px; }")
-        self.labelUAV.setGeometry(10, 250, 300, 30)
+        # self.labelUAV = QLabel("Última atenuação vista:0", self)
+        # self.labelUAV.setStyleSheet("QLabel { color : white; font-size: 24px; }")
+        # self.labelUAV.setGeometry(10, 250, 300, 30)
         
-        self.labelLimiarFoveal = QLabel("Limiar Foveal:0", self)
-        self.labelLimiarFoveal.setStyleSheet("QLabel { color : white; font-size: 24px; }")
-        self.labelLimiarFoveal.setGeometry(10, 290, 300, 30)
+        self.labelIntensidade = QLabel("Intensidade:  0", self)
+        self.labelIntensidade.setStyleSheet("QLabel { color : preto; font-size: 38px; }")
+        self.labelIntensidade.setGeometry(10, 10, 400, 80)
+      
+        # self.labelViu = QLabel("Viu:NA", self)
+        # self.labelViu.setStyleSheet("QLabel { color : white; font-size: 24px; }")
+        # self.labelViu.setGeometry(10, 170, 200, 30)
+        
+        
+        self.labelLimiarFoveal = QLabel("Limiar Foveal: 0", self)
+        self.labelLimiarFoveal.setStyleSheet("QLabel { color : white; font-size: 38px; }")
+        self.labelLimiarFoveal.setGeometry(10, 100, 400, 30)
         
     
         
@@ -260,87 +263,43 @@ class MinhaJanela(QGraphicsView):
         
         
         
-    def plotaXYANGResp(self, xg, yg, tamanhoPonto, cor, db=35,tempo = 1000):
-        self.xPontoAtual = xg
-        self.yPontoAtual = yg
-        pontoRes = tamanhoPonto / self.resolucaoX
+    def plotaXYANGResp(self, xg, yg, tamanhoPonto, cor, db=35,tempoExposicaoEstimulo = 1000, tempoRespostaPaciente = 1000):
+   
+        resposta = self.esperar_tecla_ou_timer(tempo_maximo_paciente = tempoRespostaPaciente) # Espera até 5 segundos  
+        self.labelIntensidade.setText("Intensidade:  "+str(db))
+        self.labelIntensidade.setStyleSheet("QLabel { color : white; font-size: 38px; }")
         
-        if xg < 0:
-            xrad = math.radians(xg * -1)
-            tangenteAng = math.tan(xrad)
-            xmm = self.distanciaPacienteTela * tangenteAng
-        else:
-            xrad = math.radians(xg)
-            tangenteAng = math.tan(xrad)
-            xmm = self.distanciaPacienteTela * tangenteAng
-        
-        if yg < 0:
-            yrad = math.radians(yg * -1)
-            tangenteAng = math.tan(yrad)
-            ymm = self.distanciaPacienteTela * tangenteAng
-        else:
-            yrad = math.radians(yg)        
-            tangenteAng = math.tan(yrad)
-            ymm = self.distanciaPacienteTela * tangenteAng
-                
-        x = xmm / self.resolucaoX		
-        y = ymm / self.resolucaoY
-        
-        if xg < 0 and yg < 0:                  
-            x = -x + self.scene_width / 2 - pontoRes / 2
-            y = y + self.scene_height / 2 - pontoRes / 2
-          
-        if xg < 0 and yg >= 0:
-            x = -x + self.scene_width / 2 - pontoRes / 2
-            y = -y + self.scene_height / 2 - pontoRes / 2
-           
-        if xg >= 0 and yg < 0:
-            x = x + self.scene_width / 2 - pontoRes / 2
-            y = y + self.scene_height / 2 - pontoRes / 2          
-            
-        if xg >= 0 and yg >= 0:  
-            y = -y + self.scene_height / 2 - pontoRes / 2
-            x = x + self.scene_width / 2 - pontoRes / 2
-        
-        ponto = QGraphicsEllipseItem(x, y, pontoRes, pontoRes)
-        
-        intensidade = self.dBParaIntensidade(db)
-        
-        if cor == Qt.white:
-            cor = QColor(255, 255, 255, intensidade)
-        
-        ponto.setBrush(QBrush(cor))
-        ponto.setPen(QPen(Qt.NoPen))
-        self.scene.addItem(ponto)
-        #time.sleep(200)        
-        
-        loop = QEventLoop()        
+        self.plotaXYANG(xg, yg, tamanhoPonto, cor, db)
+
         timer = QTimer()
         timer.setSingleShot(True)
-        timer.timeout.connect(loop.quit)  # Sai do loop quando o tempo acabar
+        timer.timeout.connect(lambda: self.plotaXYANG(xg=0, yg=0, tamanhoPonto=5, cor=QColor(self.tomDeCinzaArea, self.tomDeCinzaArea, self.tomDeCinzaArea, 255)))
         timer.start(200)
+      
+        if resposta:
+                       
+            self.labelIntensidade.setStyleSheet("QLabel { color : green; font-size: 38px; }")
+            
+        else:
+            
+            self.labelIntensidade.setStyleSheet("QLabel { color : red; font-size: 38px; }")
+            
+        # self.loop = QEventLoop()  # Cria um loop para bloquear a execução
+
+ 
+        # timer = QTimer()
+        # timer.setSingleShot(True)
+        # timer.timeout.connect(self.loop.quit)  # Sai do loop quando o tempo acabar
+        # timer.start(500)
+
 
         # Executa o loop de eventos (bloqueia a execução até que algo aconteça)
-        loop.exec_()
-
-        ponto.setBrush(QBrush(QColor(self.tomDeCinzaArea,self.tomDeCinzaArea,self.tomDeCinzaArea,255)))
-     
-        resposta = self.esperar_tecla_ou_timer(tempo)  # Espera até 5 segundos  
-        self.labelAngX.setText("AngX:"+str(xg))
-
-        self.labelAngY.setText("AngY:"+str(yg))
-        self.labelIntensidade.setText("Intensidade:"+str(db))
-        self.labelStatus.setText("Status:NA")
-        if resposta:
-            self.labelViu.setText("Viu:Sim")
-        else:
-            self.labelViu.setText("Viu:Não")
-            
-        self.labelUAV.setText("Última atenuação vista:NA")
-        self.labelNumCruz.setText("Número de cruzamentos:NA")
+        # self.loop.exec_()    
         return resposta  
         
         
+    def removePonto(self):
+        self.scene.removeItem(self.ponto)
         
         
     def plotaXYANG(self, xg, yg, tamanhoPonto, cor, db=35):
@@ -385,6 +344,7 @@ class MinhaJanela(QGraphicsView):
             y = -y + self.scene_height / 2 - pontoRes / 2
             x = x + self.scene_width / 2 - pontoRes / 2
         
+        
         ponto = QGraphicsEllipseItem(x, y, pontoRes, pontoRes)
         
         intensidade = self.dBParaIntensidade(db)
@@ -394,7 +354,8 @@ class MinhaJanela(QGraphicsView):
         
         ponto.setBrush(QBrush(cor))
         ponto.setPen(QPen(Qt.NoPen))
-        self.scene.addItem(ponto)
+        self.scene.addItem(ponto)     
+       
        
       
     
@@ -418,42 +379,36 @@ class MinhaJanela(QGraphicsView):
         status = ''
         limiar = 0.1
         primeiro = True
-        tempoExposicao = 2000
+        tempoExposicao = 200
         tamanhoPonto = 3
-        stopExam = False
+        self.sairAplicacao = False
         self.fixacaoDiamante()
         limiarok = False
-        while limiarok == False and stopExam == False:
+        
+        while limiarok == False and self.sairAplicacao == False:
             
         
             status = ''
             primeiro = True
             AT = 25
-            while status != '=' and stopExam == False:
-                
-                resposta = self.plotaXYANGResp(xg = 0,yg = 0,tamanhoPonto= tamanhoPonto,cor = Qt.white,db= AT,tempo=tempoExposicao)
-                if self.tecla_pressionada == "s" or self.tecla_pressionada == "S":
-                    stopExam = True
-                                         
+            while status != '=' and self.sairAplicacao == False:
+               
+                resposta = self.plotaXYANGResp(xg = 0,yg = 0,tamanhoPonto= tamanhoPonto,cor = Qt.white,db= AT,tempoExposicaoEstimulo = tempoExposicao, tempoRespostaPaciente = 2000)
+               
+                                                
                 if resposta:
                     viu = 2
                 else:   
                     viu = 1
-                
-                loop = QEventLoop()        
-                timer = QTimer()
-                timer.setSingleShot(True)
-                timer.timeout.connect(loop.quit)  # Sai do loop quando o tempo acabar
-                timer.start(1000)
-
-                # Executa o loop de eventos (bloqueia a execução até que algo aconteça)
-                loop.exec_()
+                    
+              
                 match viu:
                     case 1:
                         if AT <= 0:
                             AT = -1 
                             status = '='                            
-                            break                        
+                            continue
+                                               
                         UNV = AT 
                         if primeiro == True:
                             primeiro = False
@@ -462,22 +417,22 @@ class MinhaJanela(QGraphicsView):
                             Delta = Dbig
                             AT = AT - Delta
                             status = '+'
-                            break
+                            continue
                         if status == '-':
                             NC += 1
                             Delta = Dsmall
                             if NC >= 2:
                                 status = '='
                                 AT = (UV + UNV) / 2
-                                break
+                                continue
                             else:            
                                 AT = AT - Delta
                                 status = '+'
-                                break
+                                continue
                         else:
                             AT = AT - Delta        
                             status = '+'
-                            break
+                            continue
                             
                         
                     case 2:
@@ -489,7 +444,7 @@ class MinhaJanela(QGraphicsView):
                             Delta = Dbig
                             AT = AT + Delta
                             status = '-'
-                            break
+                            continue
                             
                         if status == '+':
                             NC =+ 1
@@ -498,25 +453,30 @@ class MinhaJanela(QGraphicsView):
                             if NC >= 2:
                                 status = '='
                                 AT = (UV + UNV) / 2
-                                break
+                                continue
+                                
                             else:
                                 AT = AT + Delta
                                 status = '-' 
-                                break
+                                continue
+                                
                                    
 
                         else:
                             AT = AT + Delta
                             status = '-'
-                            break
-                  
+                            continue
+                            
                 
+                        
                 if AT > 40:
                     AT = 35    
-            if stopExam == False:
-                limiar = AT
-                limiarok = True
-                self.labelLimiarFoveal.setText(f"{limiar}")
+            
+            
+            limiar = AT
+            self.labelIntensidade.setStyleSheet("QLabel { color : black; font-size: 38px; }")
+            limiarok = True
+            self.labelLimiarFoveal.setText(f"Limiar Foveal= {limiar}")
 
                 
                 
@@ -525,37 +485,44 @@ class MinhaJanela(QGraphicsView):
 
             
         
-        self.labelUAV.setText("saiu do while")
+      
     
         
 
     def inicializarCena(self):        
          self.scene = QGraphicsScene()
          self.scene.setSceneRect(0, 0, 1920, 1080)
-         self.scene.setBackgroundBrush(QColor(120, 120, 120, 255))
+         self.scene.setBackgroundBrush(QColor(120, 120, 120, 255))         
          self.setScene(self.scene) 
          self.plotaAreaExame(600,600,QColor(120, 120, 120, 255))    
 
-    def esperar_tecla_ou_timer(self, tempo_maximo=3000):
+    def esperar_tecla_ou_timer(self, tempo_maximo_paciente= 1000):
         """Pausa a execução até uma tecla ser pressionada ou o tempo acabar."""
         self.tecla_pressionada = None
         self.loop = QEventLoop()  # Cria um loop para bloquear a execução
 
-        # Timer para tempo máximo de espera
         timer = QTimer()
         timer.setSingleShot(True)
         timer.timeout.connect(self.loop.quit)  # Sai do loop quando o tempo acabar
-        timer.start(tempo_maximo)
+        timer.start(tempo_maximo_paciente)
 
-        # Executa o loop de eventos (bloqueia a execução até que algo aconteça)
         self.loop.exec_()
 
+        # Executa o loop de eventos (bloqueia a execução até que algo aconteça)
+       
+        
         return self.tecla_pressionada  # Retorna a tecla pressionada ou None se o tempo acabar
 
     def keyPressEvent(self, event: QKeyEvent):
         """Captura a tecla pressionada e sai do loop de espera."""
    
-        self.tecla_pressionada = event.text()
+        if event.key() == Qt.Key_Space:
+            self.tecla_pressionada = True
+        elif event.key() == Qt.Key_Escape:
+            self.sairAplicacao = True
+            self.tecla_pressionada = False
+        else:
+            self.tecla_pressionada = False
         
         if self.loop and self.loop.isRunning():
             self.loop.quit()  # Sai do loop assim que a tecla for pressionada
@@ -576,12 +543,13 @@ janela = MinhaJanela()
 janela.showFullScreen()
 janela.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 janela.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-janela.setAlignment(Qt.AlignCenter)    
-janela.inicializarCena()
-janela.fixacaoDiamante()
+janela.setAlignment(Qt.AlignCenter)  
 
-    
+
 janela.calculaLimiarFoveal()
+
+
+
 
 
 
