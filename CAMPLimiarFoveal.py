@@ -184,8 +184,8 @@
 #     view.keyPressEvent = CAMPLimiarFoveal().keyPressEvent
 #     sys.exit(app.exec_())
 
-import sys, math
-from PyQt5.QtCore import Qt, QTimer, QEventLoop
+import sys, math,time
+from PyQt5.QtCore import Qt, QTimer, QEventLoop,QThread
 from PyQt5.QtGui import QBrush, QColor, QPen, QKeyEvent, QFont
 from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsTextItem, QWidget,QLabel
 
@@ -311,9 +311,23 @@ class MinhaJanela(QGraphicsView):
         
         ponto.setBrush(QBrush(cor))
         ponto.setPen(QPen(Qt.NoPen))
-        self.scene.addItem(ponto)        
+        self.scene.addItem(ponto)
+        #time.sleep(200)        
+        
+        loop = QEventLoop()        
+        timer = QTimer()
+        timer.setSingleShot(True)
+        timer.timeout.connect(loop.quit)  # Sai do loop quando o tempo acabar
+        timer.start(200)
+
+        # Executa o loop de eventos (bloqueia a execução até que algo aconteça)
+        loop.exec_()
+
+        ponto.setBrush(QBrush(QColor(self.tomDeCinzaArea,self.tomDeCinzaArea,self.tomDeCinzaArea,255)))
+     
         resposta = self.esperar_tecla_ou_timer(tempo)  # Espera até 5 segundos  
         self.labelAngX.setText("AngX:"+str(xg))
+
         self.labelAngY.setText("AngY:"+str(yg))
         self.labelIntensidade.setText("Intensidade:"+str(db))
         self.labelStatus.setText("Status:NA")
@@ -322,8 +336,6 @@ class MinhaJanela(QGraphicsView):
         else:
             self.labelViu.setText("Viu:Não")
             
-            
-      
         self.labelUAV.setText("Última atenuação vista:NA")
         self.labelNumCruz.setText("Número de cruzamentos:NA")
         return resposta  
@@ -392,7 +404,129 @@ class MinhaJanela(QGraphicsView):
         return int(brilho)
         
 
+
+    def calculaLimiarFoveal(self):
+        UV=0
+        AT=0
+        UNV=0
+        NC=0
+        Delta = 0
+        viu = 0 
+        Dbig = 3
+        Dsmall = 2
+        limiarok = False
+        status = ''
+        limiar = 0.1
+        primeiro = True
+        tempoExposicao = 2000
+        tamanhoPonto = 3
+        stopExam = False
+        self.fixacaoDiamante()
+        limiarok = False
+        while limiarok == False and stopExam == False:
+            
         
+            status = ''
+            primeiro = True
+            AT = 25
+            while status != '=' and stopExam == False:
+                
+                resposta = self.plotaXYANGResp(xg = 0,yg = 0,tamanhoPonto= tamanhoPonto,cor = Qt.white,db= AT,tempo=tempoExposicao)
+                if self.tecla_pressionada == "s" or self.tecla_pressionada == "S":
+                    stopExam = True
+                                         
+                if resposta:
+                    viu = 2
+                else:   
+                    viu = 1
+                
+                loop = QEventLoop()        
+                timer = QTimer()
+                timer.setSingleShot(True)
+                timer.timeout.connect(loop.quit)  # Sai do loop quando o tempo acabar
+                timer.start(1000)
+
+                # Executa o loop de eventos (bloqueia a execução até que algo aconteça)
+                loop.exec_()
+                match viu:
+                    case 1:
+                        if AT <= 0:
+                            AT = -1 
+                            status = '='                            
+                            break                        
+                        UNV = AT 
+                        if primeiro == True:
+                            primeiro = False
+                            NC = 0
+                            UV = 0
+                            Delta = Dbig
+                            AT = AT - Delta
+                            status = '+'
+                            break
+                        if status == '-':
+                            NC += 1
+                            Delta = Dsmall
+                            if NC >= 2:
+                                status = '='
+                                AT = (UV + UNV) / 2
+                                break
+                            else:            
+                                AT = AT - Delta
+                                status = '+'
+                                break
+                        else:
+                            AT = AT - Delta        
+                            status = '+'
+                            break
+                            
+                        
+                    case 2:
+                        UV = AT
+                        if primeiro == True:
+                            primeiro = False
+                            NC = 0
+                            UNV = 35
+                            Delta = Dbig
+                            AT = AT + Delta
+                            status = '-'
+                            break
+                            
+                        if status == '+':
+                            NC =+ 1
+                            Delta = Dsmall
+                            
+                            if NC >= 2:
+                                status = '='
+                                AT = (UV + UNV) / 2
+                                break
+                            else:
+                                AT = AT + Delta
+                                status = '-' 
+                                break
+                                   
+
+                        else:
+                            AT = AT + Delta
+                            status = '-'
+                            break
+                  
+                
+                if AT > 40:
+                    AT = 35    
+            if stopExam == False:
+                limiar = AT
+                limiarok = True
+                self.labelLimiarFoveal.setText(f"{limiar}")
+
+                
+                
+
+    
+
+            
+        
+        self.labelUAV.setText("saiu do while")
+    
         
 
     def inicializarCena(self):        
@@ -420,9 +554,13 @@ class MinhaJanela(QGraphicsView):
 
     def keyPressEvent(self, event: QKeyEvent):
         """Captura a tecla pressionada e sai do loop de espera."""
+   
         self.tecla_pressionada = event.text()
+        
         if self.loop and self.loop.isRunning():
             self.loop.quit()  # Sai do loop assim que a tecla for pressionada
+            
+            
     def fixacaoDiamante(self):
         self.plotaXYANG(xg=0, yg=6, tamanhoPonto=2, cor=Qt.yellow)
         self.plotaXYANG(xg=6, yg=0, tamanhoPonto=2, cor=Qt.yellow)
@@ -443,32 +581,7 @@ janela.inicializarCena()
 janela.fixacaoDiamante()
 
     
-resposta = janela.plotaXYANGResp(xg = 15,yg = 15,tamanhoPonto= 3,cor = Qt.white,db= 25,tempo=2000)
-if resposta:
-    janela.plotaXYANG(xg = 15,yg = 15,tamanhoPonto= 3,cor = Qt.green,db= 0)    
-else:
-    janela.plotaXYANG(xg = 15,yg = 15,tamanhoPonto= 3,cor = Qt.red,db= 0) 
-
-    
-resposta = janela.plotaXYANGResp(xg = -15,yg = 15,tamanhoPonto= 3,cor = Qt.white,db= 20,tempo=2000)
-if resposta:
-    janela.plotaXYANG(xg = -15,yg = 15,tamanhoPonto= 3,cor = Qt.green,db= 0)    
-else:
-    janela.plotaXYANG(xg = -15,yg = 15,tamanhoPonto= 3,cor = Qt.red,db= 0) 
-    
-        
-resposta = janela.plotaXYANGResp(xg = -15,yg = -15,tamanhoPonto= 3,cor = Qt.white,db= 15,tempo=2000)
-if resposta:
-    janela.plotaXYANG(xg = -15,yg = -15,tamanhoPonto= 3,cor = Qt.green,db= 0)    
-else:
-    janela.plotaXYANG(xg = -15,yg = -15,tamanhoPonto= 3,cor = Qt.red,db= 0) 
-    
-        
-resposta = janela.plotaXYANGResp(xg = 15,yg = -15,tamanhoPonto= 3,cor = Qt.white,db= 0,tempo=2000)
-if resposta:
-    janela.plotaXYANG(xg = 15,yg = -15,tamanhoPonto= 3,cor = Qt.green,db= 0)    
-else:
-    janela.plotaXYANG(xg = 15,yg = -15,tamanhoPonto= 3,cor = Qt.red,db= 0) 
+janela.calculaLimiarFoveal()
 
 
 
