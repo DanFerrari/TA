@@ -26,155 +26,119 @@ def intensity_to_db(intensity, max_intensity=255):
         return 20 * math.log10(intensity / max_intensity)
     return float('-inf')
 
-# Parâmetros do fundo
-background_db = -4.0  # atenuação da iluminação de fundo em dB
-background_intensity = int(255 * (10 ** (background_db / 20)))
-BACKGROUND_COLOR = (background_intensity, background_intensity, background_intensity)
-
-# Inicializa o Pygame
-pygame.init()
-pygame.font.init()  # Inicializa o módulo de fontes
-
-# Define uma fonte para o cronômetro (tamanho 100, por exemplo)
-font = pygame.font.SysFont(None, 100)
-
-# Obtém informações da tela e define a janela com aspecto 1:1 (quadrada)
-info = pygame.display.Info()
-screen_dim = min(info.current_w, info.current_h)
-screen = pygame.display.set_mode((screen_dim, screen_dim))
-pygame.display.set_caption("Experimento de Limiar Visual")
-
-# --- Contagem regressiva de 3 segundos ---
-countdown_seconds = 3
-start_countdown = time.time()
-while True:
-    elapsed = time.time() - start_countdown
-    remaining = countdown_seconds - elapsed
-    if remaining <= 0:
-        break
-    countdown_value = math.ceil(remaining)
-    screen.fill(BACKGROUND_COLOR)
-    text = font.render(str(countdown_value), True, (255, 255, 255))  # Texto em branco
-    text_rect = text.get_rect(center=(screen_dim // 2, screen_dim // 2))
-    screen.blit(text, text_rect)
-    pygame.display.flip()
-    pygame.time.wait(100)
-
-# Após a contagem, limpe a tela e a fila de eventos para evitar entradas antecipadas
-screen.fill(BACKGROUND_COLOR)
-pygame.display.flip()
-pygame.event.clear()
-
-# Parâmetros visuais e do estímulo
-stimulus_radius = 10
-stimulus_x, stimulus_y = screen_dim // 2, screen_dim // 2
-stimulus_duration = 0.2     # Estímulo exibido por 200ms
-stimulus_onset_delay = 0.5  # Atraso de 500ms antes da apresentação do ponto
-
-# Janela de resposta
-max_response_time = 2.0  # 2 segundos para resposta
-
-clock = pygame.time.Clock()
-init_intensity_db = background_db / 2
-# Parâmetros do procedimento
-current_intensity = int(255 * (10 ** (init_intensity_db / 20)))  # Intensidade inicial
-db_decrement = 0.10            # Atenuação se o estímulo for visto
-db_increment = 0.07            # Amplificação se o estímulo não for visto
-min_db_limit = background_db   # Limite máximo de atenuação
-
-trial_counter = 0
-last_direction = None         # Armazena a resposta do teste anterior: 'seen' ou 'not_seen'
-reversal_count = 0
-last_seen_db = None           # Último valor visto em dB
-last_not_seen_db = None       # Último valor não visto em dB
-
-running = True
-print("Iniciando o experimento...")
-
-while running:
-    # Limpa a tela para iniciar o teste
-    screen.fill(BACKGROUND_COLOR)
-    pygame.display.flip()
+def run_trial(screen, point_coords, current_intensity, attenuation_db, 
+              stimulus_exposure_time, max_keyboard_wait, background_color, 
+              stimulus_radius=10, stimulus_onset_delay=0.5, amplification_db=0.07, 
+              min_db_limit=-4.0):
+    """
+    Executa um teste único de apresentação do estímulo e captura a resposta do usuário.
     
-    trial_counter += 1
+    Parâmetros:
+        screen: superfície do Pygame onde o estímulo será desenhado.
+        point_coords: tupla (x, y) com as coordenadas do ponto a ser testado.
+        current_intensity: intensidade atual (0 a 255) do estímulo.
+        attenuation_db: valor de atenuação (dB) a ser aplicado se o estímulo for visto.
+        stimulus_exposure_time: tempo de exposição do estímulo (em segundos).
+        max_keyboard_wait: tempo máximo para aguardar a resposta do teclado (em segundos).
+        background_color: cor de fundo da tela (tupla RGB).
+        stimulus_radius: raio do estímulo (padrão=10).
+        stimulus_onset_delay: atraso (em segundos) antes de apresentar o estímulo (padrão=0.5).
+        amplification_db: valor de amplificação (dB) a ser aplicado se o estímulo não for visto (padrão=0.07).
+        min_db_limit: limite mínimo de atenuação em dB (padrão=-4.0).
+    
+    Retorna:
+        result: 'seen' se o usuário respondeu durante a apresentação do estímulo; 'not_seen' caso contrário.
+        new_intensity: nova intensidade atualizada de acordo com a resposta.
+        response_time: tempo (em segundos) decorrido entre o início da apresentação do estímulo e a resposta do usuário;
+                       se não houver resposta, retorna None.
+    """
     trial_start_time = time.time()
     stimulus_onset_time = trial_start_time + stimulus_onset_delay
-    stimulus_end_time = stimulus_onset_time + stimulus_duration
-    response_deadline = trial_start_time + max_response_time
+    stimulus_end_time = stimulus_onset_time + stimulus_exposure_time
+    response_deadline = trial_start_time + max_keyboard_wait
+    
     response_received = False
     stimulus_presented = False  # Flag para indicar se o estímulo já foi apresentado
-
-    # Exibe a intensidade atual em dB
-    current_db = intensity_to_db(current_intensity)
-    print(f"Teste {trial_counter}: Intensidade = {current_intensity} ({current_db:.2f} dB)")
-
-    # Loop para exibir o estímulo e capturar a resposta
+    response_time = None        # Tempo de resposta (em segundos)
+    
+    clock = pygame.time.Clock()
+    
     while time.time() < response_deadline:
         current_time = time.time()
+        # Exibe o estímulo somente após o atraso definido e enquanto estiver dentro do tempo de exposição
         if stimulus_onset_time <= current_time < stimulus_end_time:
-            # Apresenta o estímulo e define o flag
             if not stimulus_presented:
                 stimulus_presented = True
-            screen.fill(BACKGROUND_COLOR)
+            screen.fill(background_color)
             pygame.draw.circle(screen, (current_intensity, current_intensity, current_intensity),
-                               (stimulus_x, stimulus_y), stimulus_radius)
+                               point_coords, stimulus_radius)
             pygame.display.flip()
         else:
-            screen.fill(BACKGROUND_COLOR)
+            screen.fill(background_color)
             pygame.display.flip()
-            
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-                break
+                pygame.quit()
+                return None, current_intensity, None
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 if stimulus_presented:
                     response_received = True
+                    # Calcula o tempo de resposta a partir do início da apresentação do estímulo
+                    response_time = current_time - stimulus_onset_time
                 else:
                     print("Entrada antecipada! Aguarde a apresentação do ponto.")
                 break
         
         if response_received:
             break
-        clock.tick(60)
+        clock.tick(200)
     
-    # Define o resultado deste teste
     if response_received:
         result = 'seen'
-        last_seen_db = current_db  # Armazena o último valor visto
-        print(f"Teste {trial_counter}: O usuário VIU o estímulo.")
+        print("O usuário VIU o estímulo.")
+        new_intensity = attenuate_intensity(current_intensity, attenuation_db, min_db_limit)
     else:
         result = 'not_seen'
-        last_not_seen_db = current_db  # Armazena o último valor não visto
-        print(f"Teste {trial_counter}: O usuário NÃO viu o estímulo.")
+        print("O usuário NÃO viu o estímulo.")
+        new_intensity = amplify_intensity(current_intensity, amplification_db)
     
-    # Verifica reversão (cruzamento de resposta)
-    if last_direction is not None and result != last_direction:
-        reversal_count += 1
-        print(f"** Reversão {reversal_count} detectada no teste {trial_counter}.")
-        
-        if reversal_count == 3:
-            # Calcula a média entre os últimos valores de estímulo visto e não visto
-            if last_seen_db is not None and last_not_seen_db is not None:
-                threshold_db = (last_seen_db + last_not_seen_db) / 2
-                print(f"\n>>> Limiar detectado no teste {trial_counter}: {threshold_db:.2f} dB <<<")
-            else:
-                print("\n>>> Erro: Não há dados suficientes para calcular o limiar. <<<")
-            running = False
-            break
-    
-    last_direction = result
+    return result, new_intensity, response_time
 
-    # Atualiza a intensidade para o próximo teste
-    if result == 'seen':
-        new_intensity = attenuate_intensity(current_intensity, db_decrement, min_db=min_db_limit)
+# Exemplo de uso:
+if __name__ == "__main__":
+    pygame.init()
+    pygame.font.init()
+    info = pygame.display.Info()
+    screen_dim = min(info.current_w, info.current_h)
+    screen = pygame.display.set_mode((screen_dim, screen_dim))
+    pygame.display.set_caption("Teste de Estímulo")
+    
+    background_db = -4.0
+    background_intensity = int(255 * (10 ** (background_db / 20)))
+    BACKGROUND_COLOR = (background_intensity, background_intensity, background_intensity)
+    
+    current_intensity = int(255 * (10 ** ((background_db/2) / 20)))  # Intensidade inicial
+    
+    # Parâmetros do teste
+    point_coords = (screen_dim // 2, screen_dim // 2)
+    attenuation_db = 0.10           # dB a ser usado se o estímulo for visto
+    stimulus_exposure_time = 0.2      # 200 ms de exposição
+    max_keyboard_wait = 2.0         # 2 segundos para resposta
+    
+    # Limpa a tela e a fila de eventos antes do teste
+    screen.fill(BACKGROUND_COLOR)
+    pygame.display.flip()
+    pygame.event.clear()
+    
+    # Executa o teste e recebe o resultado, a nova intensidade e o tempo de resposta
+    result, updated_intensity, rt = run_trial(screen, point_coords, current_intensity, attenuation_db,
+                                              stimulus_exposure_time, max_keyboard_wait, BACKGROUND_COLOR)
+    print(f"Resultado do teste: {result}")
+    print(f"Nova intensidade: {updated_intensity}")
+    if rt is not None:
+        print(f"Tempo de resposta: {rt:.3f} segundos")
     else:
-        new_intensity = amplify_intensity(current_intensity, db_increment)
+        print("Sem resposta do usuário.")
     
-    print(f"Atualizando intensidade de {current_intensity} para {new_intensity}\n")
-    current_intensity = new_intensity
-
-    # Intervalo entre testes (1 segundo)
-    pygame.time.wait(1000)
-
-pygame.quit()
+    pygame.quit()

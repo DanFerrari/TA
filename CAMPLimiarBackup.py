@@ -313,7 +313,11 @@ class MinhaJanela(QGraphicsView):
             xmm = self.distanciaPacienteTela * tangenteAng
         else:
             xrad = math.radians(xg)
-            tangenteAng = math.tan(xrad)
+            tangenteAng = math.tan(xrad)         
+            
+            
+            
+            
             xmm = self.distanciaPacienteTela * tangenteAng
         
         if yg < 0:
