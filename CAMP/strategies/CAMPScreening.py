@@ -1,93 +1,10 @@
 from Ponto import Ponto
 from ManchaCega import TesteLimiarManchaCega
+from constants.cordenadas_30 import cordenadas_30
 import pygame
 import time
 import math
 import random
-
-
-# Inicializa o Pygame
-
-
-coordinates_30 = [
-    (-9, -27),
-    (-3, -27),
-    (3, -27),
-    (9, -27),
-    (-15, -21),
-    (-9, -21),
-    (-3, -21),
-    (3, -21),
-    (9, -21),
-    (15, -21),
-    (-21, -15),
-    (-15, -15),
-    (-9, -15),
-    (-3, -15),
-    (3, -15),
-    (9, -15),
-    (15, -15),
-    (21, -15),
-    (-27, -9),
-    (-21, -9),
-    (-15, -9),
-    (-9, -9),
-    (-3, -9),
-    (3, -9),
-    (9, -9),
-    (15, -9),
-    (21, -9),
-    (27, -9),
-    (-27, -3),
-    (-21, -3),
-    (-15, -3),
-    (-9, -3),
-    (-3, -3),
-    (3, -3),
-    (9, -3),
-    (15, -3),
-    (21, -3),
-    (27, -3),
-    (-27, 3),
-    (-21, 3),
-    (-15, 3),
-    (-9, 3),
-    (-3, 3),
-    (3, 3),
-    (9, 3),
-    (15, 3),
-    (21, 3),
-    (27, 3),
-    (-27, 9),
-    (-21, 9),
-    (-15, 9),
-    (-9, 9),
-    (-3, 9),
-    (3, 9),
-    (9, 9),
-    (15, 9),
-    (21, 9),
-    (27, 9),
-    (-21, 15),
-    (-15, 15),
-    (-9, 15),
-    (-3, 15),
-    (3, 15),
-    (9, 15),
-    (15, 15),
-    (21, 15),
-    (-15, 21),
-    (-9, 21),
-    (-3, 21),
-    (3, 21),
-    (9, 21),
-    (15, 21),
-    (3, 27),
-    (9, 27),
-    (-3, 27),
-    (-9, 27),
-]
-
 
 def media_de_tempo_de_resposta_paciente(tempos):
     tempo_medio = sum(tempos) / len(tempos)
@@ -100,7 +17,7 @@ def media_de_tempo_de_resposta_paciente(tempos):
 
 
 def criar_pontos():
-    return [Ponto(x, y, 3, (255, 255, 255)) for x, y in coordinates_30]
+    return [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
 
 
 def teste_mancha_cega(ponto):

@@ -1,7 +1,8 @@
 import pygame
 import random
 from Ponto import Ponto
-
+from constants.cordenadas_mcdir import cordenadas_mcdir
+from constants.cordenadas_mcesq import cordenadas_mcesq
 import pygame
 
 
@@ -75,34 +76,7 @@ def verifica_mensagem():
                         return False
                     mostrar_mensagem = False  # Fecha a notificação
                     
-pontosMCesq = [
-    (-18, 0),
-    (-15, 0),
-    (-12, 0),
-    (-21, 3),
-    (-18, 3),
-    (-15, 3),
-    (-12, 3),
-    (-9, 3),
-    (-18, 6),
-    (-15, 6),
-    (-12, 6),
-]
 
-
-pontosMCdir = [
-    (12, 0),
-    (15, 0),
-    (18, 0),
-    (9, 3),
-    (12, 3),
-    (15, 3),
-    (18, 3),
-    (21, 3),
-    (12, 6),
-    (15, 6),
-    (18, 6),
-]
 
 botao_reiniciar = None
 botao_continuar = None
@@ -136,9 +110,9 @@ class TesteLimiarManchaCega:
     @staticmethod
     def teste_mancha_cega(olho):
         if olho == 'OD':
-            matriz_mancha_cega = pontosMCdir
+            matriz_mancha_cega = cordenadas_mcdir
         elif olho == 'OE':
-            matriz_mancha_cega = pontosMCesq
+            matriz_mancha_cega = cordenadas_mcesq
         pontos_naorespondidos = []
         random.shuffle(matriz_mancha_cega)
         for ponto in matriz_mancha_cega:
