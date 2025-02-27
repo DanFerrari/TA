@@ -1,11 +1,16 @@
 import pygame
 import time
 import math
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "pages")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "procedures")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies")))
 
+from Ponto import Ponto
 
 class TestaLimiar():
     
-    def __init__(self, ponto):
+    def __init__(self, ponto:Ponto):
         self.ponto = ponto
         self.self.UV = 0
         self.AT = 0

@@ -1,10 +1,26 @@
-from Ponto import Ponto
-from ManchaCega import TesteLimiarManchaCega
-from constants.cordenadas_30 import cordenadas_30
 import pygame
 import time
 import math
 import random
+import sys
+import os
+
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
+)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "pages")))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "procedures"))
+)
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies"))
+)
+
+from Ponto import Ponto
+from ManchaCega import TesteLimiarManchaCega
+from cordenadas_30 import cordenadas_30
+from ContagemRegressiva import ContagemRegressiva
+
 
 def media_de_tempo_de_resposta_paciente(tempos):
     tempo_medio = sum(tempos) / len(tempos)
@@ -13,7 +29,6 @@ def media_de_tempo_de_resposta_paciente(tempos):
     if tempo_medio > 2.0:
         tempo_medio = 2.0
     return tempo_medio
-    
 
 
 def criar_pontos():
@@ -21,15 +36,16 @@ def criar_pontos():
 
 
 def teste_mancha_cega(ponto):
-    x,y = ponto
-    teste = Ponto(x,y,3,pygame.Color("red"))
-    teste.testaPonto(0.2,2.0)
+    x, y = ponto
+    teste = Ponto(x, y, 3, pygame.Color("red"))
+    teste.testaPonto(0.2, 2.0)
     if teste.response_received:
         return 1.0
     else:
         return 0.0
 
-def exame_screening(ponto_mancha_cega = 0, fixacao = False):
+
+def exame_screening(ponto_mancha_cega=0, fixacao=False):
     pontos = criar_pontos()
     random.shuffle(pontos)
     tempo_resposta = 2.0
@@ -45,13 +61,13 @@ def exame_screening(ponto_mancha_cega = 0, fixacao = False):
         ponto.limiar_encontrado = True
         tempos.append(ponto.tempo_resposta)
         testemancha += 1
-        if(testemancha == 10 and teste_de_fixacao):
-            
-            perda_de_fixacao += teste_mancha_cega(mancha_cega)            
+        if testemancha == 10 and teste_de_fixacao:
+
+            perda_de_fixacao += teste_mancha_cega(mancha_cega)
             testemancha = 0
             pygame.time.delay(1000)  # Aguarda 1 segundo para reiniciar o loop
             continue
-        
+
         if len(tempos) == 5:
             tempo_resposta = media_de_tempo_de_resposta_paciente(tempos)
             tempos = []
@@ -66,7 +82,7 @@ def exame_screening(ponto_mancha_cega = 0, fixacao = False):
         teste_perda = perda_de_fixacao / 7.0
         if teste_perda >= 0:
             print(f"Perda de fixacao: {(teste_perda * 100) }%")
-            
+
     pygame.time.delay(15000)  # Aguarda 5 segundos para reiniciar o loop
 
 
@@ -88,16 +104,17 @@ def main():
                 if event.key == pygame.K_ESCAPE:  # Fecha ao pressionar ESC
                     running = False
 
-        pygame.time.delay(2000)  
+        pygame.time.delay(2000)
         mancha_cega = TesteLimiarManchaCega().teste_mancha_cega("OD")
         if mancha_cega == True:
-            break
+            ContagemRegressiva().iniciar_contagem(5)
+            continue
         elif mancha_cega == False:
-            teste_fixacao = False  
+            teste_fixacao = False
 
         exame_screening(ponto_mancha_cega=mancha_cega, fixacao=teste_fixacao)
 
-        pygame.time.delay(30000) 
+        pygame.time.delay(30000)
         pygame.display.flip()
         running = False
 

@@ -1,9 +1,19 @@
 import pygame
 import time
 import math
-from Ponto import Ponto
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "pages")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "procedures")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies")))
 
-corT = 122
+
+from Ponto import Ponto
+from colors import Colors
+
+
+
 
 
 def fixacao_diamante():
@@ -13,7 +23,7 @@ def fixacao_diamante():
     Ponto(-6, 0, 3, pygame.Color("yellow")).plotarPonto()
 
 
-def db_para_intensidade(db, db_min=40, db_max=0, i_min=corT, i_max=255):
+def db_para_intensidade(db, db_min=40, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
     """Converte dB para intensidade de cor (escala logarítmica)."""
     norm_db = (db - db_min) / (db_max - db_min)  # Normaliza dB entre 0 e 1
 
@@ -39,7 +49,7 @@ def contagem_regressiva():
     """
 
     for i in range(3, 0, -1):
-        pygame.display.get_surface().fill((corT, corT, corT))  # Limpa a tela (preto)
+        pygame.display.get_surface().fill(Colors.BACKGROUND)  # Limpa a tela (preto)
         texto = pygame.font.Font(None, 150).render(
             str(i), True, (255, 255, 255)
         )  # Texto branco
@@ -91,7 +101,7 @@ def tela_resultado(db):
 
 def calcular_limiar_foveal():
     contagem_regressiva()
-    screen.fill((corT, corT, corT))
+    screen.fill(Colors.BACKGROUND)
     pygame.display.update()
     UV = 0
     AT = 0
@@ -122,7 +132,7 @@ def calcular_limiar_foveal():
             db_para_intensidade(AT),
         ),
     )
-    ponto_limiar.BACKGROUND_COLOR = (corT, corT, corT)
+    
 
     while limiarok == False and sairAplicacao == False:
         primeiro = True
@@ -223,14 +233,8 @@ if __name__ == "__main__":
     info = pygame.display.Info()
     screen_dim = min(info.current_w, info.current_h)
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-    pygame.display.set_caption("Teste de Estímulo")
-
-    BACKGROUND_COLOR = (
-        corT,
-        corT,
-        corT,
-    )
-    screen.fill(BACKGROUND_COLOR)
+    pygame.display.set_caption("Teste de Estímulo")   
+    screen.fill(Colors.BACKGROUND)
     pygame.display.flip()
     pygame.event.clear()
 

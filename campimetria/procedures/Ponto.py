@@ -1,39 +1,69 @@
 import pygame
 import time
 import math
+import os 
+import sys
 
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
+)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "pages")))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "procedures"))
+)
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies"))
+)
+
+from colors import Colors
 
 class Ponto:
     def __init__(self, xg, yg, tamanhoPonto, cor):
-        self.xg = xg
-        self.yg = yg
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
+        self.atenuacao = 0
+        self.primeira_visualizacao = True        
+        self.response_received = False
+        self.numero_cruzamentos = 0
+        self.ultima_atenuacao_vista = 0
+        self.ultima_atenuacao_nao_vista = 0
+        self.delta = 0
+        self.status = ""
+        
+        
+       
         self.tamanhoPonto = tamanhoPonto / 2
-        self.cor = cor
-        self.db = 0
-        self.id_point = 0
+        self.xg = xg
+        self.yg = yg
         self.resolucaoX = 0.25
         self.resolucaoY = 0.25
         self.resolucao_video = 0.2599
         self.x = 0
         self.y = 0
-        self.response_received = False
-        self.current_db = 0
+     
+       
+       
         self.tempo_resposta = 0.0
         self.clock = pygame.time.Clock()
+        
+        
+        self.cor = cor
         self.distanciaPacienteTela = 200
         self.screen_width = pygame.display.Info().current_w
         self.screen_height = pygame.display.Info().current_h
-        self.surface = pygame.display.get_surface()
-        self.BACKGROUND_COLOR = (122, 122, 122)
+        self.surface = pygame.display.get_surface()     
+        
+        
         xrad = math.radians(self.xg)
         xmm = self.distanciaPacienteTela * math.tan(xrad)
         yrad = math.radians(self.yg)
         ymm = self.distanciaPacienteTela * math.tan(yrad)
         self.pontoPix = self.tamanhoPonto / self.resolucao_video
         # Converte para pixels
+        
+        
+        
         self.x = xmm / self.resolucaoX
         self.y = ymm / self.resolucaoY
         self.x = self.x + (self.screen_width / 2)
@@ -69,8 +99,7 @@ class Ponto:
         distanciaPacienteTela = 200
         screen_width = pygame.display.Info().current_w
         screen_height = pygame.display.Info().current_h
-        surface = pygame.display.get_surface()
-        BACKGROUND_COLOR = (122, 122, 122)
+        surface = pygame.display.get_surface()        
         xrad = math.radians(xg)
         xmm = distanciaPacienteTela * math.tan(xrad)
         yrad = math.radians(yg)
@@ -124,7 +153,7 @@ class Ponto:
 
     def apagarPonto(self):
         pygame.draw.circle(
-            self.surface, self.BACKGROUND_COLOR, (self.x, self.y), self.pontoPix
+            self.surface, Colors.BACKGROUND, (self.x, self.y), self.pontoPix
         )
         pygame.display.update()
 
