@@ -20,7 +20,7 @@ class CAMPExame:
 
         # Define a área da cena e cor de fundo
         self.scene.setSceneRect(0, 0, self.view.width(), self.view.height())
-        self.scene.setBackgroundBrush(QColor(200, 200, 200))
+        self.scene.setBackgroundBrush(QColor(255, 255, 255))
 
         # Lista de pontos excluídos
         self.excluded_points = {
