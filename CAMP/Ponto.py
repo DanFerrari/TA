@@ -51,23 +51,21 @@ class Ponto:
         elif intensity < i_min:
             intensity = i_min
         cor = int(round(intensity))
-        return (cor,cor,cor)
-    
-    
+        return (cor, cor, cor)
+
     def plotarPonto(self):
         pygame.draw.circle(self.surface, self.cor, (self.x, self.y), self.pontoPix)
         pygame.display.update()
-    
 
     @staticmethod
     def plotarPontoStatic(xg, yg, tamanhoPonto, cor):
 
-        tamanhoPonto = tamanhoPonto / 2        
+        tamanhoPonto = tamanhoPonto / 2
         resolucaoX = 0.25
         resolucaoY = 0.25
         resolucao_video = 0.2599
         x = 0
-        y = 0       
+        y = 0
         distanciaPacienteTela = 200
         screen_width = pygame.display.Info().current_w
         screen_height = pygame.display.Info().current_h
@@ -110,16 +108,18 @@ class Ponto:
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    self.tempo_resposta = (pygame.time.get_ticks() - trial_start_time) / 1000
+                    self.tempo_resposta = (
+                        pygame.time.get_ticks() - trial_start_time
+                    ) / 1000
                     print("yrmpo_resposta_no_ponto: ", self.tempo_resposta)
                     self.response_received = True
-                else:
-                    self.tempo_resposta = 2.0
-                    self.response_received = False    
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     pygame.quit()
 
+            if not self.response_received:
+                self.tempo_resposta = 2.0
+                self.response_received = False
             self.clock.tick(60)
 
     def apagarPonto(self):
