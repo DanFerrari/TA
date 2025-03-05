@@ -20,7 +20,7 @@ from PyQt4.QtCore import Qt,QTimer,QObject,SIGNAL
 from PyQt4.QtGui import QGraphicsView,QMatrix,QBrush,QImage,QBrush,QColor,QApplication
 
 import os,pickle,time
-#import  OPi.GPIO as GPIO
+import  OPi.GPIO as GPIO
 #import RPi.GPIO as GPIO
 import subprocess
 import sys
@@ -59,21 +59,21 @@ class TAView(QGraphicsView):
         self.ir = 'PD26'
        # self.rele ='PL08'
 	
-        # GPIO.setwarnings(False)
-        # GPIO.setmode(GPIO.SUNXI)   
-        # ## Use board pin numbering
-        # GPIO.setup(self.ir, GPIO.OUT)
-        # GPIO.output(self.ir,False)
-        # GPIO.setup(self.blue,GPIO.OUT)
-        # GPIO.output(self.blue,False)
-        # GPIO.setup(self.red, GPIO.OUT)
-        # GPIO.output(self.red,False)
-        # GPIO.setup(self.green,GPIO.OUT)
-        # GPIO.output(self.green,False)
-        # #GPIO.setup(self.rele,GPIO.OUT)
-        # #GPIO.output(self.rele,self.releon)
-        # #Iniciando o led verde para ligado
-        # GPIO.output(self.green, True)
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.SUNXI)   
+        ## Use board pin numbering
+        GPIO.setup(self.ir, GPIO.OUT)
+        GPIO.output(self.ir,False)
+        GPIO.setup(self.blue,GPIO.OUT)
+        GPIO.output(self.blue,False)
+        GPIO.setup(self.red, GPIO.OUT)
+        GPIO.output(self.red,False)
+        GPIO.setup(self.green,GPIO.OUT)
+        GPIO.output(self.green,False)
+        #GPIO.setup(self.rele,GPIO.OUT)
+        #GPIO.output(self.rele,self.releon)
+        #Iniciando o led verde para ligado
+        GPIO.output(self.green, True)
 
 
         #Variavel que verifica se está desligado
@@ -403,9 +403,9 @@ class TAView(QGraphicsView):
         Arguments:
         - `self`:
         """
-    	#GPIO.output(self.ir,True)
+    	GPIO.output(self.ir,True)
     	time.sleep(0.05)
-    	#GPIO.output(self.ir,False)
+    	GPIO.output(self.ir,False)
         
 	if self.off == True:
             #os.system("sudo /opt/vc/bin/tvservice -p; sudo chvt 6; sudo chvt 7;")
@@ -415,8 +415,8 @@ class TAView(QGraphicsView):
             #os.system("sudo systemctl suspend;")
             self.scene().setVisible()
             self.off = False
-            # GPIO.output(self.green,True)
-            # GPIO.output(self.red,False)
+            GPIO.output(self.green,True)
+            GPIO.output(self.red,False)
             self.scene().setExam("Letter")
 
         if 1==1:
@@ -427,8 +427,8 @@ class TAView(QGraphicsView):
                 #os.system("sudo /opt/vc/bin/tvservice -o")
                 #os.system("sudo xset +dpms")
 
-                # GPIO.output(self.red,True)
-                # GPIO.output(self.green, False)
+                GPIO.output(self.red,True)
+                GPIO.output(self.green, False)
 		
 		#for i in range(1):
 		#  os.system("sudo xset dpms force off;")

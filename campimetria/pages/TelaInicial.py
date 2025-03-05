@@ -15,6 +15,9 @@ sys.path.append(
 from CAMPScreening import Screening
 from dados import *
 from CAMPFullThreshold import FullThreshold
+from Ponto import Ponto
+from cordenadas_30 import cordenadas_30
+from fixacao_central import FixacaoCentral
 
 # Inicializa o pygame
 pygame.init()
@@ -38,19 +41,19 @@ botao_selecionado = 0
 
 
 # Funções para cada botão
-def selecionar_olho(exame_selecionado):
+def selecionar_olho():
     fonte_titulo = pygame.font.Font(None, int(ALTURA * 0.08))
     fonte_opcoes = pygame.font.Font(None, int(ALTURA * 0.06))
     fonte_numero = pygame.font.Font(None, int(ALTURA * 0.07))
     fonte_botao = pygame.font.Font(None, int(ALTURA * 0.06))
-    exame = exame_selecionado
     cor_fundo = (20, 20, 20)
     cor_texto = (255, 255, 255)
     cor_texto_fade = (100, 100, 100)  # Cor mais fraca para opção não selecionada
     cor_caixa = (50, 50, 50)
+    cor_caixa_selecao = (70, 70, 70)  # Branco para destacar a caixa de seleção
     cor_botao = (0, 200, 0)  # Verde
     cor_botao_hover = (0, 255, 0)  # Verde mais brilhante para hover
-
+    cor_font_olho = (255, 255, 255)  # Branco
     # Opções do topo
     opcoes = ["Olho Esquerdo", "Olho Direito"]
     opcao_selecionada = 0  # 0 = Esquerda, 1 = Direita
@@ -69,12 +72,19 @@ def selecionar_olho(exame_selecionado):
         DadosExame.olho = Constantes.olho_direito
         # Renderiza as opções do topo
         pos_y_opcoes = ALTURA * 0.2
+
+        if selecao_atual == "opcoes":
+            cor_font_olho = (255, 255, 255)
+        else:
+            cor_font_olho = (0, 255, 0)
+
         texto_esquerda = fonte_opcoes.render(
-            opcoes[0], True, cor_texto if opcao_selecionada == 0 else cor_texto_fade
+            opcoes[0], True, cor_font_olho if opcao_selecionada == 0 else cor_texto_fade
         )
         texto_direita = fonte_opcoes.render(
-            opcoes[1], True, cor_texto if opcao_selecionada == 1 else cor_texto_fade
+            opcoes[1], True, cor_font_olho if opcao_selecionada == 1 else cor_texto_fade
         )
+        # Desenha uma borda para o texto à esquerda, se selecionado
 
         tela.blit(
             texto_esquerda,
@@ -86,18 +96,30 @@ def selecionar_olho(exame_selecionado):
         )
 
         # Renderiza a caixa numérica
-        pos_y_numero = ALTURA * 0.4
-        pygame.draw.rect(
-            tela,
-            cor_caixa,
-            (LARGURA // 2 - 100, pos_y_numero, 200, 100),
-            border_radius=10,
-        )
-        texto_numero = fonte_numero.render(str(numero), True, cor_texto)
-        tela.blit(
-            texto_numero,
-            (LARGURA // 2 - texto_numero.get_width() // 2, pos_y_numero + 25),
-        )
+        if DadosExame.exame_selecionado == Constantes.screening:
+            cor_caixa_atual = (
+                cor_caixa_selecao if selecao_atual == "numero" else cor_caixa
+            )
+            pos_y_numero = ALTURA * 0.4
+            pygame.draw.rect(
+                tela,
+                cor_caixa_atual,
+                (LARGURA // 2 - 100, pos_y_numero, 200, 100),
+                border_radius=10,
+            )
+            texto_numero = fonte_numero.render(str(numero), True, cor_texto)
+            tela.blit(
+                texto_numero,
+                (LARGURA // 2 - texto_numero.get_width() // 2, pos_y_numero + 25),
+            )
+            if selecao_atual == "numero":
+                pygame.draw.rect(
+                    tela,
+                    (255, 255, 255),  # Cor da borda (branca)
+                    (LARGURA // 2 - 100, pos_y_numero, 200, 100),
+                    5,  # Espessura da borda
+                    border_radius=10,  # Mesma curvatura que a caixa
+                )
 
         # Renderiza o botão "Iniciar Exame"
         pos_y_botao = ALTURA * 0.6
@@ -112,6 +134,14 @@ def selecionar_olho(exame_selecionado):
         tela.blit(
             texto_botao, (LARGURA // 2 - texto_botao.get_width() // 2, pos_y_botao + 20)
         )
+        if selecao_atual == "botao":
+            pygame.draw.rect(
+                tela,
+                (255, 255, 255),  # Cor da borda (branca)
+                (LARGURA // 2 - 150, pos_y_botao, 300, 80),
+                5,  # Espessura da borda
+                border_radius=10,  # Mesma curvatura que o botão
+            )
 
         # Captura eventos do teclado
         for event in pygame.event.get():
@@ -126,20 +156,26 @@ def selecionar_olho(exame_selecionado):
                     if selecao_atual == "numero":
                         selecao_atual = "opcoes"
                     elif selecao_atual == "botao":
-                        selecao_atual = "numero"
+                        if DadosExame.exame_selecionado == Constantes.screening:
+                            selecao_atual = "numero"
+                        else:
+                            selecao_atual = "opcoes"
                 elif event.key == pygame.K_DOWN:
                     if selecao_atual == "opcoes":
-                        selecao_atual = "numero"
+                        if DadosExame.exame_selecionado == Constantes.screening:
+                            selecao_atual = "numero"
+                        else:
+                            selecao_atual = "botao"
                     elif selecao_atual == "numero":
                         selecao_atual = "botao"
 
                 # Navegação dentro da seleção ativa
                 elif selecao_atual == "opcoes":
                     if event.key == pygame.K_LEFT:
-                        opcao_selecionada = 0                        
+                        opcao_selecionada = 0
                         DadosExame.olho = Constantes.olho_esquerdo
                     elif event.key == pygame.K_RIGHT:
-                        opcao_selecionada =  1
+                        opcao_selecionada = 1
                         DadosExame.olho = Constantes.olho_direito
 
                 elif selecao_atual == "numero":
@@ -149,17 +185,17 @@ def selecionar_olho(exame_selecionado):
                         numero += 1
 
                 elif selecao_atual == "botao":
-                    if event.key == pygame.K_RETURN: 
-                                                
-                        if exame == Constantes.screening:
-                            ini = Screening()
-                          
+                    if event.key == pygame.K_RETURN:
+
+                        if DadosExame.exame_selecionado == Constantes.screening:
+                            exame = Screening()
                             DadosExame.atenuacao_screening = numero
-                            ini.iniciar_screening()                            
-                        elif exame == Constantes.fullthreshold:                            
-                            ini = FullThreshold()
-                            
-                            ini.main()
+                            exame.iniciar_screening()
+                            rodando = False
+                        elif DadosExame.exame_selecionado == Constantes.fullthreshold:
+                            exame = FullThreshold()
+                            exame.main()
+                            rodando = False
                         else:
                             print("Exame não implementado!")
 
@@ -178,7 +214,7 @@ def desenhar_botao(texto, y, largura, altura, selecionado):
 
 
 
-
+    
 
 # Loop principal
 rodando = True
@@ -205,7 +241,7 @@ while rodando:
         altura_botao,
         botao_selecionado == 1,
     )
-    
+
     # Captura eventos do teclado
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -217,9 +253,11 @@ while rodando:
                 botao_selecionado = 1  # Seleciona "Estratégia 2"
             elif event.key == pygame.K_RETURN:  # Tecla ENTER para confirmar
                 if botao_selecionado == 0:
-                    selecionar_olho(Constantes.screening)
+                    DadosExame.exame_selecionado = Constantes.screening
+                    selecionar_olho()
                 elif botao_selecionado == 1:
-                    selecionar_olho("fullthreshold")
+                    DadosExame.exame_selecionado = Constantes.fullthreshold
+                    selecionar_olho()
             elif event.key == pygame.K_ESCAPE:  # Tecla ESC para sair
                 rodando = False
 
