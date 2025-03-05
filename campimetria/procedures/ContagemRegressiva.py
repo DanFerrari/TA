@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "c
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "pages")))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "procedures")))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies")))
-from colors import Colors
+from dados import Colors
 
 class ContagemRegressiva():
     @staticmethod

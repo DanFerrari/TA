@@ -15,22 +15,21 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies"))
 )
 
-from colors import Colors
+from dados import *
 
 class Ponto:
     def __init__(self, xg, yg, tamanhoPonto, cor):
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
-        self.atenuacao = 0
+        self.atenuacao = 25
         self.primeira_visualizacao = True        
         self.response_received = False
         self.numero_cruzamentos = 0
         self.ultima_atenuacao_vista = 0
         self.ultima_atenuacao_nao_vista = 0
         self.delta = 0
-        self.status = ""
-        
+        self.status = ""     
         
        
         self.tamanhoPonto = tamanhoPonto / 2

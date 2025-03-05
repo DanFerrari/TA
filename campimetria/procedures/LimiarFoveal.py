@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "s
 
 
 from Ponto import Ponto
-from colors import Colors
+from dados import *
 
 
 
@@ -48,7 +48,7 @@ def contagem_regressiva():
         posicao: Tupla (x, y) indicando onde exibir o texto na tela.
     """
 
-    for i in range(3, 0, -1):
+    for i in range(5, 0, -1):
         pygame.display.get_surface().fill(Colors.BACKGROUND)  # Limpa a tela (preto)
         texto = pygame.font.Font(None, 150).render(
             str(i), True, (255, 255, 255)
@@ -65,7 +65,7 @@ def tela_resultado(db):
     AZUL_ESCURO = (30, 100, 200)
 
     # Fonte para exibição
-    fonte = pygame.font.Font(None, 50)
+    fonte = pygame.font.Font(None, 150)
     fonte_botao = pygame.font.Font(None, 40)
 
     # Número grande de exemplo
@@ -75,21 +75,17 @@ def tela_resultado(db):
     botao_rect = pygame.Rect(1920 // 2 - 50, 1080 // 2 + 50, 100, 50)
     esperando_clique = True
     while esperando_clique:
-        screen.fill((0, 0, 0))  # Fundo preto
+        pygame.display.get_surface().fill((0, 0, 0))  # Fundo preto
 
         # Renderiza o texto
-        texto = fonte.render(f"Resultado: {numero_grande}", True, BRANCO)
+        texto = fonte.render(f"{numero_grande}", True, BRANCO)
         rect_texto = texto.get_rect(center=(1920 // 2, 1080 // 2 - 50))
-        screen.blit(texto, rect_texto)
+        pygame.display.get_surface().blit(texto, rect_texto)
 
-        # Desenha o botão OK
-        pygame.draw.rect(screen, AZUL, botao_rect, border_radius=10)
-        texto_botao = fonte_botao.render("OK", True, BRANCO)
-        rect_texto_botao = texto_botao.get_rect(center=botao_rect.center)
-        screen.blit(texto_botao, rect_texto_botao)
+       
 
         pygame.display.flip()  # Atualiza a tela
-
+        
         # Captura eventos
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -97,147 +93,138 @@ def tela_resultado(db):
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 if botao_rect.collidepoint(evento.pos):
                     esperando_clique = False  # Fecha a tela quando clica no botão
+        pygame.time.delay(3000)
+        esperando_clique = False
 
-
-def calcular_limiar_foveal():
-    contagem_regressiva()
-    screen.fill(Colors.BACKGROUND)
-    pygame.display.update()
-    UV = 0
-    AT = 0
-    UNV = 0
-    NC = 0
-    Delta = 0
-    viu = 0
-    Dbig = 3
-    Dsmall = 2
-    limiarok = False
-    status = ""
-    limiar = 0
-    primeiro = True
-    tempoExposicao = 0.2
-    tempoRespostaPaciente = 2.0
-    tamanhoPonto = 3
-    sairAplicacao = False
-    fixacao_diamante()
-    limiarok = False
-
-    ponto_limiar = Ponto(
-        0,
-        0,
-        tamanhoPonto,
-        (
-            db_para_intensidade(AT),
-            db_para_intensidade(AT),
-            db_para_intensidade(AT),
-        ),
-    )
+class CalcularLimiar():
     
-
-    while limiarok == False and sairAplicacao == False:
+    def iniciar_teste_limiar_foveal():
+        contagem_regressiva()
+        pygame.display.get_surface().fill(Colors.BACKGROUND)
+        pygame.display.update()
+        UV = 0
+        AT = 0
+        UNV = 0
+        NC = 0
+        Delta = 0
+        viu = 0
+        Dbig = 3
+        Dsmall = 2
+        limiarok = False
+        status = ""
+        limiar = 0
         primeiro = True
-        AT = 25
-        while status != "=" and sairAplicacao == False:
-            ponto_limiar.response_received = False
-            ponto_limiar.cor = (
+        tempoExposicao = 0.2
+        tempoRespostaPaciente = 2.0
+        tamanhoPonto = 3
+        sairAplicacao = False
+        fixacao_diamante()
+        limiarok = False
+
+        ponto_limiar = Ponto(
+            0,
+            0,
+            tamanhoPonto,
+            (
                 db_para_intensidade(AT),
                 db_para_intensidade(AT),
                 db_para_intensidade(AT),
-            )
+            ),
+        )
+        
 
-            ponto_limiar.testaPonto(tempoExposicao, tempoRespostaPaciente)
+        while limiarok == False and sairAplicacao == False:
+            primeiro = True
+            AT = 25
+            while status != "=" and sairAplicacao == False:
+                ponto_limiar.response_received = False
+                ponto_limiar.cor = (
+                    db_para_intensidade(AT),
+                    db_para_intensidade(AT),
+                    db_para_intensidade(AT),
+                )
 
-            print(
-                f"AT: {AT}, viu: {"Yes" if ponto_limiar.response_received else "No"}, intensidade: {db_para_intensidade(AT)}"
-            )
-            if ponto_limiar.response_received:
-                viu = 2
-            else:
-                viu = 1
-            pygame.time.delay(500)
-            match viu:
-                case 1:
-                    if AT <= 0:
-                        AT = -1
-                        status = "="
-                        continue
+                ponto_limiar.testaPonto(tempoExposicao, tempoRespostaPaciente)
 
-                    UNV = AT
-                    if primeiro == True:
-                        primeiro = False
-                        NC = 0
-                        UV = 0
-                        Delta = Dbig
-                        AT = AT - Delta
-                        status = "+"
-                        continue
-                    if status == "-":
-                        NC += 1
-                        Delta = Dsmall
-                        if NC >= 2:
+                print(
+                    f"AT: {AT}, viu: {"Yes" if ponto_limiar.response_received else "No"}, intensidade: {db_para_intensidade(AT)}"
+                )
+                if ponto_limiar.response_received:
+                    viu = 2
+                else:
+                    viu = 1
+                pygame.time.delay(500)
+                match viu:
+                    case 1:
+                        if AT <= 0:
+                            AT = -1
                             status = "="
-                            AT = (UV + UNV) / 2
                             continue
+
+                        UNV = AT
+                        if primeiro == True:
+                            primeiro = False
+                            NC = 0
+                            UV = 0
+                            Delta = Dbig
+                            AT = AT - Delta
+                            status = "+"
+                            continue
+                        if status == "-":
+                            NC += 1
+                            Delta = Dsmall
+                            if NC >= 2:
+                                status = "="
+                                AT = (UV + UNV) / 2
+                                continue
+                            else:
+                                AT = AT - Delta
+                                status = "+"
+                                continue
                         else:
                             AT = AT - Delta
                             status = "+"
                             continue
-                    else:
-                        AT = AT - Delta
-                        status = "+"
-                        continue
 
-                case 2:
-                    UV = AT
-                    if primeiro == True:
-                        primeiro = False
-                        NC = 0
-                        UNV = 35
-                        Delta = Dbig
-                        AT = AT + Delta
-                        status = "-"
-                        continue
-
-                    if status == "+":
-                        NC = +1
-                        Delta = Dsmall
-
-                        if NC >= 2:
-                            status = "="
-                            AT = (UV + UNV) / 2
+                    case 2:
+                        UV = AT
+                        if primeiro == True:
+                            primeiro = False
+                            NC = 0
+                            UNV = 35
+                            Delta = Dbig
+                            AT = AT + Delta
+                            status = "-"
                             continue
+
+                        if status == "+":
+                            NC = +1
+                            Delta = Dsmall
+
+                            if NC >= 2:
+                                status = "="
+                                AT = (UV + UNV) / 2
+                                continue
+
+                            else:
+                                AT = AT + Delta
+                                status = "-"
+                                continue
 
                         else:
                             AT = AT + Delta
                             status = "-"
                             continue
 
-                    else:
-                        AT = AT + Delta
-                        status = "-"
-                        continue
+                if AT > 40:
+                    AT = 35
 
-            if AT > 40:
-                AT = 35
-
-        limiar = AT
-        print(f"Limiar Foveal: {limiar} dB")
-        limiarok = True
-        ponto_limiar.db = limiar
-        tela_resultado(limiar)
+            limiar = AT
+            DadosExame.limiar_foveal = limiar
+            print(f"Limiar Foveal: {limiar} dB")
+            limiarok = True  
+            tela_resultado(limiar)      
+        
 
 
-if __name__ == "__main__":
-    pygame.init()
-    pygame.font.init()
-    info = pygame.display.Info()
-    screen_dim = min(info.current_w, info.current_h)
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-    pygame.display.set_caption("Teste de Estímulo")   
-    screen.fill(Colors.BACKGROUND)
-    pygame.display.flip()
-    pygame.event.clear()
 
-    calcular_limiar_foveal()
-
-    pygame.quit()

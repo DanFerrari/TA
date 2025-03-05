@@ -98,10 +98,11 @@
             if (matExame[idPto].Status == '=')
             {
                 Dados.gContIgual++;
-                if ((Dados.gFlutuacao) && (!Dados.DadosExame.LF) && (Dados.gExame[idPto].SF) && Dados.LimQuad == false)
-                    setLimiarFlutuacao(matExame, idPto);
-            }
-            if ((resp == 1) && (!Dados.DadosExame.LF)&& (!Dados.DadosExame.ThrRel) && (!Dados.LimQuad))
-                VerifyFalseNegative();
-            return resp;
-        }
+            }   
+        //         if ((Dados.gFlutuacao) && (!Dados.DadosExame.LF) && (Dados.gExame[idPto].SF) && Dados.LimQuad == false)
+        //             setLimiarFlutuacao(matExame, idPto);
+        //     }
+        //     if ((resp == 1) && (!Dados.DadosExame.LF)&& (!Dados.DadosExame.ThrRel) && (!Dados.LimQuad))
+        //         VerifyFalseNegative();
+        //     return resp;
+        // }

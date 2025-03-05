@@ -17,7 +17,8 @@ sys.path.append(
 from Ponto import Ponto
 from cordenadas_mcdir import cordenadas_mcdir
 from cordenadas_mcesq import cordenadas_mcesq
-
+from dados import *
+from fixacao_central import FixacaoCentral
 
 pygame.font.init()
 fonte = pygame.font.Font(None, 36)
@@ -56,7 +57,7 @@ def desenhar_botao(texto, x, y, largura, altura, selecionado):
 
 
 def mostrar_alerta(botao_reiniciar_estado, botao_continuar_estado):
-    largura, altura = 400, 200
+    largura, altura = 800, 400
     x, y = (pygame.display.get_surface().get_width() - largura) // 2, (
         pygame.display.get_surface().get_height() - altura
     ) // 2  # Centro da tela
@@ -119,9 +120,11 @@ def verifica_mensagem():
                 elif event.key == pygame.K_RETURN and mostrar_mensagem:
                     if botao_selecionado == 0:
                         rodando = False  # Fecha o jogo
+                        pygame.display.get_surface().fill(Colors.BACKGROUND)
                         return True
                     elif botao_selecionado == 1:
                         rodando = False  # Fecha o jogo
+                        pygame.display.get_surface().fill(Colors.BACKGROUND)
                         return False
                     mostrar_mensagem = False  # Fecha a notificação
 
@@ -159,12 +162,14 @@ class TesteLimiarManchaCega:
 
     @staticmethod
     def teste_mancha_cega(olho):
-        if olho == "OD":
+        matriz_mancha_cega = []
+        if olho == Constantes().olho_direito:
             matriz_mancha_cega = cordenadas_mcdir
-        elif olho == "OE":
+        elif olho == Constantes().olho_esquerdo:
             matriz_mancha_cega = cordenadas_mcesq
         pontos_naorespondidos = []
         random.shuffle(matriz_mancha_cega)
+        FixacaoCentral.plotar_fixacao_central()
         for ponto in matriz_mancha_cega:
             x, y = ponto
             cor_ponto = Ponto.db_para_intensidade(0)
@@ -178,4 +183,6 @@ class TesteLimiarManchaCega:
             return verifica_mensagem()
 
         else:
-            return resultado
+            DadosExame.posicao_mancha_cega = resultado
+            
+            
