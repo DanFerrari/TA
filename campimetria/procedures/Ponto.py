@@ -110,14 +110,14 @@ class Ponto:
         x = x + (screen_width / 2)
         y = y + (screen_height / 2)
         pygame.draw.circle(surface, cor, (x, y), pontoPix)
-        pygame.display.update()
+        
 
     def desenha_quadrado(self):
         tamanho = (self.tamanhoPonto,self.tamanhoPonto)
         quadrado = pygame.Rect(0,0,*tamanho)
         quadrado.center = (self.x,self.y)
         pygame.draw.rect(pygame.display.get_surface(),self.cor,quadrado)        
-        pygame.display.update()
+        
 
     def testaPonto(self, tempo_exposicao, tempo_resposta_paciente):
         trial_start_time = pygame.time.get_ticks()

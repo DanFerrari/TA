@@ -121,7 +121,7 @@ class ResultadoScreening:
             ponto.y = int(ponto.y * nova_altura / ALTURA)  # Reduzindo a coordenada Y
             if ponto.response_received:
                 ponto.cor = pygame.Color("green")
-                ponto.plotarPonto()
+                Ponto.plotarPontoStatic(ponto.xg,ponto.yg,ponto.tamanhoPonto,ponto.cor)
             elif not ponto.response_received:
                 ponto.cor = pygame.Color("red")
                 ponto.tamanhoPonto = 6

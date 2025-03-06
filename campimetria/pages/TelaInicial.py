@@ -1,5 +1,5 @@
 import pygame
-import os, sys
+import os,sys
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
@@ -215,6 +215,25 @@ def desenhar_botao(texto, y, largura, altura, selecionado):
 # Loop principal
 rodando = True
 while rodando:
+    
+    
+    from TelaResultadoFullThreshold import ResultadoFullthreshold
+    tela.fill(pygame.Color("white"))  # Preenche o fundo
+    pygame.display.flip()
+    DadosExame.matriz_pontos = [
+        Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30
+    ]
+    
+    for ponto in DadosExame.matriz_pontos:
+        if ponto.xg == 3 and ponto.yg == 3 or ponto.xg == 3 and ponto.yg == -3 or ponto.xg == -3 and ponto.yg == 3 or ponto.xg == -3 and ponto.yg == -3:
+            ponto.atenuacao = 0
+    ResultadoFullthreshold.desenhar_mapa()
+    while rodando:
+        
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    rodando = False
 
     tela.fill(cor_fundo)  # Preenche o fundo
 
