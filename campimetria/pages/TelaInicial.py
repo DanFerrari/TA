@@ -212,17 +212,10 @@ def desenhar_botao(texto, y, largura, altura, selecionado):
     return pygame.Rect(x, y, largura, altura)  # Retorna a área do botão
 
 
-
-
-    
-
 # Loop principal
 rodando = True
 while rodando:
-     
-    DadosExame.matriz_pontos = [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
-    from TelaResultadoScreening import ResultadoScreening
-    ResultadoScreening.desenha_pontos()
+
     tela.fill(cor_fundo)  # Preenche o fundo
 
     # Renderiza a label no topo da tela

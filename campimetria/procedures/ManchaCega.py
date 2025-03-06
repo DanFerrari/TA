@@ -23,7 +23,7 @@ from fixacao_central import FixacaoCentral
 pygame.font.init()
 fonte = pygame.font.Font(None, 36)
 cor_texto = (255, 255, 255)
-cor_alerta = (200, 0, 0)  # Vermelho
+cor_alerta = Colors.BACKGROUND # Vermelho
 cor_botao = (100, 100, 100)
 cor_botao_hover = (150, 150, 150)
 cor_borda_selecao = (255, 255, 255)  # Branco (para o botão selecionado)
@@ -57,7 +57,7 @@ def desenhar_botao(texto, x, y, largura, altura, selecionado):
 
 
 def mostrar_alerta(botao_reiniciar_estado, botao_continuar_estado):
-    largura, altura = 800, 400
+    largura, altura = 800, 600
     x, y = (pygame.display.get_surface().get_width() - largura) // 2, (
         pygame.display.get_surface().get_height() - altura
     ) // 2  # Centro da tela
@@ -75,15 +75,15 @@ def mostrar_alerta(botao_reiniciar_estado, botao_continuar_estado):
         True,
         cor_texto,
     )
-    texto_rect = texto.get_rect(center=(x + largura // 2, y + 50))
+    texto_rect = texto.get_rect(center=(960,405))
     pygame.display.get_surface().blit(texto, texto_rect)
 
     # Desenha os botões com a seleção destacada
     botao_reiniciar = desenhar_botao(
-        "Reiniciar", x + 50, y + 120, 120, 40, botao_reiniciar_estado
+        "Reiniciar", 960 - 150, 455, 120, 40, botao_reiniciar_estado
     )
     botao_continuar = desenhar_botao(
-        "Continuar", x + 230, y + 120, 120, 40, botao_continuar_estado
+        "Continuar", 960 + 150, 455, 120, 40, botao_continuar_estado
     )
     pygame.display.update()
     return (
@@ -97,7 +97,7 @@ def verifica_mensagem():
     mostrar_mensagem = True
     botao_reiniciar = None
     botao_continuar = None
-    pygame.display.get_surface().fill((122, 122, 122))
+    pygame.display.get_surface().fill(Colors.BACKGROUND)
     pygame.display.update()
     botao_selecionado = 0
     botao_reiniciar, botao_continuar = mostrar_alerta(True, False)
@@ -121,10 +121,12 @@ def verifica_mensagem():
                     if botao_selecionado == 0:
                         rodando = False  # Fecha o jogo
                         pygame.display.get_surface().fill(Colors.BACKGROUND)
+                        FixacaoCentral.plotar_fixacao_central()
                         return True
                     elif botao_selecionado == 1:
                         rodando = False  # Fecha o jogo
                         pygame.display.get_surface().fill(Colors.BACKGROUND)
+                        FixacaoCentral.plotar_fixacao_central()
                         return False
                     mostrar_mensagem = False  # Fecha a notificação
 

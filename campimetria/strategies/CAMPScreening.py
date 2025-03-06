@@ -22,6 +22,7 @@ from cordenadas_30 import cordenadas_30
 from ContagemRegressiva import ContagemRegressiva
 from dados import *
 from TelaResultadoScreening import ResultadoScreening
+from fixacao_central import FixacaoCentral
 
 
 class Screening:
@@ -63,6 +64,7 @@ class Screening:
         testemancha = 0
         testenegativo = 0
         testepositivo = 0
+        
         for ponto in pontos:
             ponto.cor = ponto.db_para_intensidade(DadosExame.atenuacao_screening)
             pygame.time.delay(100)  # Aguarda 100 ms para cada ponto
@@ -112,7 +114,7 @@ class Screening:
             ContagemRegressiva.iniciar_contagem(5)
             pygame.display.get_surface().fill(Colors.BACKGROUND)
             pygame.display.update()
-            Ponto(0, 0, 3, pygame.Color("yellow")).plotarPonto()
+            FixacaoCentral.plotar_fixacao_central()
             # Captura eventos
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:  # Fecha ao clicar no botão de fechar
@@ -123,11 +125,11 @@ class Screening:
 
             pygame.time.delay(2000)
             mancha_cega = TesteLimiarManchaCega().teste_mancha_cega(DadosExame.olho)
-            if mancha_cega == True:
-                ContagemRegressiva().iniciar_contagem(5)
+            if mancha_cega == True:                
                 continue
             elif mancha_cega == False:
                 teste_fixacao = False
+                pygame.time.delay(1500)
             start_time = pygame.time.get_ticks()
             
             self.exame_screening(

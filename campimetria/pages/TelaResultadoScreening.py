@@ -27,10 +27,13 @@ class ResultadoScreening:
         #falso positivo
         #falso negativo
         
+        
+        
         perda_fixacao = 0
+        
         perda_fixacao = (
-            (DadosExame.perda_de_fixacao / DadosExame.total_testes_mancha) * 100
-            if perda_fixacao > 0.0
+            ((DadosExame.perda_de_fixacao / DadosExame.total_testes_mancha) * 100)
+            if DadosExame.perda_de_fixacao > 0.0
             else 0
         )
         
@@ -47,9 +50,17 @@ class ResultadoScreening:
         pos_y = 270  # Começa no meio da tela
         espacamento = 100  # Espaço entre as labels
         fonte = pygame.font.Font(None, 30)
+        color_label_info = (0,0,0)
+        
         for i, texto in enumerate(labels):
             # Renderiza a label
-            texto_renderizado = fonte.render(texto, True, (0,0,0))
+            color_label_info = (0,0,0)
+            if i == 3 and DadosExame.falso_positivo_respondidos_percentual > 33 or i == 4 and DadosExame.falso_negativo_respondidos_percentual > 33 or i == 5 and perda_fixacao > 33 :
+                color_label_info = pygame.Color("red")
+            
+                
+        
+            texto_renderizado = fonte.render(texto, True, color_label_info)
 
             # Posiciona centralizado no quadrante direito
             pygame.display.get_surface().blit(texto_renderizado, (pos_x - texto_renderizado.get_width() // 2, pos_y + i * espacamento))
