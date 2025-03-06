@@ -146,9 +146,7 @@ class CalcularLimiar():
 
                 ponto_limiar.testaPonto(tempoExposicao, tempoRespostaPaciente)
 
-                print(
-                    f"AT: {AT}, viu: {"Yes" if ponto_limiar.response_received else "No"}, intensidade: {db_para_intensidade(AT)}"
-                )
+               
                 if ponto_limiar.response_received:
                     viu = 2
                 else:
