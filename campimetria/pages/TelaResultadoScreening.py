@@ -1,5 +1,5 @@
 import pygame, random, time, os, sys, math
-from PIL import Image, ImageDraw
+
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
@@ -38,14 +38,14 @@ class ResultadoScreening:
         DadosExame.falso_positivo_respondidos_percentual = DadosExame.falso_positivo_respondidos / DadosExame.total_testes_falsos_positivo  * 100 if DadosExame.falso_positivo_respondidos > 0 else 0
         DadosExame.duracao_do_exame = (DadosExame.duracao_do_exame / 1000) / 60
         
-        labels = [f"Exame: {DadosExame.exame_selecionado}", f"Duracao do exame:{DadosExame.duracao_do_exame}", f"Total de pontos:76", f"Falso positivo:{DadosExame.falso_positivo_respondidos} / {DadosExame.total_testes_falsos_positivo} ({DadosExame.falso_positivo_respondidos_percentual}%)", f"Falso negativo:{DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual}%)", f"Perda de fixacao:{int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao}%)"]
+        labels = [f"Exame: {DadosExame.exame_selecionado}", f"Duração (min):{DadosExame.duracao_do_exame:.2f}", f"Total de pontos:{DadosExame.total_de_pontos_testados}", f"Falso positivo:{int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual}%)", f"Falso negativo:{DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)", f"Perda de fixacao:{int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao:.2f}%)"]
 
         
 
         # Posição inicial para desenhar labels (quadrante direito)
         pos_x = 1920 * 3 // 4  # 75% da largura (centro do quadrante direito)
-        pos_y = 25  # Começa no meio da tela
-        espacamento = 150  # Espaço entre as labels
+        pos_y = 270  # Começa no meio da tela
+        espacamento = 100  # Espaço entre as labels
         fonte = pygame.font.Font(None, 30)
         for i, texto in enumerate(labels):
             # Renderiza a label
@@ -67,10 +67,42 @@ class ResultadoScreening:
         perda_fixacao = 0.0
         LARGURA, ALTURA = 1920, 1080  # Tela original
         nova_largura, nova_altura = 960, 540  # Nova tela
-        pygame.draw.rect(pygame.display.get_surface(), pygame.Color("black"), (0, 0, 960, 540), 1, 0)
-        pygame.draw.rect(pygame.display.get_surface(), pygame.Color("black"), (0,540, 960, 540), 1, 0)
-        pygame.draw.rect(pygame.display.get_surface(), pygame.Color("black"), (960, 0, 960, 540), 1, 0)
-        pygame.draw.rect(pygame.display.get_surface(), pygame.Color("black"), (960, 540, 960, 540), 1, 0)
+     
+        
+        #circulo do mapa de pontos
+        pygame.draw.circle(pygame.display.get_surface(),(0,0,0),(480,270),250,1)
+        
+        #circulo do mapa de limiar
+        pygame.draw.circle(pygame.display.get_surface(),(0,0,0),(480,810),250,1)
+        
+        #linhas da cruz mapa de pontos
+        pygame.draw.line(pygame.display.get_surface(),(0,0,0),(480,519),(480,20),1) 
+        pygame.draw.line(pygame.display.get_surface(),(0,0,0),(729,270),(230,270),1)
+        
+        #linhas da cruz mapa de limiar
+        pygame.draw.line(pygame.display.get_surface(),(0,0,0),(480,1060),(480,560),1)
+        pygame.draw.line(pygame.display.get_surface(),(0,0,0),(729,810),(230,810),1)
+        
+        #legenda do mapa de pontos
+        fonte = pygame.font.SysFont('Arial',15)
+            
+        ponto_legenda_green = Ponto(0,0,3,pygame.Color("green"))
+        ponto_legenda_green.x = 800
+        ponto_legenda_green.y = 270        
+        ponto_legenda_green.plotarPonto()
+        label_legenda_green = fonte.render("Acima do limiar de referência",True,(0,0,0))
+        pygame.display.get_surface().blit(label_legenda_green,label_legenda_green.get_rect(center = (900,270)))
+      
+        label_legenda_red = fonte.render("Abaixo do limiar de referência",True,(0,0,0))
+        
+        pygame.display.get_surface().blit(label_legenda_red,label_legenda_red.get_rect(center = (900,310)))
+        quadrado_legenda_vermelho = Ponto(0,0,16,pygame.Color("red"))
+        quadrado_legenda_vermelho.x = 800
+        quadrado_legenda_vermelho.y = 310    
+        quadrado_legenda_vermelho.desenha_quadrado()
+        
+        
+
         
         pontos_ajustados = DadosExame.matriz_pontos
         for ponto in pontos_ajustados:                       
@@ -81,7 +113,8 @@ class ResultadoScreening:
                 ponto.plotarPonto()
             elif not ponto.response_received:
                 ponto.cor = pygame.Color("red")
-                ponto.plotarPonto()
+                ponto.tamanhoPonto = 6
+                ponto.desenha_quadrado()
                 
                 
         for ponto in pontos_ajustados:
@@ -94,7 +127,7 @@ class ResultadoScreening:
             
             
             ponto.y += ALTURA//2  
-            pygame.display.get_surface().blit(texto, (ponto.x,ponto.y))
+            pygame.display.get_surface().blit(texto, texto.get_rect(center = (ponto.x,ponto.y)))
 
 
 

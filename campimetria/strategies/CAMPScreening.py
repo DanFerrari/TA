@@ -67,6 +67,7 @@ class Screening:
             ponto.cor = ponto.db_para_intensidade(DadosExame.atenuacao_screening)
             pygame.time.delay(100)  # Aguarda 100 ms para cada ponto
             ponto.testaPonto(0.2, tempo_resposta)
+            DadosExame.total_de_pontos_testados += 1
             if ponto.response_received:
                 pontos_vistos.append(ponto)
 
