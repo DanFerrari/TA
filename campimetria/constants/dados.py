@@ -42,8 +42,8 @@ class DadosExame:
     falso_negativo_respondidos = 0.0
     total_testes_falsos_positivo = 0
     total_testes_falsos_negativo = 0
-    falso_negativo_respondidos_percentual = falso_negativo_respondidos /  total_testes_falsos_negativo * 100 if total_testes_falsos_negativo > 0 else 0.0
-    falso_positivo_respondidos_percentual = falso_positivo_respondidos / total_testes_falsos_positivo * 100 if total_testes_falsos_positivo > 0 else 0.0
+    falso_negativo_respondidos_percentual = 0.0
+    falso_positivo_respondidos_percentual = 0.0
     
     
 

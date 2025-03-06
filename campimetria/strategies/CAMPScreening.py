@@ -84,12 +84,14 @@ class Screening:
             if testepositivo == 15 and len(pontos_vistos) > 1:
                 pontos_vistos[-1].cor = Colors.BACKGROUND
                 pontos_vistos[-1].plotarPonto()
+                DadosExame.total_testes_falsos_positivo += 1
                 if pontos_vistos[-1].response_received:
                     DadosExame.falso_positivo_respondidos += 1
                 testepositivo = 0
             if testenegativo == 12 and len(pontos_vistos) > 1:
                 pontos_vistos[-1].cor = Ponto.db_para_intensidade(25)
-                pontos_vistos[-1].plotarPonto()
+                pontos_vistos[-1].testaPonto(0.2,tempo_resposta)
+                DadosExame.total_testes_falsos_negativo += 1
                 if not pontos_vistos[-1].response_received:
                     DadosExame.falso_negativo_respondidos += 1
                 testenegativo = 0
@@ -119,12 +121,12 @@ class Screening:
                         running = False
 
             pygame.time.delay(2000)
-            # mancha_cega = TesteLimiarManchaCega().teste_mancha_cega(DadosExame.olho)
-            # if mancha_cega == True:
-            #     ContagemRegressiva().iniciar_contagem(5)
-            #     continue
-            # elif mancha_cega == False:
-            #     teste_fixacao = False
+            mancha_cega = TesteLimiarManchaCega().teste_mancha_cega(DadosExame.olho)
+            if mancha_cega == True:
+                ContagemRegressiva().iniciar_contagem(5)
+                continue
+            elif mancha_cega == False:
+                teste_fixacao = False
             start_time = pygame.time.get_ticks()
             
             self.exame_screening(
