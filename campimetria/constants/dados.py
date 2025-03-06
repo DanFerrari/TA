@@ -34,11 +34,11 @@ class DadosExame:
     total_de_pontos_testados = 0
     
     posicao_mancha_cega = (0, 0)
-    perda_de_fixacao = 5.0
+    perda_de_fixacao = 0.0
     total_testes_mancha = 10   
     
-    falso_positivo_respondidos = 4.0
-    falso_negativo_respondidos = 4.0
+    falso_positivo_respondidos = 0.0
+    falso_negativo_respondidos = 0.0
     total_testes_falsos_positivo = 10
     total_testes_falsos_negativo = 10
     falso_negativo_respondidos_percentual = 0.0

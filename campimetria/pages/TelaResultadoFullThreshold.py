@@ -23,24 +23,6 @@ class Mapa:
         self.matriz_interpolada = matriz_interpolada
         self.texturas = self.carregar_texturas()
 
-    def carregar_texturas(self):
-        """Carrega as texturas das imagens e retorna uma lista de Surfaces do Pygame"""
-        texturas = []
-        caminho_base = "utils/images/bitmaps"
-        
-        for i in range(1, 11):
-            caminho_imagem = os.path.join(caminho_base, f"{i}.bmp")
-            if os.path.exists(caminho_imagem):
-                textura = pygame.image.load(caminho_imagem)
-                textura = pygame.transform.scale(textura, (20, 20))  # Ajuste do tamanho
-            else:
-                textura = pygame.Surface((20, 20))  # Criar um espaço vazio se a imagem não existir
-                textura.fill((255, 255, 255))  # Branco
-            texturas.append(textura)
-        return texturas
-
-  
-
 
 
 def exibir_resultados(pontos):

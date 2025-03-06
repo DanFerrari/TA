@@ -41,7 +41,7 @@ class ResultadoScreening:
         DadosExame.falso_positivo_respondidos_percentual = DadosExame.falso_positivo_respondidos / DadosExame.total_testes_falsos_positivo  * 100 if DadosExame.falso_positivo_respondidos > 0 else 0
         DadosExame.duracao_do_exame = (DadosExame.duracao_do_exame / 1000) / 60
         
-        labels = [f"Exame: {DadosExame.exame_selecionado}", f"Duração (min):{DadosExame.duracao_do_exame:.2f}", f"Total de pontos:{DadosExame.total_de_pontos_testados}", f"Falso positivo:{int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual}%)", f"Falso negativo:{DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)", f"Perda de fixacao:{int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao:.2f}%)"]
+        labels = [f"Exame: {DadosExame.exame_selecionado}", f"Duração (min): {DadosExame.duracao_do_exame:.2f}", f"Total de pontos: {DadosExame.total_de_pontos_testados}", f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)", f"Falso negativo: {DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)", f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao:.2f}%)"]
 
         
 
@@ -63,7 +63,7 @@ class ResultadoScreening:
             texto_renderizado = fonte.render(texto, True, color_label_info)
 
             # Posiciona centralizado no quadrante direito
-            pygame.display.get_surface().blit(texto_renderizado, (pos_x - texto_renderizado.get_width() // 2, pos_y + i * espacamento))
+            pygame.display.get_surface().blit(texto_renderizado, (pos_x - 200, pos_y + i * espacamento))
 
 
         
