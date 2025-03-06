@@ -34,13 +34,13 @@ class ResultadoScreening:
             else 0
         )
         
-        labels = [f"Exame: {DadosExame.exame_selecionado}", f"Duracao do exame:", f"Total de pontos:76", f"Falso positivo:{DadosExame.falso_positivo_respondidos} / {DadosExame.total_testes_falsos_positivo} ({DadosExame.falso_positivo_respondidos_percentual}%)", f"Falso negativo:{DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual}%)", f"Perda de fixacao:{int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao}%)"]
+        labels = [f"Exame: {DadosExame.exame_selecionado}", f"Duracao do exame:{DadosExame.duracao_do_exame}", f"Total de pontos:76", f"Falso positivo:{DadosExame.falso_positivo_respondidos} / {DadosExame.total_testes_falsos_positivo} ({DadosExame.falso_positivo_respondidos_percentual}%)", f"Falso negativo:{DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual}%)", f"Perda de fixacao:{int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao}%)"]
 
         
 
         # Posição inicial para desenhar labels (quadrante direito)
         pos_x = 1920 * 3 // 4  # 75% da largura (centro do quadrante direito)
-        pos_y = 50  # Começa no meio da tela
+        pos_y = 20  # Começa no meio da tela
         espacamento = 50  # Espaço entre as labels
         fonte = pygame.font.Font(None, 30)
         for i, texto in enumerate(labels):

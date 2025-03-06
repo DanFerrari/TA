@@ -82,7 +82,7 @@ class Screening:
                 pygame.time.delay(1000)  # Aguarda 1 segundo para reiniciar o loop
                 continue
             if testepositivo == 15 and len(pontos_vistos) > 1:
-                pontos_vistos[-1].cor = Constantes.BACKGROUND
+                pontos_vistos[-1].cor = Colors.BACKGROUND
                 pontos_vistos[-1].plotarPonto()
                 if pontos_vistos[-1].response_received:
                     DadosExame.falso_positivo_respondidos += 1
@@ -107,7 +107,7 @@ class Screening:
 
         while running or sair:
             ContagemRegressiva.iniciar_contagem(5)
-            pygame.display.get_surface().fill((120, 120, 120))
+            pygame.display.get_surface().fill(Colors.BACKGROUND)
             pygame.display.update()
             Ponto(0, 0, 3, pygame.Color("yellow")).plotarPonto()
             # Captura eventos
@@ -125,10 +125,13 @@ class Screening:
             #     continue
             # elif mancha_cega == False:
             #     teste_fixacao = False
-
+            start_time = pygame.time.get_ticks()
+            
             self.exame_screening(
                 ponto_mancha_cega=DadosExame.posicao_mancha_cega, fixacao=teste_fixacao
             )
+            end_time = pygame.time.get_ticks() - start_time
+            DadosExame.duracao_do_exame = end_time
             ResultadoScreening.desenha_pontos()
 
             pygame.display.flip()
