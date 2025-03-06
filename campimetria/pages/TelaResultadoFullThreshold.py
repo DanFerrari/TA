@@ -1,5 +1,5 @@
 import pygame, random, time, os, sys,math
-from PIL import Image, ImageDraw
+
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
