@@ -19,59 +19,165 @@ from dados import *
 from Ponto import Ponto
 from cordenadas_30 import cordenadas_30
 
+
 class ResultadoFullthreshold:
+    matriz_interpolada = []
+    LARGURA, ALTURA = 1920, 1080
+    nova_largura, nova_altura = 960, 540       
+
+    pontos_ajustados = DadosExame.matriz_pontos
+    for ponto in pontos_ajustados:
+        ponto.x = int(ponto.x * nova_largura / LARGURA)
+        ponto.y = int(ponto.y * nova_altura / ALTURA)
+        ponto.cor = (0, 0, 0)
     
     @staticmethod
-    def desenhar_mapa():
-        # Cria os pontos a partir das coordenadas
-        DadosExame.matriz_pontos = [Ponto(xg, yg, 3, (0, 0, 0)) for xg, yg in cordenadas_30]
+    def gerar_matriz_interpolada():
+        LARGURA, ALTURA = 1920, 1080
+        nova_largura, nova_altura = 960, 540
         
-        # Extraímos as coordenadas para referência
-        pontos = [(p.x, p.y) for p in DadosExame.matriz_pontos]
-        xs = [p[0] for p in pontos]
-        ys = [p[1] for p in pontos]
-        min_x, max_x = min(xs), max(xs)
-        min_y, max_y = min(ys), max(ys)
+
+        pontos_ajustados = DadosExame.matriz_pontos
+        for ponto in pontos_ajustados:
+            ponto.x = int(ponto.x * nova_largura / LARGURA)
+            ponto.y = int(ponto.y * nova_altura / ALTURA)
+            ponto.cor = (0, 0, 0)
+            if ponto.xg == 23 and ponto.yg == -3:
+                ponto.atenuacao = 0
+                print("atenuei a mancha cega")
+            ResultadoFullthreshold.matriz_interpolada.append(ponto)
+
+        Ponto_inicial = Ponto(-27, -27, 1, (255, 0, 0))
+        ponto_central = Ponto(0, 0, 1, (0, 0, 0))
+
+        Ponto_finalx = Ponto(27, -27, 3, (0, 255, 0))
+        tamanho_total = Ponto_finalx.x * 0.5 - Ponto_inicial.x * 0.5
+
+
+
+        centro_x, centro_y = nova_largura // 2,270
+        raio = 469 / 2  # Reduz um pouco para caber na tela
+     
+        # Criar pontos dentro do círculo
+        for i in range(centro_x - int(raio), centro_x + int(raio),2):
+            for j in range(centro_y - int(raio), centro_y + int(raio),2):
+                # Cálculo da distância até o centro
+                cor_ponto = (255,0,0)
+                distancia = math.sqrt((i - centro_x) ** 2 + (j - centro_y) ** 2)
+                fora_da_matriz_original = True
+                
+                # for ponto in pontos_ajustados:
+                #     if ponto.x == i and ponto.y == j or ponto.x + 2 == i and ponto.y == j or ponto.x == i and ponto.y == j + 2 or ponto.x == i + 2 and ponto.y == j + 2:
+                #         fora_da_matriz_original = False
+                    
+                
+                if distancia <= raio and fora_da_matriz_original == True:  # Somente pontos dentro do círculo
+                    ponto_novo = Ponto(0,0,3,cor_ponto)
+                    ponto_novo.x = i
+                    ponto_novo.y = j                    
+                    ResultadoFullthreshold.matriz_interpolada.append(ponto_novo)
         
-        # Define a resolução da imagem base
-        base_width, base_height = 960, 540
-        base_img = Image.new("RGBA", (base_width, base_height), "white")
+        ResultadoFullthreshold.interpolar()
         
-        # Carrega as texturas
+    
+    def interpolar():
+        # Tamanho da matriz interpolada
+        tam_eixo_x  = len(ResultadoFullthreshold.matriz_interpolada)
+        tam_eixo_y = tam_eixo_x
+        # Grau da interpolação
+        grau_x = (tam_eixo_x + 8) // 9
+        grau_y = (tam_eixo_y + 8) // 9
+        
+        # Índice máximo da interpolação
+        ind_max_inter_x = grau_x - 1
+        ind_max_inter_y = grau_y - 1        
+        potencia = 6
+        matriz_original = ResultadoFullthreshold.pontos_ajustados
+     
+                
+        
+        
+        
+        for ponto in matriz_original:
+                i, j = ponto.x, ponto.y
+                if ((i * ind_max_inter_x) + ind_max_inter_x < tam_eixo_x and (j * ind_max_inter_y) + ind_max_inter_y < tam_eixo_y) or \
+                ((i * ind_max_inter_x) + ind_max_inter_x < tam_eixo_x and (j * ind_max_inter_y) + ind_max_inter_y < ind_max_inter_y):
+                    for n in range(grau_y):
+                        for m in range(grau_x):
+                            acima_x = [p for p in matriz_original if p.x > i and p.y == j]
+                            acima_y = [p for p in matriz_original if p.x == i and p.y > j]
+                            acima_xy = [p for p in matriz_original if p.x > i and p.y > j]
+                            ponto_direita = min(acima_x,key=lambda p: p.x)
+                            ponto_abaixo = min(acima_y, key=lambda p: p.y)
+                            ponto_diagonal = min(acima_xy,key=lambda p: p.x and p.y)
+                            
+                            
+                            lim0 = ponto.atenuacao
+                            lim1 = ponto_direita.atenuacao
+                            lim2 = ponto_abaixo.atenuacao
+                            lim3 = ponto_diagonal.atenuacao
+                            
+                            inv_dist_p0 = 1 / (math.sqrt((0 - m) ** potencia + (n - 0) ** potencia)) * 1000
+                            inv_dist_p1 = 1 / (math.sqrt((m - ind_max_inter_x) ** potencia + (n - 0) ** potencia)) * 1000
+                            inv_dist_p2 = 1 / (math.sqrt((m - 0) ** potencia + (n - ind_max_inter_y) ** potencia)) * 1000
+                            inv_dist_p3 = 1 / (math.sqrt((m - ind_max_inter_x) ** potencia + (n - ind_max_inter_y) ** potencia)) * 1000
+                            
+                            pos_x = (i * ind_max_inter_x) + m
+                            pos_y = (j * ind_max_inter_y) + n
+                            
+                            limiar_interpolado = ((inv_dist_p0 * lim0) + (inv_dist_p1 * lim1) + (inv_dist_p2 * lim2) + (inv_dist_p3 * lim3)) / \
+                                                (inv_dist_p0 + inv_dist_p1 + inv_dist_p2 + inv_dist_p3)
+                            
+                            
+                            ponto_matriz_interpolada = [p for p in ResultadoFullthreshold.matriz_interpolada if p.x == pos_x and p.y == pos_y]
+                            
+                            ponto_matriz_interpolada[0].atenuacao = round(limiar_interpolado)
+                            
+                        ponto_matriz_interpolada_central = [p for p in ResultadoFullthreshold.matriz_interpolada if p.x == (i * ind_max_inter_x) and p.y == (j * ind_max_inter_y)]
+                        ponto_matriz_interpolada_central[0].x, ponto_matriz_interpolada_central[0].y, ponto_matriz_interpolada_central[0].atenuacao = ponto.x,ponto.y,ponto.atenuacao
+                       
+                        ponto_matriz_interpolada_direita = [p for p in ResultadoFullthreshold.matriz_interpolada if p.x == (i * ind_max_inter_x) + ind_max_inter_x and p.y == j * ind_max_inter_y]
+                        ponto_matriz_interpolada_direita[0].x,ponto_matriz_interpolada_direita[0].y, ponto_matriz_interpolada_direita[0].atenuacao = ponto_direita.x,ponto_direita.y,ponto_direita.atenuacao
+                       
+                        ponto_matriz_interpolada_baixo = [p for p in ResultadoFullthreshold.matriz_interpolada if p.x == i * ind_max_inter_x and p.y == (j * ind_max_inter_y) + ind_max_inter_y]
+                        ponto_matriz_interpolada_baixo[0].x,ponto_matriz_interpolada_baixo[0].y, ponto_matriz_interpolada_baixo[0].atenuacao = ponto_abaixo.x,ponto_abaixo.y,ponto_abaixo.atenuacao
+                       
+                        ponto_matriz_interpolada_diagonal = [p for p in ResultadoFullthreshold.matriz_interpolada if p.x == (i * ind_max_inter_x) + ind_max_inter_x and p.y == (j * ind_max_inter_y) + ind_max_inter_y]
+                        ponto_matriz_interpolada_diagonal[0].x, ponto_matriz_interpolada_diagonal[0].y, ponto_matriz_interpolada_diagonal[0].atenuacao = ponto_diagonal.x , ponto_diagonal.y,ponto_diagonal.atenuacao
+        
+      
+
+    
+    
+    @staticmethod
+    def mapa_pontos():
+            # Criar uma imagem branca
+        ResultadoFullthreshold.gerar_matriz_interpolada()
+        imagem = Image.new("RGB", (960,540), "white")
+        draw = ImageDraw.Draw(imagem)      
+       
+
+        
+        
+        
+
+        # Carregar texturas (Certifique-se de que os arquivos existem!)
         texturas = []
-        for i in range(1, 11):
+        for i in range(1,11):
             caminho = f"campimetria/utils/images/bitmaps/{i}.bmp"
             if os.path.exists(caminho):
                 texturas.append(Image.open(caminho))
+          
             else:
-                print(f"⚠️ Aviso: {caminho} não encontrado!")
-                texturas.append(Image.new("RGB", (50, 50), (200, 200, 200)))
-        
-        # Aqui, definimos o tamanho base da célula.
-        # Se os pontos centrais estão a 3 de distância e os demais a 6, escolha um tamanho que minimize lacunas.
-        cell_width = cell_height = 7  # Ajuste conforme necessário
-        
-        cells = []  # Armazenará informações de cada célula
-        
-        # Redimensiona as coordenadas dos pontos para a resolução da imagem base
-        for ponto in DadosExame.matriz_pontos:
-            ponto.x = int(ponto.x * base_width / 1920)   # Exemplo de escala para X
-            ponto.y = int(ponto.y * base_height / 1080)    # Exemplo de escala para Y
-        
-        # Calcula o centro dos pontos para centralizar o desenho na imagem base
-        soma_x = sum(ponto.x for ponto in DadosExame.matriz_pontos)
-        soma_y = sum(ponto.y for ponto in DadosExame.matriz_pontos)
-        num_pontos = len(DadosExame.matriz_pontos)
-        centro_grade_x = soma_x // num_pontos
-        centro_grade_y = soma_y // num_pontos
-        offset_x = (base_width // 2) - centro_grade_x
-        offset_y = (base_height // 2) - centro_grade_y
-        
-        # Desenha as células e armazena suas informações
-        for ponto in DadosExame.matriz_pontos:
-            # Seleciona a textura conforme a atenuação
+      
+                texturas.append(Image.new("RGB", (50, 50), (200,0 , 0)))  # Placeholder cinza
+
+      
+
+        # Preencher a imagem com as texturas
+        for ponto in ResultadoFullthreshold.matriz_interpolada:
             if ponto.atenuacao <= -90:
-                textura = None
+               pass
             elif ponto.atenuacao <= 0:
                 textura = texturas[0]
             elif ponto.atenuacao < 6:
@@ -85,6 +191,7 @@ class ResultadoFullthreshold:
             elif ponto.atenuacao < 26:
                 textura = texturas[5]
             elif ponto.atenuacao < 31:
+               
                 textura = texturas[6]
             elif ponto.atenuacao < 36:
                 textura = texturas[7]
@@ -93,127 +200,118 @@ class ResultadoFullthreshold:
             else:
                 textura = texturas[9]
             
-            # Calcula a posição onde a célula será desenhada (com centralização e offset)
-            cell_x = int(ponto.x) - (cell_width // 2) + offset_x
-            cell_y = int(ponto.y) - (cell_height // 2) + offset_y
-            
-            # Cria a célula e preenche com tiling da textura, se definida
-            cell_img = Image.new("RGB", (cell_width, cell_height), "white")
-            if textura is not None:
-                for i_pos in range(0, cell_width, textura.width):
-                    for j_pos in range(0, cell_height, textura.height):
-                        cell_img.paste(textura, (i_pos, j_pos))
-            
-            base_img.paste(cell_img, (cell_x, cell_y))
-            
-            cells.append({
-                'center': (int(ponto.x) + offset_x, int(ponto.y) + offset_y),
-                'top_left': (cell_x, cell_y),
-                'texture': textura,
-                'cell_width': cell_width,
-                'cell_height': cell_height
-            })
-        
-        # Cria a máscara circular centrada na imagem base
-        diameter = min(base_width, base_height)
-        mask = Image.new("L", (base_width, base_height), 0)
-        draw = ImageDraw.Draw(mask)
-        circ_left = (base_width - diameter) // 2
-        circ_top  = (base_height - diameter) // 2
-        circ_right = circ_left + diameter
-        circ_bottom = circ_top + diameter
-        draw.ellipse((circ_left, circ_top, circ_right, circ_bottom), fill=255)
-        
-        # Aplica a máscara e recorta para obter somente a área circular
-        circular_img = Image.new("RGBA", (base_width, base_height))
-        circular_img.paste(base_img, (0, 0), mask)
-        circular_img = circular_img.crop((circ_left, circ_top, circ_right, circ_bottom))
-        
-        # Ajusta as coordenadas das células para o novo sistema (após o crop)
-        for cell in cells:
-            cell['center'] = (cell['center'][0] - circ_left, cell['center'][1] - circ_top)
-            cell['top_left'] = (cell['top_left'][0] - circ_left, cell['top_left'][1] - circ_top)
-        
-        # Preenche os "buracos" (pixels com fundo branco) com a textura da célula mais próxima
-        final_img = ResultadoFullthreshold.preencher_lacunas(circular_img, cells)
-        
-        # Desenha uma cruz central (linha vertical e horizontal no centro)
-        draw_final = ImageDraw.Draw(final_img)
-        w, h = final_img.size
-        center = (w // 2, h // 2)
-        line_color = (0, 0, 0, 255)  # Cor preta com opacidade total
-        line_width = 1  # Espessura da linha
-        
-        # Linha vertical: do topo ao fundo, no centro
-        draw_final.line([(center[0], 0), (center[0], h)], fill=line_color, width=line_width)
-        # Linha horizontal: do lado esquerdo ao direito, no centro
-        draw_final.line([(0, center[1]), (w, center[1])], fill=line_color, width=line_width)
-        
-        final_img.save("mapa_gerado.png")
-        final_img.show()
-        
+            # Aplicar textura
+            if textura:
+                
+                imagem.paste(textura, (ponto.x, ponto.y))
+
+        # Salvar e exibir a imagem
+        imagem.save("mapa_gerado.png")
+        pygame.image.load("png","mapa_gerado").blit(pygame.display.get_surface(),(0,0))
+        pygame.display.update()
+    
+
     @staticmethod
-    def preencher_lacunas(circular_img, cells):
-        """
-        Preenche os pixels vazios (fundo branco) com a textura da célula cujo centro é o mais próximo.
-        """
-        circular_np = np.array(circular_img)
-        H, W = circular_np.shape[:2]
-        
-        # Identifica pixels com fundo branco (assumindo [255,255,255,255])
-        white_mask = np.all(circular_np[:, :, :3] == 255, axis=-1)
-        
-        # Cria o KDTree com os centros das células
-        cell_centers = np.array([cell['center'] for cell in cells])
-        tree = KDTree(cell_centers)
-        
-        # Cria um grid com as coordenadas de cada pixel
-        grid_y, grid_x = np.indices((H, W))
-        
-        # Coleta as coordenadas dos pixels vazios
-        vazio_coords = np.column_stack((grid_x[white_mask], grid_y[white_mask]))
-        
-        # Para cada pixel vazio, consulta o vizinho mais próximo
-        if vazio_coords.shape[0] > 0:
-            dist, indices = tree.query(vazio_coords)
-        else:
-            return circular_img  # Se não houver pixels vazios, retorna a imagem original
-        
-        # Preenche os pixels vazios com a textura da célula mais próxima
-        for (x, y), idx in zip(vazio_coords, indices):
-            cell = cells[idx]
-            textura = cell['texture']
-            if textura is None:
-                continue
-            tex_np = np.array(textura.convert("RGBA"))
-            tex_w, tex_h = textura.size
-            # Calcula a posição relativa dentro da célula (para tiling)
-            cell_top_left = cell['top_left']
-            local_x = (x - cell_top_left[0]) % tex_w
-            local_y = (y - cell_top_left[1]) % tex_h
-            circular_np[y, x] = tex_np[local_y, local_x]
-        
-        return Image.fromarray(circular_np)
-            
+    def desenha_legendas():
+        # exame
+        # duracao do exame
+        # total de pontos
+        # limiar foveal
+        # colocar legenda
+        # falso positivo
+        # falso negativo
+
+        perda_fixacao = 0
+
+        perda_fixacao = (
+            ((DadosExame.perda_de_fixacao / DadosExame.total_testes_mancha) * 100)
+            if DadosExame.perda_de_fixacao > 0.0
+            else 0
+        )
+
+        DadosExame.falso_negativo_respondidos_percentual = (
+            DadosExame.falso_negativo_respondidos
+            / DadosExame.total_testes_falsos_negativo
+            * 100
+            if DadosExame.falso_negativo_respondidos > 0
+            else 0
+        )
+        DadosExame.falso_positivo_respondidos_percentual = (
+            DadosExame.falso_positivo_respondidos
+            / DadosExame.total_testes_falsos_positivo
+            * 100
+            if DadosExame.falso_positivo_respondidos > 0
+            else 0
+        )
+        DadosExame.duracao_do_exame = (DadosExame.duracao_do_exame / 1000) / 60
+
+        labels = [
+            f"Exame: {DadosExame.exame_selecionado}",
+            f"Duração (min): {DadosExame.duracao_do_exame:.2f}",
+            f"Total de pontos: {DadosExame.total_de_pontos_testados}",
+            f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
+            f"Falso negativo: {DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
+            f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao:.2f}%)",
+        ]
+
+        # Posição inicial para desenhar labels (quadrante direito)
+        pos_x = 1920 * 3 // 4  # 75% da largura (centro do quadrante direito)
+        pos_y = 270  # Começa no meio da tela
+        espacamento = 100  # Espaço entre as labels
+        fonte = pygame.font.Font(None, 30)
+        color_label_info = (0, 0, 0)
+
+        for i, texto in enumerate(labels):
+            # Renderiza a label
+            color_label_info = (0, 0, 0)
+            if (
+                i == 3
+                and DadosExame.falso_positivo_respondidos_percentual > 33
+                or i == 4
+                and DadosExame.falso_negativo_respondidos_percentual > 33
+                or i == 5
+                and perda_fixacao > 33
+            ):
+                color_label_info = pygame.Color("red")
+
+            texto_renderizado = fonte.render(texto, True, color_label_info)
+
+            # Posiciona centralizado no quadrante direito
+            pygame.display.get_surface().blit(
+                texto_renderizado, (pos_x - 200, pos_y + i * espacamento)
+            )
+
+    @staticmethod
+    def desenha_mapa_limiares():
+        LARGURA, ALTURA = 1920, 1080  # Tela original
+        nova_largura, nova_altura = 960, 540  # Nova tela
+
+        pygame.draw.circle(pygame.display.get_surface(), (0, 0, 0), (480, 270), 469 / 2, 1)
+        pygame.draw.line(
+            pygame.display.get_surface(), (0, 0, 0), (480, 519), (480, 20), 1
+        )
+        pygame.draw.line(
+            pygame.display.get_surface(), (0, 0, 0), (729, 270), (230, 270), 1
+        )
+
+        pontos_ajustados = DadosExame.matriz_pontos
+        for ponto in pontos_ajustados:
+            ponto.x = int(ponto.x * nova_largura / LARGURA)  # Reduzindo a coordenada X
+            ponto.y = int(ponto.y * nova_altura / ALTURA)  # Reduzindo a coordenada Y
+
+        for ponto in pontos_ajustados:
+            fonte = pygame.font.Font(None, 20)
+            label = fonte.render(f"{ponto.atenuacao}", True, (0, 0, 0))
+            pygame.display.get_surface().blit(
+                label, label.get_rect(center=(ponto.x, ponto.y))
+            )  # Adicionar texto abaixo
+
     @staticmethod
     def exibir_resultados():
         pygame.font.init()
 
-        fonte = pygame.font.Font(None, 24)
+        pygame.display.get_surface().fill(pygame.Color("white"))
+        ResultadoFullthreshold.desenha_legendas()
+        ResultadoFullthreshold.desenha_mapa_limiares()
 
-        
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                rodando = False
-
-        # Desenhar pontos e labels
-        for ponto in DadosExame.matriz_pontos:
-            ponto.cor = pygame.Color("blue")
-            ponto.plotarPonto()
-            label = fonte.render(f"{ponto.atenuacao}", True, (255, 255, 255))
-            pygame.display.get_surface().blit(
-                label, (ponto.x - 10, ponto.y + 10)
-            )  # Adicionar texto abaixo
-        pygame.display.get_surface().fill(Colors.BACKGROUND)
-        
         pygame.display.flip()

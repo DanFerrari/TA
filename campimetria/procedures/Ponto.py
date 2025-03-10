@@ -22,7 +22,7 @@ class Ponto:
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
-        self.atenuacao = 28
+        self.atenuacao = 15
         self.primeira_visualizacao = True        
         self.response_received = False
         self.numero_cruzamentos = 0
@@ -84,7 +84,7 @@ class Ponto:
 
     def plotarPonto(self):
         pygame.draw.circle(self.surface, self.cor, (self.x, self.y), self.pontoPix)
-        pygame.display.update()
+        
 
     @staticmethod
     def plotarPontoStatic(xg, yg, tamanhoPonto, cor):

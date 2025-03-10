@@ -216,12 +216,12 @@ def desenhar_botao(texto, y, largura, altura, selecionado):
 rodando = True
 while rodando:
     
-    
+    DadosExame.matriz_pontos = [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
     from TelaResultadoFullThreshold import ResultadoFullthreshold
     tela.fill(pygame.Color("white"))  # Preenche o fundo
     pygame.display.flip()
    
-    ResultadoFullthreshold.desenhar_mapa()
+    ResultadoFullthreshold.mapa_pontos()
     while rodando:
         
         for event in pygame.event.get():
