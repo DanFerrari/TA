@@ -27,28 +27,29 @@ class ResultadoFullthreshold:
             return 20  # Valor padrão mínimo caso haja poucos pontos
 
         tree = KDTree([(p.x, p.y) for p in pontos if p != ponto])
-        dists, indices = tree.query((ponto.x, ponto.y), k=min(10, len(pontos)))
+        dists, indices = tree.query((ponto.x, ponto.y), k=min(5, len(pontos)))
 
         dist_acima = min((ponto.y - pontos[i].y for i in indices if pontos[i].y < ponto.y), default=40)
         dist_abaixo = min((pontos[i].y - ponto.y for i in indices if pontos[i].y > ponto.y), default=40)
-        dist_esquerda = min((ponto.x - pontos[i].x for i in indices if pontos[i].x < ponto.x), default=40)
+        dist_esquerda = min((ponto.x - pontos[i].x for i in indices if pontos[i].x < ponto.x), default=55)
         dist_direita = min((pontos[i].x - ponto.x for i in indices if pontos[i].x > ponto.x), default=40)
 
-        largura = dist_esquerda + dist_direita
-        altura = dist_acima + dist_abaixo
-        x = int(ponto.x - dist_esquerda)
-        y = int(ponto.y - dist_acima)
+        largura = dist_esquerda + dist_direita + 5  # Expansão para suavizar bordas
+        altura = dist_acima + dist_abaixo + 5
+        x = int(ponto.x - dist_esquerda - 2)  # Ajuste fino para alinhamento
+        y = int(ponto.y - dist_acima - 2)
         return x, y, max(10, int(largura)), max(10, int(altura))
+
 
     @staticmethod
     def calcular_atenuacao_interpolada(x, y, kdtree, pontos):
-        """ Interpola a atenuação dentro da célula com base na distância para os pontos vizinhos """
-        dists, indices = kdtree.query((x, y), k=min(4, len(pontos)))  # Se houver menos pontos, usar apenas os disponíveis
+        """ Interpola a atenuação dentro da célula suavizando a transição para as vizinhas """
+        dists, indices = kdtree.query((x, y), k=min(5, len(pontos)))  # Buscar até 5 vizinhos
         
         if len(indices) == 0:
             return 0  # Caso não haja vizinhos, retorna atenuação neutra
         
-        pesos = np.exp(-np.array(dists) / 30)# Evitar divisão por zero
+        pesos = np.exp(-np.array(dists) / 15)  # Reduz a influência para suavizar a transição
         pesos /= pesos.sum()  # Normalizar pesos
 
         atenuacao_interpolada = sum(pesos[i] * pontos[indices[i]].atenuacao for i in range(len(indices)))
@@ -56,17 +57,17 @@ class ResultadoFullthreshold:
 
     @staticmethod
     def desenhar_mapa():
-        """ Desenha o mapa com efeito de degradê multidirecional na atenuação """
+        """ Desenha o mapa com efeito de degradê unificado nas fronteiras das células """
         img = Image.new("RGB", (960, 540), "white")
         texturas = []
         
         for i in range(1, 11):
             caminho = f"campimetria/utils/images/bitmaps/{i}.bmp"
             if os.path.exists(caminho):
-                #texturas.append(Image.open(caminho))
                 texturas.append(Image.new("RGB", (50, 50), (20 * i, 20 * i, 20 * i)))
+                #texturas.append(Image.open(caminho).resize((5, 5)))  # Garantir que a textura seja 5x5
             else:
-                texturas.append(Image.new("RGB", (50, 50), (200, 200, 200)))
+                texturas.append(Image.new("RGB", (5, 5), (200, 200, 200)))
 
         for ponto in DadosExame.matriz_pontos:
             ponto.x = int(ponto.x * 960 / 1920)  
@@ -76,16 +77,14 @@ class ResultadoFullthreshold:
         atenuacoes_cache = {}  # Cache para armazenar atenuações já calculadas
 
         for ponto in DadosExame.matriz_pontos:
-            
-            
             if ponto.atenuacao <= -90:
                 continue  
             
             x, y, cell_width, cell_height = ResultadoFullthreshold.calcular_tamanho_celula(ponto, DadosExame.matriz_pontos)
             textura_quadrado = Image.new("RGB", (cell_width, cell_height))
             
-            for i in range(cell_width):
-                for j in range(cell_height):
+            for i in range(0, cell_width, 5):  # Aplicação correta da textura 5x5
+                for j in range(0, cell_height, 5):
                     posicao = (x + i, y + j)
                     if posicao in atenuacoes_cache:
                         atenuacao_interpolada = atenuacoes_cache[posicao]
@@ -114,12 +113,13 @@ class ResultadoFullthreshold:
                     else:
                         textura = texturas[9]
                     
-                    textura_quadrado.paste(textura, (i, j))
+                    textura_quadrado.paste(textura, (i, j))  # Aplicação correta
             
             img.paste(textura_quadrado, (x, y))
 
         img.save("mapa_gerado.png")
         img.show()
+
             
     @staticmethod
     def exibir_resultados():
