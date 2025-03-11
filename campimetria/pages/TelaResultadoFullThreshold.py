@@ -27,11 +27,11 @@ class ResultadoFullthreshold:
             return 20  # Valor padrão mínimo caso haja poucos pontos
 
         tree = KDTree([(p.x, p.y) for p in pontos if p != ponto])
-        dists, indices = tree.query((ponto.x, ponto.y), k=min(5, len(pontos)))
+        dists, indices = tree.query((ponto.x, ponto.y), k=min(10, len(pontos)))
 
         dist_acima = min((ponto.y - pontos[i].y for i in indices if pontos[i].y < ponto.y), default=40)
         dist_abaixo = min((pontos[i].y - ponto.y for i in indices if pontos[i].y > ponto.y), default=40)
-        dist_esquerda = min((ponto.x - pontos[i].x for i in indices if pontos[i].x < ponto.x), default=55)
+        dist_esquerda = min((ponto.x - pontos[i].x for i in indices if pontos[i].x < ponto.x), default=40)
         dist_direita = min((pontos[i].x - ponto.x for i in indices if pontos[i].x > ponto.x), default=40)
 
         largura = dist_esquerda + dist_direita
@@ -43,12 +43,12 @@ class ResultadoFullthreshold:
     @staticmethod
     def calcular_atenuacao_interpolada(x, y, kdtree, pontos):
         """ Interpola a atenuação dentro da célula com base na distância para os pontos vizinhos """
-        dists, indices = kdtree.query((x, y), k=min(5, len(pontos)))  # Se houver menos pontos, usar apenas os disponíveis
+        dists, indices = kdtree.query((x, y), k=min(4, len(pontos)))  # Se houver menos pontos, usar apenas os disponíveis
         
         if len(indices) == 0:
             return 0  # Caso não haja vizinhos, retorna atenuação neutra
         
-        pesos = 1 / (np.array(dists) + 1e-6)  # Evitar divisão por zero
+        pesos = np.exp(-np.array(dists) / 30)# Evitar divisão por zero
         pesos /= pesos.sum()  # Normalizar pesos
 
         atenuacao_interpolada = sum(pesos[i] * pontos[indices[i]].atenuacao for i in range(len(indices)))

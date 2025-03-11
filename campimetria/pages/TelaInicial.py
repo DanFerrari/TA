@@ -1,5 +1,6 @@
 import pygame
 import os,sys
+import numpy as np
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
@@ -221,9 +222,12 @@ while rodando:
     tela.fill(pygame.Color("white"))  # Preenche o fundo
     pygame.display.flip()
     for ponto in DadosExame.matriz_pontos:
-        
+        # coordenadas = (23,27,-23,-27)
+        # if ponto.xg in coordenadas or ponto.yg in coordenadas:
+        #     ponto.atenuacao = 0
         if ponto.xg == 21 and ponto.yg == 3:
             ponto.atenuacao = 0
+        
     
     ResultadoFullthreshold.desenhar_mapa()
     while rodando:
