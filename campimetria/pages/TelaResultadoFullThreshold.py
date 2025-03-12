@@ -40,7 +40,6 @@ class ResultadoFullthreshold:
         x = int(ponto.x - largura // 2)
         y = int(ponto.y - altura // 2)
         return x, y, largura, altura
-   
 
     @staticmethod
     def calcular_atenuacao_interpolada(x, y, kdtree, pontos):
@@ -50,9 +49,7 @@ class ResultadoFullthreshold:
         if len(indices) == 0:
             return 0  # Caso não haja vizinhos, retorna atenuação neutra
         
-        pesos = np.exp(-np.array(dists) / 5)
-        
-        # Reduz a influência para suavizar a transição
+        pesos = np.exp(-np.array(dists) / 6)  # Aumentar o fator para suavizar a influência dos vizinhos
         pesos /= pesos.sum()  # Normalizar pesos
 
         atenuacao_interpolada = sum(pesos[i] * pontos[indices[i]].atenuacao for i in range(len(indices)))
@@ -67,6 +64,10 @@ class ResultadoFullthreshold:
         centro_x, centro_y = 960 // 2, 540 // 2
         raio = min(centro_x, centro_y) - 10
         draw.ellipse([(centro_x - raio, centro_y - raio), (centro_x + raio, centro_y + raio)], fill=255)
+        
+        # Desenhar a cruz no centro
+        draw.line([(centro_x, centro_y - raio), (centro_x, centro_y + raio)], fill=0, width=2)
+        draw.line([(centro_x - raio, centro_y), (centro_x + raio, centro_y)], fill=0, width=2)
         
         texturas = []
         for i in range(1, 11):
@@ -86,7 +87,11 @@ class ResultadoFullthreshold:
         for x in range(960):
             for y in range(540):
                 if mask.getpixel((x, y)) == 255:  # Apenas dentro da área circular
-                    atenuacao_interpolada = ResultadoFullthreshold.calcular_atenuacao_interpolada(x, y, kdtree, DadosExame.matriz_pontos)
+                    if (x, y) in atenuacoes_cache:
+                        atenuacao_interpolada = atenuacoes_cache[(x, y)]
+                    else:
+                        atenuacao_interpolada = ResultadoFullthreshold.calcular_atenuacao_interpolada(x, y, kdtree, DadosExame.matriz_pontos)
+                        atenuacoes_cache[(x, y)] = atenuacao_interpolada
                     
                     if atenuacao_interpolada <= 0:
                         textura = texturas[0]
