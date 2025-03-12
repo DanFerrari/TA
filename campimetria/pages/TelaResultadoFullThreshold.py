@@ -40,7 +40,7 @@ class ResultadoFullthreshold:
         x = int(ponto.x - largura // 2)
         y = int(ponto.y - altura // 2)
         return x, y, largura, altura
-
+   
 
     @staticmethod
     def calcular_atenuacao_interpolada(x, y, kdtree, pontos):
@@ -62,8 +62,13 @@ class ResultadoFullthreshold:
     def desenhar_mapa():
         """ Desenha o mapa ajustando o espaçamento das células para eliminar lacunas e melhorar o alinhamento """
         img = Image.new("RGB", (960, 540), "white")
-        texturas = []
+        mask = Image.new("L", (960, 540), 0)
+        draw = ImageDraw.Draw(mask)
+        centro_x, centro_y = 960 // 2, 540 // 2
+        raio = min(centro_x, centro_y) - 10
+        draw.ellipse([(centro_x - raio, centro_y - raio), (centro_x + raio, centro_y + raio)], fill=255)
         
+        texturas = []
         for i in range(1, 11):
             caminho = f"campimetria/utils/images/bitmaps/{i}.bmp"
             if os.path.exists(caminho):
@@ -78,21 +83,10 @@ class ResultadoFullthreshold:
         kdtree = KDTree([(p.x, p.y) for p in DadosExame.matriz_pontos])  # Criar KDTree uma única vez
         atenuacoes_cache = {}  # Cache para armazenar atenuações já calculadas
 
-        for ponto in DadosExame.matriz_pontos:
-            if ponto.atenuacao <= -90:
-                continue  
-            
-            x, y, cell_width, cell_height = ResultadoFullthreshold.calcular_tamanho_celula(ponto, DadosExame.matriz_pontos)
-            textura_quadrado = Image.new("RGB", (cell_width, cell_height))
-            
-            for i in range(cell_width):  # Aplicação uniforme da textura
-                for j in range(cell_height):
-                    posicao = (x + i, y + j)
-                    if posicao in atenuacoes_cache:
-                        atenuacao_interpolada = atenuacoes_cache[posicao]
-                    else:
-                        atenuacao_interpolada = ResultadoFullthreshold.calcular_atenuacao_interpolada(x + i, y + j, kdtree, DadosExame.matriz_pontos)
-                        atenuacoes_cache[posicao] = atenuacao_interpolada
+        for x in range(960):
+            for y in range(540):
+                if mask.getpixel((x, y)) == 255:  # Apenas dentro da área circular
+                    atenuacao_interpolada = ResultadoFullthreshold.calcular_atenuacao_interpolada(x, y, kdtree, DadosExame.matriz_pontos)
                     
                     if atenuacao_interpolada <= 0:
                         textura = texturas[0]
@@ -115,12 +109,12 @@ class ResultadoFullthreshold:
                     else:
                         textura = texturas[9]
                     
-                    textura_quadrado.paste(textura, (i, j))  # Aplicação correta
-            
-            img.paste(textura_quadrado, (x, y))
-
+                    img.paste(textura, (x, y))
+        
+        img.putalpha(mask)  # Aplica a máscara circular
         img.save("mapa_gerado.png")
         img.show()
+
 
             
     @staticmethod

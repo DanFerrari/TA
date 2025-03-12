@@ -222,11 +222,11 @@ while rodando:
     tela.fill(pygame.Color("white"))  # Preenche o fundo
     pygame.display.flip()
     for ponto in DadosExame.matriz_pontos:
-        # coordenadas = (23,27,-23,-27)
-        # if ponto.xg in coordenadas or ponto.yg in coordenadas:
-        #     ponto.atenuacao = 0
-        if ponto.xg == 21 and ponto.yg == 3:
-            ponto.atenuacao = 0
+        
+        # limiar = np.random.randint(0,40)
+        # ponto.atenuacao = limiar
+         if ponto.xg == 21 and ponto.yg == 3:
+             ponto.atenuacao = 0
         
     
     ResultadoFullthreshold.desenhar_mapa()
