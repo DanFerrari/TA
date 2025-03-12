@@ -1,5 +1,5 @@
 import pygame
-import os,sys
+import os, sys
 import numpy as np
 
 sys.path.append(
@@ -216,17 +216,15 @@ def desenhar_botao(texto, y, largura, altura, selecionado):
 # Loop principal
 rodando = True
 while rodando:
-    
-    DadosExame.matriz_pontos = [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
+
+    DadosExame.matriz_pontos = [
+        Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30
+    ]
     from TelaResultadoFullThreshold import ResultadoFullthreshold
-    
-                
-        
-    
-    ResultadoFullthreshold.desenhar_mapa()
-    pygame.display.flip()  
+
+    ResultadoFullthreshold.exibir_resultados()
+
     while rodando:
-        
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
