@@ -17,43 +17,21 @@ sys.path.append(
 
 from dados import *
 from Ponto import Ponto
-
+from atenuacoes_personalizadas import atenuacoes_personalizadas
 
 class ResultadoFullthreshold:
-    @staticmethod
-    def calcular_tamanho_celula(ponto, pontos):
-        """Determina o tamanho da célula baseado na distribuição dos pontos, evitando lacunas e garantindo cobertura uniforme"""
-        if len(pontos) < 2:
-            return 20  # Valor padrão mínimo caso haja poucos pontos
-
-        tree = KDTree([(p.x, p.y) for p in pontos if p != ponto])
-        dists, indices = tree.query((ponto.x, ponto.y), k=min(5, len(pontos)))
-
-        if len(indices) == 0:
-            return 20  # Se não há vizinhos, usa o mínimo padrão
-
-        dist_mediana = np.median(dists)
-        dist_max = np.max(dists)
-        largura = max(10, int((dist_mediana + dist_max) / 2))
-        altura = largura
-
-        x = int(ponto.x - largura // 2)
-        y = int(ponto.y - altura // 2)
-        
-        ponto.x = x
-        ponto.y = y
-        return x, y, largura, altura
-    
+      
 
     @staticmethod
     def calcular_atenuacao_interpolada(x, y, kdtree, pontos):
         """Interpola a atenuação dentro da célula suavizando a transição para as vizinhas"""
-        dists, indices = kdtree.query((x, y), k=min(5, len(pontos)))
+        dists, indices = kdtree.query((x, y), k=min(10, len(pontos)))
 
         if len(indices) == 0:
             return 0
 
         pesos = np.exp(-np.array(dists) / 10)
+       
         pesos /= pesos.sum()
 
         atenuacao_interpolada = sum(
@@ -76,90 +54,8 @@ class ResultadoFullthreshold:
 
         texturas = []
         for i in range(1, 11):
-            texturas.append((10 * i, 10 * i, 10 * i))
-        
-        
-        atenuacoes_personalizadas = {
-        (21, 3):26,
-        (21, -3): 29,
-        (-15, 21): 25,
-        (-21, -3): 25,
-        (-27, -9): 24,
-        (-15, -21): 24,
-        (-9, -21): 25,
-        (-3, -27): 24,
-        (3, -27): 23,
-        (3, -21): 23,
-        (9, -27): 22,
-        (15, -21): 24,
-        (9, -15): 25,
-        (-3, 3): 31,
-        (3, 9): 31,
-        (9, 15): 31,                
-        (-9,-27): 29,
-        (-3, -21): 28,
-        (9, -21): 27,        
-        (-21, -15): 27,
-        (-15, -15): 27,
-        (-9, -15): 30,
-        (-3, -15): 26,
-        (3, -15): 29,        
-        (15, -15): 29,
-        (21, -15): 29,        
-        (-21, -9): 27,
-        (-15, -9): 28,
-        (-9, -9): 26,
-        (-3, -9): 30,
-        (3, -9): 30,
-        (9, -9): 29,
-        (15, -9): 29,
-        (21, -9): 29,
-        (27, -9): 29,
-        (-27, -3): 29,      
-        (-15, -3): 30,
-        (-9, -3): 29,
-        (-3, -3): 30,
-        (3, -3): 30,
-        (9, -3): 28,
-        (15, -3): 24,        
-        (27, -3): 29,
-        (-27, 3): 25,
-        (-21, 3): 29,
-        (-15, 3): 30,
-        (-9, 3): 30,        
-        (3, 3): 30,
-        (9, 3): 29,
-        (15, 3): -1,        
-        (27, 3): 29,
-        (-27, 9): 25,
-        (-21, 9): 29,
-        (-15, 9): 26,
-        (-9, 9): 30,
-        (-3, 9): 27,        
-        (9, 9): 30,
-        (15, 9): 30,
-        (21, 9): 29,
-        (27, 9): 29,
-        (-21, 15): 29,
-        (-15, 15): 29,
-        (-9, 15): 26,
-        (-3, 15): 30,
-        (3, 15): 27,        
-        (15, 15): 30,
-        (21, 15): 29,       
-        (-9, 21): 28,
-        (-3, 21): 29,
-        (3, 21): 30,
-        (9, 21): 26,
-        (15, 21): 25,
-        (3, 27): 29,
-        (9, 27): 25,
-        (-3, 27): 28,
-        (-9, 27): 28,
-        }
-
-        
-
+            texturas.append((25 * i, 25 * i, 25 * i))
+            
         for ponto in DadosExame.matriz_pontos: 
             if (ponto.xg, ponto.yg) in atenuacoes_personalizadas:
                  ponto.atenuacao = atenuacoes_personalizadas[(ponto.xg, ponto.yg)]    
@@ -186,7 +82,7 @@ class ResultadoFullthreshold:
 
                     if atenuacao_interpolada <= 0:
                         cor = texturas[0]
-                    elif atenuacao_interpolada >=1 and atenuacao_interpolada <= 5:
+                    elif atenuacao_interpolada < 6:
                         cor = texturas[1]
                     elif atenuacao_interpolada < 11:
                         cor = texturas[2]
@@ -228,16 +124,16 @@ class ResultadoFullthreshold:
 
     @staticmethod
     def desenhar_mapa_limiares():
-        fonte = pygame.font.Font(None, 14)
+        fonte = pygame.font.Font(None, 18)
         # Desenhar pontos e labels
         for ponto in DadosExame.matriz_pontos:
             ponto.y += 540
             ponto.x = ponto.x 
-            ponto.tamanhoPonto = 1
-            ponto.cor = pygame.Color("black")
+            ponto.tamanhoPonto = 0.5
+            ponto.cor = pygame.Color("black")            
             ponto.plotarPonto()
             label = fonte.render(f"{ponto.atenuacao}", True, (0, 0, 0))
-            label_rect = label.get_rect(center=(ponto.x - 0.505, ponto.y + 15))
+            label_rect = label.get_rect(center=(ponto.x - 0.505, ponto.y + 12))
             pygame.display.get_surface().blit(label, label_rect)
         # circulo do mapa de limiar
         pygame.draw.circle(pygame.display.get_surface(), (0, 0, 0), (480, 810), 230, 1)
