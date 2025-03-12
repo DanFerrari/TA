@@ -22,23 +22,24 @@ from Ponto import Ponto
 class ResultadoFullthreshold:
     @staticmethod
     def calcular_tamanho_celula(ponto, pontos):
-        """ Calcula o tamanho da célula baseado na distância até os pontos vizinhos mais próximos """
+        """ Determina o tamanho da célula baseado na distribuição dos pontos, evitando lacunas e garantindo cobertura uniforme """
         if len(pontos) < 2:
             return 20  # Valor padrão mínimo caso haja poucos pontos
 
         tree = KDTree([(p.x, p.y) for p in pontos if p != ponto])
         dists, indices = tree.query((ponto.x, ponto.y), k=min(5, len(pontos)))
 
-        dist_acima = min((ponto.y - pontos[i].y for i in indices if pontos[i].y < ponto.y), default=40)
-        dist_abaixo = min((pontos[i].y - ponto.y for i in indices if pontos[i].y > ponto.y), default=40)
-        dist_esquerda = min((ponto.x - pontos[i].x for i in indices if pontos[i].x < ponto.x), default=55)
-        dist_direita = min((pontos[i].x - ponto.x for i in indices if pontos[i].x > ponto.x), default=40)
+        if len(indices) == 0:
+            return 20  # Se não há vizinhos, usa o mínimo padrão
 
-        largura = dist_esquerda + dist_direita + 5  # Expansão para suavizar bordas
-        altura = dist_acima + dist_abaixo + 5
-        x = int(ponto.x - dist_esquerda - 2)  # Ajuste fino para alinhamento
-        y = int(ponto.y - dist_acima - 2)
-        return x, y, max(10, int(largura)), max(10, int(altura))
+        dist_mediana = np.median(dists)  # Usa a mediana para evitar distâncias muito pequenas ou grandes
+        dist_max = np.max(dists)  # Distância máxima para verificar lacunas
+        largura = max(10, int((dist_mediana + dist_max) / 2))  # Média entre mediana e máximo para suavizar
+        altura = largura
+        
+        x = int(ponto.x - largura // 2)
+        y = int(ponto.y - altura // 2)
+        return x, y, largura, altura
 
 
     @staticmethod
@@ -49,7 +50,9 @@ class ResultadoFullthreshold:
         if len(indices) == 0:
             return 0  # Caso não haja vizinhos, retorna atenuação neutra
         
-        pesos = np.exp(-np.array(dists) / 15)  # Reduz a influência para suavizar a transição
+        pesos = np.exp(-np.array(dists) / 5)
+        
+        # Reduz a influência para suavizar a transição
         pesos /= pesos.sum()  # Normalizar pesos
 
         atenuacao_interpolada = sum(pesos[i] * pontos[indices[i]].atenuacao for i in range(len(indices)))
@@ -57,7 +60,7 @@ class ResultadoFullthreshold:
 
     @staticmethod
     def desenhar_mapa():
-        """ Desenha o mapa com efeito de degradê unificado nas fronteiras das células """
+        """ Desenha o mapa ajustando o espaçamento das células para eliminar lacunas e melhorar o alinhamento """
         img = Image.new("RGB", (960, 540), "white")
         texturas = []
         
@@ -65,9 +68,8 @@ class ResultadoFullthreshold:
             caminho = f"campimetria/utils/images/bitmaps/{i}.bmp"
             if os.path.exists(caminho):
                 texturas.append(Image.new("RGB", (50, 50), (20 * i, 20 * i, 20 * i)))
-                #texturas.append(Image.open(caminho).resize((5, 5)))  # Garantir que a textura seja 5x5
             else:
-                texturas.append(Image.new("RGB", (5, 5), (200, 200, 200)))
+                texturas.append(Image.new("RGB", (50, 50), (200, 200, 200)))
 
         for ponto in DadosExame.matriz_pontos:
             ponto.x = int(ponto.x * 960 / 1920)  
@@ -83,8 +85,8 @@ class ResultadoFullthreshold:
             x, y, cell_width, cell_height = ResultadoFullthreshold.calcular_tamanho_celula(ponto, DadosExame.matriz_pontos)
             textura_quadrado = Image.new("RGB", (cell_width, cell_height))
             
-            for i in range(0, cell_width, 5):  # Aplicação correta da textura 5x5
-                for j in range(0, cell_height, 5):
+            for i in range(cell_width):  # Aplicação uniforme da textura
+                for j in range(cell_height):
                     posicao = (x + i, y + j)
                     if posicao in atenuacoes_cache:
                         atenuacao_interpolada = atenuacoes_cache[posicao]
