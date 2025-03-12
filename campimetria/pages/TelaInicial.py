@@ -219,17 +219,12 @@ while rodando:
     
     DadosExame.matriz_pontos = [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
     from TelaResultadoFullThreshold import ResultadoFullthreshold
-    tela.fill(pygame.Color("white"))  # Preenche o fundo
-    pygame.display.flip()
-    for ponto in DadosExame.matriz_pontos:
-        if ponto.xg == 21 and ponto.yg == 3:
-            ponto.atenuacao = 0
-        if ponto.xg == 21 and ponto.yg == -3:
-            ponto.atenuacao = 24
+    
                 
         
     
     ResultadoFullthreshold.desenhar_mapa()
+    pygame.display.flip()  
     while rodando:
         
         for event in pygame.event.get():

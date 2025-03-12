@@ -32,9 +32,9 @@ class ResultadoFullthreshold:
         if len(indices) == 0:
             return 20  # Se não há vizinhos, usa o mínimo padrão
 
-        dist_mediana = np.median(dists)  # Usa a mediana para evitar distâncias muito pequenas ou grandes
-        dist_max = np.max(dists)  # Distância máxima para verificar lacunas
-        largura = max(10, int((dist_mediana + dist_max) / 2))  # Média entre mediana e máximo para suavizar
+        dist_mediana = np.median(dists)
+        dist_max = np.max(dists)
+        largura = max(10, int((dist_mediana + dist_max) / 2))
         altura = largura
         
         x = int(ponto.x - largura // 2)
@@ -44,13 +44,13 @@ class ResultadoFullthreshold:
     @staticmethod
     def calcular_atenuacao_interpolada(x, y, kdtree, pontos):
         """ Interpola a atenuação dentro da célula suavizando a transição para as vizinhas """
-        dists, indices = kdtree.query((x, y), k=min(5, len(pontos)))  # Buscar até 5 vizinhos
+        dists, indices = kdtree.query((x, y), k=min(5, len(pontos)))
         
         if len(indices) == 0:
-            return 0  # Caso não haja vizinhos, retorna atenuação neutra
+            return 0
         
-        pesos = np.exp(-np.array(dists) / 6)  # Aumentar o fator para suavizar a influência dos vizinhos
-        pesos /= pesos.sum()  # Normalizar pesos
+        pesos = np.exp(-np.array(dists) / 10)
+        pesos /= pesos.sum()
 
         atenuacao_interpolada = sum(pesos[i] * pontos[indices[i]].atenuacao for i in range(len(indices)))
         return atenuacao_interpolada
@@ -58,35 +58,34 @@ class ResultadoFullthreshold:
     @staticmethod
     def desenhar_mapa():
         """ Desenha o mapa ajustando o espaçamento das células para eliminar lacunas e melhorar o alinhamento """
-        img = Image.new("RGB", (960, 540), "white")
-        mask = Image.new("L", (960, 540), 0)
-        draw = ImageDraw.Draw(mask)
+        pygame.init()
+      
+
         centro_x, centro_y = 960 // 2, 540 // 2
         raio = min(centro_x, centro_y) - 10
-        draw.ellipse([(centro_x - raio, centro_y - raio), (centro_x + raio, centro_y + raio)], fill=255)
-        
-        # Desenhar a cruz no centro
-        draw.line([(centro_x, centro_y - raio), (centro_x, centro_y + raio)], fill=0, width=2)
-        draw.line([(centro_x - raio, centro_y), (centro_x + raio, centro_y)], fill=0, width=2)
         
         texturas = []
         for i in range(1, 11):
             caminho = f"campimetria/utils/images/bitmaps/{i}.bmp"
             if os.path.exists(caminho):
-                texturas.append(Image.new("RGB", (50, 50), (20 * i, 20 * i, 20 * i)))
+                texturas.append((20 * i, 20 * i, 20 * i))
             else:
-                texturas.append(Image.new("RGB", (50, 50), (200, 200, 200)))
+                texturas.append((200, 200, 200))
 
         for ponto in DadosExame.matriz_pontos:
+            if ponto.xg == 21 and ponto.yg == 3:
+                ponto.atenuacao = 0
+            if ponto.xg == 21 and ponto.yg == -3:
+                ponto.atenuacao = 24
             ponto.x = int(ponto.x * 960 / 1920)  
             ponto.y = int(ponto.y * 540 / 1080)  
         
-        kdtree = KDTree([(p.x, p.y) for p in DadosExame.matriz_pontos])  # Criar KDTree uma única vez
-        atenuacoes_cache = {}  # Cache para armazenar atenuações já calculadas
+        kdtree = KDTree([(p.x, p.y) for p in DadosExame.matriz_pontos])
+        atenuacoes_cache = {}
 
         for x in range(960):
             for y in range(540):
-                if mask.getpixel((x, y)) == 255:  # Apenas dentro da área circular
+                if (x - centro_x) ** 2 + (y - centro_y) ** 2 <= raio ** 2:
                     if (x, y) in atenuacoes_cache:
                         atenuacao_interpolada = atenuacoes_cache[(x, y)]
                     else:
@@ -94,31 +93,33 @@ class ResultadoFullthreshold:
                         atenuacoes_cache[(x, y)] = atenuacao_interpolada
                     
                     if atenuacao_interpolada <= 0:
-                        textura = texturas[0]
+                        cor = texturas[0]
                     elif atenuacao_interpolada < 6:
-                        textura = texturas[1]
+                        cor = texturas[1]
                     elif atenuacao_interpolada < 11:
-                        textura = texturas[2]
+                        cor = texturas[2]
                     elif atenuacao_interpolada < 16:
-                        textura = texturas[3]
+                        cor = texturas[3]
                     elif atenuacao_interpolada < 21:
-                        textura = texturas[4]
+                        cor = texturas[4]
                     elif atenuacao_interpolada < 26:
-                        textura = texturas[5]
+                        cor = texturas[5]
                     elif atenuacao_interpolada < 31:
-                        textura = texturas[6]
+                        cor = texturas[6]
                     elif atenuacao_interpolada < 36:
-                        textura = texturas[7]
+                        cor = texturas[7]
                     elif atenuacao_interpolada < 41:
-                        textura = texturas[8]
+                        cor = texturas[8]
                     else:
-                        textura = texturas[9]
+                        cor = texturas[9]
                     
-                    img.paste(textura, (x, y))
+                    pygame.display.get_surface().set_at((x, y), cor)
         
-        img.putalpha(mask)  # Aplica a máscara circular
-        img.save("mapa_gerado.png")
-        img.show()
+        pygame.draw.line(pygame.display.get_surface(), (0, 0, 0), (centro_x, centro_y - raio), (centro_x, centro_y + raio), 2)
+        pygame.draw.line(pygame.display.get_surface(), (0, 0, 0), (centro_x - raio, centro_y), (centro_x + raio, centro_y), 2)
+        
+        pygame.display.flip()
+
 
 
             
