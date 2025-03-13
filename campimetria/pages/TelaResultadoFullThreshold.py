@@ -19,10 +19,11 @@ from dados import *
 from Ponto import Ponto
 from atenuacoes_personalizadas import atenuacoes_personalizadas
 
+
 class ResultadoFullthreshold:
-      
+
     mapa_cor = True
-    
+
     @staticmethod
     def calcular_atenuacao_interpolada(x, y, kdtree, pontos):
         """Interpola a atenuação dentro da célula suavizando a transição para as vizinhas"""
@@ -32,13 +33,13 @@ class ResultadoFullthreshold:
             return 0
 
         pesos = np.exp(-np.array(dists) / 10)
-       
+
         pesos /= pesos.sum()
 
         atenuacao_interpolada = sum(
             pesos[i] * pontos[indices[i]].atenuacao for i in range(len(indices))
         )
-        atenuacao_interpolada = round(atenuacao_interpolada, 1) 
+        atenuacao_interpolada = round(atenuacao_interpolada, 1)
         return atenuacao_interpolada
 
     @staticmethod
@@ -87,6 +88,92 @@ class ResultadoFullthreshold:
 
         return (vermelho, verde, azul)
     
+    
+    @staticmethod
+    def estrutura_legenda(texturas):       
+
+        centro_x, centro_y = 480, 270
+        largura, altura = 40, 30
+
+        fonte = pygame.font.Font(None, 24)
+
+        
+        textura0_rect = (centro_x + 280, centro_y + 120, largura, altura)
+        textura1_rect = (centro_x + 280, centro_y + 90, largura, altura)
+        textura2_rect = (centro_x + 280, centro_y + 60, largura, altura)
+        textura3_rect = (centro_x + 280, centro_y + 30, largura, altura)
+        textura4_rect = (centro_x + 280, centro_y - 0, largura, altura)
+        textura5_rect = (centro_x + 280, centro_y - 30, largura, altura)
+        textura6_rect = (centro_x + 280, centro_y - 60, largura, altura)
+        textura7_rect = (centro_x + 280, centro_y - 90, largura, altura)
+        textura8_rect = (centro_x + 280, centro_y - 120, largura, altura)
+        textura9_rect = (centro_x + 280, centro_y - 150, largura, altura)
+
+        if ResultadoFullthreshold.mapa_cor:
+            pygame.draw.rect(pygame.display.get_surface(), texturas[0], textura0_rect)
+            pygame.draw.rect(pygame.display.get_surface(), texturas[1], textura1_rect)
+            pygame.draw.rect(pygame.display.get_surface(), texturas[2], textura2_rect)
+            pygame.draw.rect(pygame.display.get_surface(), texturas[3], textura3_rect)
+            pygame.draw.rect(pygame.display.get_surface(), texturas[4], textura4_rect)
+            pygame.draw.rect(pygame.display.get_surface(), texturas[5], textura5_rect)
+            pygame.draw.rect(pygame.display.get_surface(), texturas[6], textura6_rect)
+            pygame.draw.rect(pygame.display.get_surface(), texturas[7], textura7_rect)
+            pygame.draw.rect(pygame.display.get_surface(), texturas[8], textura8_rect)
+            pygame.draw.rect(pygame.display.get_surface(), texturas[9], textura9_rect)
+        else:
+           
+           for k in range(10):
+            for i in range(0,textura0_rect.width,5):
+                for j in range(0,textura0_rect.height,5):
+                    pass
+        
+        
+        
+        
+        
+            
+        pygame.display.get_surface().blit(fonte.render("0",True,(0,0,0)), ( (lambda: textura0_rect[0])() + 50, (lambda:textura0_rect[1])() + 7.5) )
+        pygame.display.get_surface().blit(fonte.render("1 - 5",True,(0,0,0)), ( (lambda: textura1_rect[0])() + 50, (lambda:textura1_rect[1])() + 7.5) )
+        pygame.display.get_surface().blit(fonte.render("6 - 10",True,(0,0,0)), ( (lambda: textura2_rect[0])() + 50, (lambda:textura2_rect[1])() + 7.5) )
+        pygame.display.get_surface().blit(fonte.render("11 - 15",True,(0,0,0)), ( (lambda: textura3_rect[0])() + 50, (lambda:textura3_rect[1])() + 7.5) )
+        pygame.display.get_surface().blit(fonte.render("16 - 20",True,(0,0,0)), ( (lambda: textura4_rect[0])() + 50, (lambda:textura4_rect[1])() + 7.5) )
+        pygame.display.get_surface().blit(fonte.render("21 - 25",True,(0,0,0)), ( (lambda: textura5_rect[0])() + 50, (lambda:textura5_rect[1])() + 7.5) )
+        pygame.display.get_surface().blit(fonte.render("26 - 30",True,(0,0,0)), ( (lambda: textura6_rect[0])() + 50, (lambda:textura6_rect[1])() + 7.5) )
+        pygame.display.get_surface().blit(fonte.render("31 - 35",True,(0,0,0)), ( (lambda: textura7_rect[0])() + 50, (lambda:textura7_rect[1])() + 7.5) )
+        pygame.display.get_surface().blit(fonte.render("36 - 40",True,(0,0,0)), ( (lambda: textura8_rect[0])() + 50, (lambda:textura8_rect[1])() + 7.5) )
+        pygame.display.get_surface().blit(fonte.render("41 - 50",True,(0,0,0)), ( (lambda: textura9_rect[0])() + 50, (lambda:textura9_rect[1])() + 7.5) )
+        
+
+    @staticmethod
+    def gerar_legenda_pontos():
+        texturas = [pygame.image.load(f"campimetria/utils/images/bitmaps/{i}.bmp").convert() for i in range(1,11)]        
+        ResultadoFullthreshold.estrutura_legenda(texturas)
+
+
+    @staticmethod
+    def gerar_legenda_cores():
+        
+        texturas = [
+                    (0, 0, 156),
+                    (0, 85, 204),
+                    (0, 131, 207),
+                    (2, 147, 166),
+                    (0, 145, 107),
+                    (0, 163, 87),
+                    (149, 201, 28),
+                    (252, 219, 0),
+                    (232, 129, 26),
+                    (255, 0, 0)
+                    ]
+
+        ResultadoFullthreshold.estrutura_legenda(texturas)
+    
+    
+    def gerar_legenda_tons_cinza():
+        texturas = [(25 * i, 25 * i, 25 * i) for i in range(1,11) ]
+        ResultadoFullthreshold.estrutura_legenda(texturas)
+       
+        
     @staticmethod
     def gerar_texturas_pontos(atenuacao):
         texturas = {}
@@ -94,7 +181,7 @@ class ResultadoFullthreshold:
             caminho = f"campimetria/utils/images/bitmaps/{i}.bmp"
             if os.path.exists(caminho):
                 texturas[i] = pygame.image.load(caminho).convert()
-        
+
         if atenuacao <= 0:
             cor = texturas[0]
         elif atenuacao < 6:
@@ -109,21 +196,21 @@ class ResultadoFullthreshold:
             cor = texturas[5]
         elif atenuacao >= 26 and atenuacao <= 30:
             cor = texturas[6]
-        elif atenuacao >= 31 and atenuacao <=35:
+        elif atenuacao >= 31 and atenuacao <= 35:
             cor = texturas[7]
         elif atenuacao < 41:
             cor = texturas[8]
         else:
             cor = texturas[9]
-            
+
         return cor
-    
+
     @staticmethod
     def gerar_texturas_cinza(atenuacao):
         texturas = []
         for i in range(1, 11):
             texturas.append((25 * i, 25 * i, 25 * i))
-        
+
         if atenuacao <= 0:
             cor = texturas[0]
         elif atenuacao < 6:
@@ -138,17 +225,15 @@ class ResultadoFullthreshold:
             cor = texturas[5]
         elif atenuacao >= 26 and atenuacao <= 30:
             cor = texturas[6]
-        elif atenuacao >= 31 and atenuacao <=35:
+        elif atenuacao >= 31 and atenuacao <= 35:
             cor = texturas[7]
         elif atenuacao < 41:
             cor = texturas[8]
         else:
             cor = texturas[9]
-            
+
         return cor
 
-    
-    
     @staticmethod
     def desenhar_mapa():
         """Desenha o mapa com otimização de desempenho"""
@@ -161,18 +246,16 @@ class ResultadoFullthreshold:
         centro_x, centro_y = 960 // 2, 540 // 2
         raio = min(centro_x, centro_y) - 55
 
-        
-            
-        for ponto in DadosExame.matriz_pontos: 
+        for ponto in DadosExame.matriz_pontos:
             if (ponto.xg, ponto.yg) in atenuacoes_personalizadas:
-                 ponto.atenuacao = atenuacoes_personalizadas[(ponto.xg, ponto.yg)]    
+                ponto.atenuacao = atenuacoes_personalizadas[(ponto.xg, ponto.yg)]
 
             ponto.x = int(ponto.x * 960 / 1920)
             ponto.y = int(ponto.y * 540 / 1080)
 
         kdtree = KDTree([(p.x, p.y) for p in DadosExame.matriz_pontos])
         atenuacoes_cache = {}
-        step = 5  # Reduz a granularidade para melhorar a performance
+        step = 2 if ResultadoFullthreshold.mapa_cor else 5
 
         for x in range(0, 960, step):
             for y in range(0, 540, step):
@@ -186,21 +269,19 @@ class ResultadoFullthreshold:
                             )
                         )
                         atenuacoes_cache[(x, y)] = atenuacao_interpolada
-                    
-                    
-                    
-                   
-                    
+
                     if ResultadoFullthreshold.mapa_cor == True:
-                        cor = ResultadoFullthreshold.gerar_texturas_coloridas(atenuacao_interpolada)
+                        cor = ResultadoFullthreshold.gerar_texturas_cinza(
+                            atenuacao_interpolada
+                        )
                         pygame.draw.rect(
-                        buffer, cor, (x, y, step, step)
+                            buffer, cor, (x, y, step, step)
                         )  # Desenha blocos em vez de pixels individuais
                     else:
-                        cor = ResultadoFullthreshold.gerar_texturas_pontos(atenuacao_interpolada)
+                        cor = ResultadoFullthreshold.gerar_texturas_pontos(
+                            atenuacao_interpolada
+                        )
                         buffer.blit(cor, (x, y))
-
-                   
 
         pygame.draw.line(
             buffer,
@@ -225,17 +306,30 @@ class ResultadoFullthreshold:
         # Desenhar pontos e labels
         for ponto in DadosExame.matriz_pontos:
             ponto.y += 540
-            ponto.x = ponto.x 
+            ponto.x = ponto.x
             ponto.tamanhoPonto = 0.5
-            ponto.cor = pygame.Color("black")            
+            ponto.cor = pygame.Color("black")
             ponto.plotarPonto()
             label = fonte.render(f"{ponto.atenuacao}", True, (0, 0, 0))
             label_rect = label.get_rect(center=(ponto.x - 0.505, ponto.y + 12))
             pygame.display.get_surface().blit(label, label_rect)
         # circulo do mapa de limiar
         pygame.draw.circle(pygame.display.get_surface(), (0, 0, 0), (480, 810), 230, 1)
-        pygame.draw.line(pygame.display.get_surface(),(0,0,0),(480 + 230, 810),(480 - 230, 810),1)
-        pygame.draw.line(pygame.display.get_surface(),(0,0,0),(480,810 + 230),(480, 810 - 230),1)
+        pygame.draw.line(
+            pygame.display.get_surface(),
+            (0, 0, 0),
+            (480 + 230, 810),
+            (480 - 230, 810),
+            1,
+        )
+        pygame.draw.line(
+            pygame.display.get_surface(),
+            (0, 0, 0),
+            (480, 810 + 230),
+            (480, 810 - 230),
+            1,
+        )
+
     @staticmethod
     def desenha_legendas():
 
@@ -306,6 +400,7 @@ class ResultadoFullthreshold:
         ResultadoFullthreshold.desenhar_mapa()
         ResultadoFullthreshold.desenhar_mapa_limiares()
         ResultadoFullthreshold.desenha_legendas()
+        ResultadoFullthreshold.gerar_legenda_tons_cinza()
 
         DadosExame.reset()
 
