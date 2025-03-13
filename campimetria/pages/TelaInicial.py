@@ -224,12 +224,7 @@ while rodando:
 
     ResultadoFullthreshold.exibir_resultados()
 
-    while rodando:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    rodando = False
-
+   
     tela.fill(cor_fundo)  # Preenche o fundo
 
     # Renderiza a label no topo da tela
