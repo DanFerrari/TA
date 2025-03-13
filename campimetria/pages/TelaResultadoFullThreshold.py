@@ -54,6 +54,19 @@ class ResultadoFullthreshold:
     mapa_cinza = True        
     matriz_pontos_mapa_textura = None
     matriz_pontos_mapa_limiar = None
+    textura_cache = {}
+    cache_texturas_cor = {}
+    cache_texturas_cinza = {}
+    
+    
+    
+    @staticmethod
+    def carregar_texturas():
+        for i in range(1, 11):
+            caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils', 'images', 'bitmaps', f"{i}.bmp"))
+            if os.path.exists(caminho):
+                ResultadoFullthreshold.textura_cache[i] = pygame.image.load(caminho).convert()
+
 
     @staticmethod
     def inicializar_matrizes():
@@ -70,13 +83,10 @@ class ResultadoFullthreshold:
         if len(indices) == 0:
             return 0
 
-        pesos = np.exp(-np.array(dists) / 10)
+        pesos = np.exp(-np.array(dists, dtype=np.float32) / 10)
+        pesos /= np.sum(pesos)  # Usa numpy para somar mais rápido
+        atenuacao_interpolada = np.dot(pesos, [pontos[idx].atenuacao for idx in indices])
 
-        pesos /= pesos.sum()
-
-        atenuacao_interpolada = sum(
-            pesos[i] * pontos[indices[i]].atenuacao for i in range(len(indices))
-        )
         atenuacao_interpolada = round(atenuacao_interpolada, 1)
         return atenuacao_interpolada
 
@@ -173,86 +183,48 @@ class ResultadoFullthreshold:
     @staticmethod
     def gerar_texturas_coloridas(atenuacao):
         """Mapeia atenuação para um gradiente de cores passando por vermelho, amarelo, verde e azul"""
-        if atenuacao <= 0:
-            vermelho = 0
-            verde = 0
-            azul = 156
-        elif atenuacao < 6:
-            vermelho = 0
-            verde = 85
-            azul = 204
-        elif atenuacao < 11:
-            vermelho = 0
-            verde = 131
-            azul = 207
-        elif atenuacao < 16:
-            vermelho = 2
-            verde = 147
-            azul = 166
-        elif atenuacao < 21:
-            vermelho = 0
-            verde = 145
-            azul = 107
-        elif atenuacao < 26:
-            vermelho = 0
-            verde = 163
-            azul = 87
-        elif atenuacao < 30:
-            vermelho = 149
-            verde = 201
-            azul = 28
-        elif atenuacao < 36:
-            vermelho = 252
-            verde = 219
-            azul = 0
-        elif atenuacao < 41:
-            vermelho = 232
-            verde = 129
-            azul = 26
-        elif atenuacao < 50:
-            vermelho = 255
-            verde = 0
-            azul = 0
+        if atenuacao in ResultadoFullthreshold.cache_texturas_cor:
+            return ResultadoFullthreshold.cache_texturas_cor[atenuacao]
 
-        return (vermelho, verde, azul)
+        if atenuacao <= 0:
+            cor = (0, 0, 156)
+        elif atenuacao < 6:
+            cor = (0, 85, 204)
+        elif atenuacao < 11:
+            cor = (0, 131, 207)
+        elif atenuacao < 16:
+            cor = (2, 147, 166)
+        elif atenuacao < 21:
+            cor = (0, 145, 107)
+        elif atenuacao < 26:
+            cor = (0, 163, 87)
+        elif atenuacao < 30:
+            cor = (149, 201, 28)
+        elif atenuacao < 36:
+            cor = (252, 219, 0)
+        elif atenuacao < 41:
+            cor = (232, 129, 26)
+        else:
+            cor = (255, 0, 0)
+
+        # Armazena no cache e retorna
+        ResultadoFullthreshold.cache_texturas_cor[atenuacao] = cor
+        return cor
         
     @staticmethod
     def gerar_texturas_pontos(atenuacao):
-        texturas = {}
+        if not ResultadoFullthreshold.textura_cache:
+            ResultadoFullthreshold.carregar_texturas()
         
-
-        for i in range(1, 11):
-            caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils', 'images', 'bitmaps',f"{i}.bmp"))
-            if os.path.exists(caminho):
-                texturas[i] = pygame.image.load(caminho).convert()
-            else:
-                print(f"caminho nao existe: {caminho}")
-
-        if atenuacao <= 0:
-            cor = texturas[0]
-        elif atenuacao < 6:
-            cor = texturas[1]
-        elif atenuacao < 11:
-            cor = texturas[2]
-        elif atenuacao < 16:
-            cor = texturas[3]
-        elif atenuacao < 21:
-            cor = texturas[4]
-        elif atenuacao < 26:
-            cor = texturas[5]
-        elif atenuacao < 30:
-            cor = texturas[6]
-        elif atenuacao < 36:
-            cor = texturas[7]
-        elif atenuacao < 41:
-            cor = texturas[8]
-        elif atenuacao < 50:
-            cor = texturas[9]
-
-        return cor
+        faixa = min(9, max(0, atenuacao // 5))  # Mapeia atenuação para índice 0-9
+        return ResultadoFullthreshold.textura_cache.get(faixa, pygame.Surface((5,5))) 
 
     @staticmethod
     def gerar_texturas_cinza(atenuacao):
+        """Mapeia a atenuação para tons de cinza e usa cache"""
+        if atenuacao in ResultadoFullthreshold.cache_texturas_cinza:
+            return ResultadoFullthreshold.cache_texturas_cinza[atenuacao]
+
         texturas = []
         for i in range(0, 10):
             texturas.append((25 * i, 25 * i, 25 * i))
@@ -278,6 +250,8 @@ class ResultadoFullthreshold:
         else:
             cor = texturas[9]
 
+        # Armazena no cache e retorna
+        ResultadoFullthreshold.cache_texturas_cinza[atenuacao] = cor
         return cor
 
     @staticmethod
@@ -294,19 +268,17 @@ class ResultadoFullthreshold:
         kdtree = KDTree([(p.x, p.y) for p in ResultadoFullthreshold.matriz_pontos_mapa_textura])
         atenuacoes_cache = {}
         step = 2 if ResultadoFullthreshold.mapa_cor else 5
-
+        pixels = []
         for x in range(0, 960, step):
             for y in range(0, 540, step):
                 if (x - centro_x) ** 2 + (y - centro_y) ** 2 <= raio**2:
-                    if (x, y) in atenuacoes_cache:
-                        atenuacao_interpolada = atenuacoes_cache[(x, y)]
-                    else:
-                        atenuacao_interpolada = (
-                            ResultadoFullthreshold.calcular_atenuacao_interpolada(
-                                x, y, kdtree, ResultadoFullthreshold.matriz_pontos_mapa_textura
-                            )
+                    atenuacao_interpolada = atenuacoes_cache.get(
+                        (x, y),
+                        ResultadoFullthreshold.calcular_atenuacao_interpolada(
+                            x, y, kdtree, ResultadoFullthreshold.matriz_pontos_mapa_textura
                         )
-                        atenuacoes_cache[(x, y)] = atenuacao_interpolada
+                    )
+                    atenuacoes_cache[(x, y)] = atenuacao_interpolada
 
                     if ResultadoFullthreshold.mapa_cor:
                         if ResultadoFullthreshold.mapa_cinza:
@@ -317,15 +289,14 @@ class ResultadoFullthreshold:
                             cor = ResultadoFullthreshold.gerar_texturas_coloridas(
                                 atenuacao_interpolada
                             )
-                        pygame.draw.rect(
-                            buffer, cor, (x, y, step, step)
-                        )  # Desenha blocos em vez de pixels individuais
+                        pixels.append((x,y,cor))
                     else:
                         cor = ResultadoFullthreshold.gerar_texturas_pontos(
                             atenuacao_interpolada
                         )
                         buffer.blit(cor, (x, y))
-
+        for x, y, cor in pixels:
+            pygame.draw.rect(buffer, cor, (x, y, step, step))
         pygame.draw.line(
             buffer,
             (0, 0, 0),
@@ -350,7 +321,7 @@ class ResultadoFullthreshold:
         if ResultadoFullthreshold.mapa_cor:
             if ResultadoFullthreshold.mapa_cinza:
                 ResultadoFullthreshold.gerar_legenda_tons_cinza()
-                pygame.display.update()
+               
             else:
                 ResultadoFullthreshold.gerar_legenda_cores()
         else:
@@ -450,18 +421,37 @@ class ResultadoFullthreshold:
                 texto_renderizado, (pos_x - 200, pos_y + i * espacamento)
             )
 
+
+    def processar_eventos():
+        global visualizando
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_UP]:
+            ResultadoFullthreshold.mapa_cor = True
+            ResultadoFullthreshold.mapa_cinza = True
+        elif keys[pygame.K_DOWN]:
+            ResultadoFullthreshold.mapa_cor = True
+            ResultadoFullthreshold.mapa_cinza = False
+        elif keys[pygame.K_RIGHT]:
+            ResultadoFullthreshold.mapa_cor = False
+        elif keys[pygame.K_ESCAPE]:
+            visualizando = False
+            pygame.quit()
+
+        ResultadoFullthreshold.desenhar_mapa_texturas()
+        pygame.display.flip()
+
     @staticmethod
     def exibir_resultados():
         ResultadoFullthreshold.inicializar_matrizes()
         pygame.font.init()
-        pygame.display.get_surface().fill((255,255,255))
-        pygame.display.update()
+        pygame.display.get_surface().fill((255,255,255))        
         tempo_inicial = pygame.time.get_ticks()
         ResultadoFullthreshold.desenhar_mapa_texturas()
         tempo_final = pygame.time.get_ticks() - tempo_inicial       
         ResultadoFullthreshold.desenhar_mapa_limiares()
         ResultadoFullthreshold.desenha_legendas_exame()
-        pygame.display.update()
+        pygame.display.flip()
         visualizando = True
         while visualizando:
             for event in pygame.event.get():
