@@ -212,11 +212,12 @@ class ResultadoFullthreshold:
         
     @staticmethod
     def gerar_texturas_pontos(atenuacao):
-        texturas = []
+        texturas = {}
         for i in range(1, 11):
-            caminho = f"campimetria/utils/images/bitmaps/{i}.bmp"
-            texturas.append(pygame.image.load(caminho).convert())
-           
+            caminho_imagens = os.path.join(os.path.dirname(__file__), '..', 'utils', 'images', 'bitmaps')
+            caminho = f"{caminho_imagens}/{i}.bmp"
+            if os.path.exists(caminho):
+                texturas[i] = pygame.image.load(caminho).convert()
 
         if atenuacao <= 0:
             cor = texturas[0]
