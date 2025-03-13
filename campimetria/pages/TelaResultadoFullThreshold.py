@@ -212,11 +212,11 @@ class ResultadoFullthreshold:
         
     @staticmethod
     def gerar_texturas_pontos(atenuacao):
-        texturas = {}
+        texturas = []
         for i in range(1, 11):
             caminho = f"campimetria/utils/images/bitmaps/{i}.bmp"
-            if os.path.exists(caminho):
-                texturas[i] = pygame.image.load(caminho).convert()
+            texturas.append(pygame.image.load(caminho).convert())
+           
 
         if atenuacao <= 0:
             cor = texturas[0]
@@ -473,7 +473,8 @@ class ResultadoFullthreshold:
                         ResultadoFullthreshold.desenhar_mapa_texturas()
                         pygame.display.update()
                     elif event.key == pygame.K_ESCAPE:  # Tecla ESC para sair
-                        visualizando = False       
+                        visualizando = False    
+                        pygame.quit()   
                 
 
         DadosExame.reset()
