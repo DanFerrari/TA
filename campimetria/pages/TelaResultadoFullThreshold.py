@@ -214,7 +214,7 @@ class ResultadoFullthreshold:
     def gerar_texturas_pontos(atenuacao):
         texturas = {}
         for i in range(1, 11):
-            caminho_imagens = os.path.join(os.path.dirname(__file__), '..', 'utils', 'images', 'bitmaps')
+            caminho_imagens = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'utils', 'images', 'bitmaps')
             caminho = f"{caminho_imagens}/{i}.bmp"
             if os.path.exists(caminho):
                 texturas[i] = pygame.image.load(caminho).convert()
