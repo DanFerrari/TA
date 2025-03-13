@@ -39,7 +39,7 @@ class ResultadoFullthreshold:
     def gerar_pontos_mapa_limiar():
         matriz = []
         for ponto in DadosExame.matriz_pontos:
-            ponto_novo = Ponto(0,0,0.5,(0,0,0))
+            ponto_novo = Ponto(0,0,3,(0,0,0))
             if (ponto.xg, ponto.yg) in atenuacoes_personalizadas:
                 ponto_novo.atenuacao = atenuacoes_personalizadas[(ponto.xg, ponto.yg)]
             ponto_novo.x = int(ponto.x * 960 / 1920)
@@ -134,7 +134,13 @@ class ResultadoFullthreshold:
 
     @staticmethod
     def gerar_legenda_pontos():
-        texturas = [pygame.image.load(f"campimetria/utils/images/bitmaps/{i}.bmp").convert() for i in range(1,11)]        
+        texturas = []
+        for i in range(1, 11):
+            caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils', 'images', 'bitmaps',f"{i}.bmp"))
+            if os.path.exists(caminho):
+                texturas.append(pygame.image.load(caminho).convert())
+            else:
+                print(f"caminho nao existe: {caminho}")       
         ResultadoFullthreshold.estrutura_legenda(texturas)
 
 
@@ -191,7 +197,7 @@ class ResultadoFullthreshold:
             vermelho = 0
             verde = 163
             azul = 87
-        elif atenuacao < 31:
+        elif atenuacao < 30:
             vermelho = 149
             verde = 201
             azul = 28
@@ -213,9 +219,10 @@ class ResultadoFullthreshold:
     @staticmethod
     def gerar_texturas_pontos(atenuacao):
         texturas = {}
-        caminho_imagens = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'utils', 'images', 'bitmaps')
+        
+
         for i in range(1, 11):
-            caminho = os.path.join(caminho_imagens,f"{i}.bmp")
+            caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils', 'images', 'bitmaps',f"{i}.bmp"))
             if os.path.exists(caminho):
                 texturas[i] = pygame.image.load(caminho).convert()
             else:
@@ -233,7 +240,7 @@ class ResultadoFullthreshold:
             cor = texturas[4]
         elif atenuacao < 26:
             cor = texturas[5]
-        elif atenuacao < 31:
+        elif atenuacao < 30:
             cor = texturas[6]
         elif atenuacao < 36:
             cor = texturas[7]
@@ -262,7 +269,7 @@ class ResultadoFullthreshold:
             cor = texturas[4]
         elif atenuacao < 26:
             cor = texturas[5]
-        elif atenuacao < 31:
+        elif atenuacao < 30:
             cor = texturas[6]
         elif atenuacao < 36:
             cor = texturas[7]
