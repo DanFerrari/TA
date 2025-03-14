@@ -16,7 +16,7 @@ sys.path.append(
 
 from dados import *
 from Ponto import Ponto
-from atenuacoes_personalizadas import atenuacoes_personalizadas
+
 
 
 class ResultadoFullthreshold:
@@ -27,10 +27,7 @@ class ResultadoFullthreshold:
     def gerar_pontos_mapa_textura():
         matriz = []
         for ponto in DadosExame.matriz_pontos:
-            ponto_novo = Ponto(0,0,1,(0,0,0))
-            if (ponto.xg, ponto.yg) in atenuacoes_personalizadas:
-                ponto_novo.atenuacao = atenuacoes_personalizadas[(ponto.xg, ponto.yg)]
-
+            ponto_novo = Ponto(0,0,1,(0,0,0))  
             ponto_novo.x = int(ponto.x * 960 / 1920)
             ponto_novo.y = int(ponto.y * 540 / 1080)
             matriz.append(ponto_novo)
@@ -40,8 +37,6 @@ class ResultadoFullthreshold:
         matriz = []
         for ponto in DadosExame.matriz_pontos:
             ponto_novo = Ponto(0,0,3,(0,0,0))
-            if (ponto.xg, ponto.yg) in atenuacoes_personalizadas:
-                ponto_novo.atenuacao = atenuacoes_personalizadas[(ponto.xg, ponto.yg)]
             ponto_novo.x = int(ponto.x * 960 / 1920)
             ponto_novo.y = int(ponto.y * 540 / 1080)
             ponto_novo.y += 540 
