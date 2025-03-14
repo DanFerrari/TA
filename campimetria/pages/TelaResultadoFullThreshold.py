@@ -523,7 +523,7 @@ class ResultadoFullthreshold:
                         pygame.display.update()
                     elif event.key == pygame.K_ESCAPE:  # Tecla ESC para sair
                         visualizando = False    
-                        pygame.quit()   
+                        
                 
 
         DadosExame.reset()

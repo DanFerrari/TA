@@ -221,14 +221,7 @@ def desenhar_botao(texto, y, largura, altura, selecionado):
 rodando = True
 while rodando:
 
-    DadosExame.matriz_pontos = [
-        Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30
-    ]
-    from TelaResultadoFullThreshold import ResultadoFullthreshold
-    
-    ResultadoFullthreshold.exibir_resultados()
-
-
+   
     tela.fill(cor_fundo)  # Preenche o fundo
 
     # Renderiza a label no topo da tela
@@ -273,4 +266,8 @@ while rodando:
 
     pygame.display.flip()  # Atualiza a tela
 
-pygame.quit()
+
+
+caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..',"mainTA.py"))
+os.execvp("python", ["python", caminho])
+

@@ -143,8 +143,7 @@ class Ponto:
                     print("yrmpo_resposta_no_ponto: ", self.tempo_resposta)
                     self.response_received = True
 
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    pygame.quit()
+              
 
             if not self.response_received:
                 self.tempo_resposta = 2.0
