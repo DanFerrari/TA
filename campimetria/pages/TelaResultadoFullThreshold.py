@@ -96,7 +96,22 @@ class ResultadoFullthreshold:
 
     
     
-    
+    @staticmethod
+    def mostrar_label_temporaria(carregado):
+        """Mostra uma label temporária na tela e depois a apaga"""
+        fonte = pygame.font.Font(None, 36)
+        label = fonte.render("CARREGANDO MAPA...", True, (0, 0, 0),(255,255,255))  
+        label_rect = label.get_rect(center=(480,540))
+
+        if not carregado:
+            # Desenha a label na tela
+            pygame.display.get_surface().blit(label, label_rect)
+            pygame.display.update()
+
+        if carregado:
+            pygame.draw.rect(pygame.display.get_surface(), (255, 255, 255), label_rect)  # Fundo preto (ajuste conforme necessário)
+            pygame.display.update()
+        
     @staticmethod
     def estrutura_legenda(texturas):       
 
@@ -288,19 +303,20 @@ class ResultadoFullthreshold:
         return cor
 
     @staticmethod
-    def desenhar_mapa_texturas():
+    def desenhar_mapa_texturas(firstload):
         """Desenha o mapa com otimização de desempenho"""
        
         
         buffer = pygame.Surface((960, 540))  # Usa um buffer para melhorar a performance
         buffer.fill((255, 255, 255))
-        
+        if not firstload:
+            ResultadoFullthreshold.mostrar_label_temporaria(False)
         
         centro_x, centro_y = 960 // 2, 540 // 2
         raio = min(centro_x, centro_y) - 55
         kdtree = KDTree([(p.x, p.y) for p in ResultadoFullthreshold.matriz_pontos_mapa_textura])
         atenuacoes_cache = {}
-        step = 3 if ResultadoFullthreshold.mapa_cor else 5
+        step = 5 if ResultadoFullthreshold.mapa_cor else 5
         pixels = []
         for x in range(0, 960, step):
             for y in range(0, 540, step):
@@ -346,6 +362,10 @@ class ResultadoFullthreshold:
         )
         pygame.display.get_surface().blit(buffer, (0, 0))
         ResultadoFullthreshold.gerar_legenda_textura()
+        if not firstload:
+            ResultadoFullthreshold.mostrar_label_temporaria(True)
+        else:
+            ResultadoFullthreshold.status_resultado( carregado = True)
    
 
     @staticmethod
@@ -454,36 +474,37 @@ class ResultadoFullthreshold:
                 texto_renderizado, (pos_x - 200, pos_y + i * espacamento)
             )
 
+    @staticmethod
+    def status_resultado(carregado):
+        """Mostra uma label temporária na tela e depois a apaga"""
+        
+        fonte = pygame.font.Font(None, 78)
+        label = fonte.render("CARREGANDO MAPA...", True, (0, 0, 0),(255,255,255))  
+        label_rect = label.get_rect(center=(960,540))
 
-    def processar_eventos():
-        global visualizando
-        keys = pygame.key.get_pressed()
+        if not carregado:
+            # Desenha a label na tela
+            pygame.display.get_surface().fill((255,255,255))
+            pygame.display.get_surface().blit(label, label_rect)
+            pygame.display.update()
 
-        if keys[pygame.K_UP]:
-            ResultadoFullthreshold.mapa_cor = True
-            ResultadoFullthreshold.mapa_cinza = True
-        elif keys[pygame.K_DOWN]:
-            ResultadoFullthreshold.mapa_cor = True
-            ResultadoFullthreshold.mapa_cinza = False
-        elif keys[pygame.K_RIGHT]:
-            ResultadoFullthreshold.mapa_cor = False
-        elif keys[pygame.K_ESCAPE]:
-            visualizando = False
-            pygame.quit()
+        if  carregado:
+            pygame.draw.rect(pygame.display.get_surface(), (255, 255, 255), label_rect)  # Fundo preto (ajuste conforme necessário)
+            pygame.display.update()
 
-        ResultadoFullthreshold.desenhar_mapa_texturas()
-        pygame.display.flip()
+
 
     @staticmethod
     def exibir_resultados():
         ResultadoFullthreshold.inicializar_matrizes()
         pygame.font.init()
-        pygame.display.get_surface().fill((255,255,255))        
+        ResultadoFullthreshold.status_resultado(carregado=False)      
         tempo_inicial = pygame.time.get_ticks()
-        ResultadoFullthreshold.desenhar_mapa_texturas()
+        ResultadoFullthreshold.desenhar_mapa_texturas(firstload=True)
         tempo_final = pygame.time.get_ticks() - tempo_inicial       
         ResultadoFullthreshold.desenhar_mapa_limiares()
         ResultadoFullthreshold.desenha_legendas_exame()
+        print(tempo_final / 1000)
         pygame.display.flip()
         visualizando = True
         while visualizando:
@@ -494,16 +515,16 @@ class ResultadoFullthreshold:
                     if event.key == pygame.K_UP:  # Mover para cima
                         ResultadoFullthreshold.mapa_cor = True
                         ResultadoFullthreshold.mapa_cinza = True
-                        ResultadoFullthreshold.desenhar_mapa_texturas()
+                        ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
                         pygame.display.update()
                     elif event.key == pygame.K_DOWN:  # Mover para baixo
                         ResultadoFullthreshold.mapa_cor = True
                         ResultadoFullthreshold.mapa_cinza = False
-                        ResultadoFullthreshold.desenhar_mapa_texturas()
+                        ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
                         pygame.display.update()
                     elif event.key == pygame.K_RIGHT:
                         ResultadoFullthreshold.mapa_cor = False                        
-                        ResultadoFullthreshold.desenhar_mapa_texturas()
+                        ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
                         pygame.display.update()
                     elif event.key == pygame.K_ESCAPE:  # Tecla ESC para sair
                         visualizando = False    
