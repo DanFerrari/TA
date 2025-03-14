@@ -300,7 +300,7 @@ class ResultadoFullthreshold:
         raio = min(centro_x, centro_y) - 55
         kdtree = KDTree([(p.x, p.y) for p in ResultadoFullthreshold.matriz_pontos_mapa_textura])
         atenuacoes_cache = {}
-        step = 2 if ResultadoFullthreshold.mapa_cor else 5
+        step = 3 if ResultadoFullthreshold.mapa_cor else 5
         pixels = []
         for x in range(0, 960, step):
             for y in range(0, 540, step):
