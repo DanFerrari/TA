@@ -54,7 +54,7 @@ class ResultadoFullthreshold:
     mapa_cinza = True        
     matriz_pontos_mapa_textura = None
     matriz_pontos_mapa_limiar = None
-    textura_cache = {}
+    textura_cache = []
     cache_texturas_cor = {}
     cache_texturas_cinza = {}
     
@@ -65,7 +65,7 @@ class ResultadoFullthreshold:
         for i in range(1, 11):
             caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils', 'images', 'bitmaps', f"{i}.bmp"))
             if os.path.exists(caminho):
-                ResultadoFullthreshold.textura_cache[i] = pygame.image.load(caminho).convert()
+                ResultadoFullthreshold.textura_cache.append(pygame.image.load(caminho).convert())
 
 
     @staticmethod
@@ -76,19 +76,23 @@ class ResultadoFullthreshold:
     
 
     @staticmethod
-    def calcular_atenuacao_interpolada(x, y, kdtree, pontos):
-        """Interpola a atenuação dentro da célula suavizando a transição para as vizinhas"""
+    def calcular_atenuacao_interpolada(x, y, kdtree, pontos, raio_fixo=15):
+        """Interpola a atenuação suavizando a transição, mantendo valores fixos dentro de um raio"""
         dists, indices = kdtree.query((x, y), k=min(10, len(pontos)))
 
         if len(indices) == 0:
             return 0
 
+        # Se o ponto está dentro do raio, usa a atenuação do ponto mais próximo
+        if dists[0] < raio_fixo:
+            return round(pontos[indices[0]].atenuacao, 1)
+
+        # Fora do raio, faz interpolação com os vizinhos
         pesos = np.exp(-np.array(dists, dtype=np.float32) / 10)
-        pesos /= np.sum(pesos)  # Usa numpy para somar mais rápido
+        pesos /= np.sum(pesos)
         atenuacao_interpolada = np.dot(pesos, [pontos[idx].atenuacao for idx in indices])
 
-        atenuacao_interpolada = round(atenuacao_interpolada, 1)
-        return atenuacao_interpolada
+        return round(atenuacao_interpolada, 1)
 
     
     
@@ -174,9 +178,21 @@ class ResultadoFullthreshold:
     
     
     def gerar_legenda_tons_cinza():
-        texturas = []
-        for i in range(0, 10):
-            texturas.append((25 * i, 25 * i, 25 * i))
+        
+        texturas = [          
+            (0,0,0),
+            (25,25,25),
+            (50,50,50),
+            (75,75,75),
+            (100,100,100),
+            (125,125,125),
+            (150,150,150),
+            (170,170,170),
+            (210,210,210),        
+            (225,225,225)
+        ]
+        
+        
         ResultadoFullthreshold.estrutura_legenda(texturas)
        
        
@@ -198,7 +214,7 @@ class ResultadoFullthreshold:
             cor = (0, 145, 107)
         elif atenuacao < 26:
             cor = (0, 163, 87)
-        elif atenuacao < 30:
+        elif atenuacao < 31:
             cor = (149, 201, 28)
         elif atenuacao < 36:
             cor = (252, 219, 0)
@@ -216,8 +232,27 @@ class ResultadoFullthreshold:
         if not ResultadoFullthreshold.textura_cache:
             ResultadoFullthreshold.carregar_texturas()
         
-        faixa = min(9, max(0, atenuacao // 5))  # Mapeia atenuação para índice 0-9
-        return ResultadoFullthreshold.textura_cache.get(faixa, pygame.Surface((5,5))) 
+        if atenuacao <= 0:
+            cor = ResultadoFullthreshold.textura_cache[0]
+        elif atenuacao < 6:
+            cor = ResultadoFullthreshold.textura_cache[1]
+        elif atenuacao < 11:
+            cor = ResultadoFullthreshold.textura_cache[2]
+        elif atenuacao < 16:
+            cor = ResultadoFullthreshold.textura_cache[3]
+        elif atenuacao < 21:
+            cor = ResultadoFullthreshold.textura_cache[4]
+        elif atenuacao < 26:
+            cor = ResultadoFullthreshold.textura_cache[5]
+        elif atenuacao < 31:
+            cor = ResultadoFullthreshold.textura_cache[6]
+        elif atenuacao < 36:
+            cor = ResultadoFullthreshold.textura_cache[7]
+        elif atenuacao < 41:
+            cor = ResultadoFullthreshold.textura_cache[8]
+        else:
+            cor = ResultadoFullthreshold.textura_cache[9]
+        return cor
 
     @staticmethod
     def gerar_texturas_cinza(atenuacao):
@@ -225,30 +260,28 @@ class ResultadoFullthreshold:
         if atenuacao in ResultadoFullthreshold.cache_texturas_cinza:
             return ResultadoFullthreshold.cache_texturas_cinza[atenuacao]
 
-        texturas = []
-        for i in range(0, 10):
-            texturas.append((25 * i, 25 * i, 25 * i))
+        
 
         if atenuacao <= 0:
-            cor = texturas[0]
+            cor = (0,0,0)
         elif atenuacao < 6:
-            cor = texturas[1]
+            cor = (25,25,25)
         elif atenuacao < 11:
-            cor = texturas[2]
+            cor = (50,50,50)
         elif atenuacao < 16:
-            cor = texturas[3]
+            cor = (75,75,75)
         elif atenuacao < 21:
-            cor = texturas[4]
+            cor = (100,100,100)
         elif atenuacao < 26:
-            cor = texturas[5]
-        elif atenuacao < 30:
-            cor = texturas[6]
+            cor = (125,125,125)
+        elif atenuacao < 31:
+            cor = (150,150,150)
         elif atenuacao < 36:
-            cor = texturas[7]
+            cor = (170,170,170)
         elif atenuacao < 41:
-            cor = texturas[8]
+            cor = (210,210,210)
         else:
-            cor = texturas[9]
+            cor = (225,225,225)
 
         # Armazena no cache e retorna
         ResultadoFullthreshold.cache_texturas_cinza[atenuacao] = cor
