@@ -120,7 +120,7 @@ class Screening:
                 if event.type == pygame.QUIT:  # Fecha ao clicar no botão de fechar
                     running = False
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:  # Fecha ao pressionar ESC
+                    if event.key == pygame.K_j:  # Fecha ao pressionar ESC
                         running = False
 
             pygame.time.delay(2000)

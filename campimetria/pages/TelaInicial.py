@@ -149,9 +149,9 @@ def selecionar_olho():
             if event.type == pygame.QUIT:
                 rodando = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:  # Tecla ESC para sair
+                if event.key == pygame.K_j:  # Tecla ESC para sair
                     rodando = False
-
+                
                 # Alterna entre seleção de opções, número e botão
                 elif event.key == pygame.K_UP:
                     if selecao_atual == "numero":
@@ -261,7 +261,7 @@ while rodando:
                 elif botao_selecionado == 1:
                     DadosExame.exame_selecionado = Constantes.fullthreshold
                     selecionar_olho()
-            elif event.key == pygame.K_ESCAPE:  # Tecla ESC para sair
+            elif event.key == pygame.K_j:  # Tecla ESC para sair
                 rodando = False
 
     pygame.display.flip()  # Atualiza a tela

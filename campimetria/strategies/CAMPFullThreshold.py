@@ -212,6 +212,6 @@ class FullThreshold:
                 if (
                     evento.type == pygame.QUIT
                     or evento.type == pygame.KEYDOWN
-                    and evento.key == pygame.K_ESCAPE
+                    and evento.key == pygame.K_j
                 ):
                     visualizando = False

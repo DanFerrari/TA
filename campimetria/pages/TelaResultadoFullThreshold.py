@@ -521,7 +521,7 @@ class ResultadoFullthreshold:
                         ResultadoFullthreshold.mapa_cor = False                        
                         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
                         pygame.display.update()
-                    elif event.key == pygame.K_ESCAPE:  # Tecla ESC para sair
+                    elif event.key == pygame.K_j:  # Tecla ESC para sair
                         visualizando = False    
                         
                 
