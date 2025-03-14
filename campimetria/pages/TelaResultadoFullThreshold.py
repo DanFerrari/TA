@@ -507,17 +507,17 @@ class ResultadoFullthreshold:
                 if event.type == pygame.QUIT:
                     visualizando = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:  # Mover para cima
+                    if event.key == pygame.K_a:  # Mover para cima
                         ResultadoFullthreshold.mapa_cor = True
                         ResultadoFullthreshold.mapa_cinza = True
                         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
                         pygame.display.update()
-                    elif event.key == pygame.K_DOWN:  # Mover para baixo
+                    elif event.key == pygame.K_g:  # Mover para baixo
                         ResultadoFullthreshold.mapa_cor = True
                         ResultadoFullthreshold.mapa_cinza = False
                         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
                         pygame.display.update()
-                    elif event.key == pygame.K_RIGHT:
+                    elif event.key == pygame.K_0:
                         ResultadoFullthreshold.mapa_cor = False                        
                         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
                         pygame.display.update()

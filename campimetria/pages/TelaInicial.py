@@ -153,7 +153,7 @@ def selecionar_olho():
                     rodando = False
                 
                 # Alterna entre seleção de opções, número e botão
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_x:
                     if selecao_atual == "numero":
                         selecao_atual = "opcoes"
                     elif selecao_atual == "botao":
@@ -161,7 +161,7 @@ def selecionar_olho():
                             selecao_atual = "numero"
                         else:
                             selecao_atual = "opcoes"
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_e:
                     if selecao_atual == "opcoes":
                         if DadosExame.exame_selecionado == Constantes.screening:
                             selecao_atual = "numero"
@@ -169,6 +169,18 @@ def selecionar_olho():
                             selecao_atual = "botao"
                     elif selecao_atual == "numero":
                         selecao_atual = "botao"
+                    elif selecao_atual == "botao":
+                        if DadosExame.exame_selecionado == Constantes.screening:
+                            exame = Screening()
+                            DadosExame.atenuacao_screening = numero
+                            exame.iniciar_screening()
+                            rodando = False                            
+                        elif DadosExame.exame_selecionado == Constantes.fullthreshold:
+                            exame = FullThreshold()
+                            exame.main()
+                            rodando = False
+                        else:
+                            print("Exame não implementado!")
 
                 # Navegação dentro da seleção ativa
                 elif selecao_atual == "opcoes":
@@ -185,20 +197,7 @@ def selecionar_olho():
                     elif event.key == pygame.K_RIGHT and numero < NUMERO_MAX:
                         numero += 1
 
-                elif selecao_atual == "botao":
-                    if event.key == pygame.K_RETURN:
-
-                        if DadosExame.exame_selecionado == Constantes.screening:
-                            exame = Screening()
-                            DadosExame.atenuacao_screening = numero
-                            exame.iniciar_screening()
-                            rodando = False
-                        elif DadosExame.exame_selecionado == Constantes.fullthreshold:
-                            exame = FullThreshold()
-                            exame.main()
-                            rodando = False
-                        else:
-                            print("Exame não implementado!")
+                
 
         pygame.display.flip()  # Atualiza a tela
 
@@ -250,11 +249,11 @@ while rodando:
         if event.type == pygame.QUIT:
             rodando = False
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:  # Mover para cima
+            if event.key == pygame.K_LEFT:  # Mover para cima
                 botao_selecionado = 0  # Seleciona "Estratégia 1"
-            elif event.key == pygame.K_DOWN:  # Mover para baixo
+            elif event.key == pygame.K_RIGHT:  # Mover para baixo
                 botao_selecionado = 1  # Seleciona "Estratégia 2"
-            elif event.key == pygame.K_RETURN:  # Tecla ENTER para confirmar
+            elif event.key == pygame.K_e:  # Tecla ENTER para confirmar
                 if botao_selecionado == 0:
                     DadosExame.exame_selecionado = Constantes.screening
                     selecionar_olho()
