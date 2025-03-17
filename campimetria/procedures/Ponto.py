@@ -1,7 +1,7 @@
 import pygame
 import time
 import math
-import os 
+import os
 import sys
 
 sys.path.append(
@@ -17,21 +17,20 @@ sys.path.append(
 
 from dados import *
 
+
 class Ponto:
     def __init__(self, xg, yg, tamanhoPonto, cor):
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
         self.atenuacao = 27
-        self.primeira_visualizacao = True        
+        self.primeira_visualizacao = True
         self.response_received = False
         self.numero_cruzamentos = 0
         self.ultima_atenuacao_vista = 0
         self.ultima_atenuacao_nao_vista = 0
         self.delta = 0
-        self.status = ""     
-        
-       
+        self.status = ""
         self.tamanhoPonto = tamanhoPonto / 2
         self.xg = xg
         self.yg = yg
@@ -40,29 +39,23 @@ class Ponto:
         self.resolucao_video = 0.2599
         self.x = 0
         self.y = 0
-     
-       
-       
+        
         self.tempo_resposta = 0.0
         self.clock = pygame.time.Clock()
-        
-        
+
         self.cor = cor
         self.distanciaPacienteTela = 200
         self.screen_width = pygame.display.Info().current_w
         self.screen_height = pygame.display.Info().current_h
-        self.surface = pygame.display.get_surface()     
-        
-        
+        self.surface = pygame.display.get_surface()
+
         xrad = math.radians(self.xg)
         xmm = self.distanciaPacienteTela * math.tan(xrad)
         yrad = math.radians(self.yg)
         ymm = self.distanciaPacienteTela * math.tan(yrad)
         self.pontoPix = self.tamanhoPonto / self.resolucao_video
         # Converte para pixels
-        
-        
-        
+
         self.x = xmm / self.resolucaoX
         self.y = ymm / self.resolucaoY
         self.x = self.x + (self.screen_width / 2)
@@ -84,7 +77,6 @@ class Ponto:
 
     def plotarPonto(self):
         pygame.draw.circle(self.surface, self.cor, (self.x, self.y), self.pontoPix)
-        
 
     @staticmethod
     def plotarPontoStatic(xg, yg, tamanhoPonto, cor):
@@ -98,7 +90,7 @@ class Ponto:
         distanciaPacienteTela = 200
         screen_width = pygame.display.Info().current_w
         screen_height = pygame.display.Info().current_h
-        surface = pygame.display.get_surface()        
+        surface = pygame.display.get_surface()
         xrad = math.radians(xg)
         xmm = distanciaPacienteTela * math.tan(xrad)
         yrad = math.radians(yg)
@@ -110,14 +102,12 @@ class Ponto:
         x = x + (screen_width / 2)
         y = y + (screen_height / 2)
         pygame.draw.circle(surface, cor, (x, y), pontoPix)
-        
 
     def desenha_quadrado(self):
-        tamanho = (self.tamanhoPonto,self.tamanhoPonto)
-        quadrado = pygame.Rect(0,0,*tamanho)
-        quadrado.center = (self.x,self.y)
-        pygame.draw.rect(pygame.display.get_surface(),self.cor,quadrado)        
-        
+        tamanho = (self.tamanhoPonto, self.tamanhoPonto)
+        quadrado = pygame.Rect(0, 0, *tamanho)
+        quadrado.center = (self.x, self.y)
+        pygame.draw.rect(pygame.display.get_surface(), self.cor, quadrado)
 
     def testaPonto(self, tempo_exposicao, tempo_resposta_paciente):
         trial_start_time = pygame.time.get_ticks()
@@ -143,9 +133,7 @@ class Ponto:
                         ) / 1000
                         print("yrmpo_resposta_no_ponto: ", self.tempo_resposta)
                         self.response_received = True
-                    elif event.key == pygame.K_j:
-                        exit()
-              
+                   
 
             if not self.response_received:
                 self.tempo_resposta = 2.0

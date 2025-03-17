@@ -1,6 +1,4 @@
 import pygame
-import time
-import math
 import random
 import sys
 import os
@@ -27,8 +25,9 @@ from fixacao_central import FixacaoCentral
 
 class Screening:
 
-    def __init__(self):
-        pass
+    def __init__(self, game):
+        self.game = game
+        self.running = True
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
         tempo_medio = sum(tempos) / len(tempos)
@@ -50,6 +49,16 @@ class Screening:
         else:
             return 0.0
 
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.game.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_j:  # Volta para o menu ou sai
+                    from strategy_screen import StrategyScreen
+
+                    self.game.change_screen(StrategyScreen(self.game))
+
     def exame_screening(self, fixacao=False):
         pontos = self.criar_pontos()
         random.shuffle(pontos)
@@ -57,32 +66,33 @@ class Screening:
         tempos = []
         # mancha_cega = ponto_mancha_cega
         mancha_cega = False
-        
+
         teste_de_fixacao = fixacao
         pontos_vistos = []
 
         testemancha = 0
         testenegativo = 0
         testepositivo = 0
-        
+
         for ponto in pontos:
-            
+            self.handle_events()
             ponto.cor = ponto.db_para_intensidade(DadosExame.atenuacao_screening)
             pygame.time.delay(100)  # Aguarda 100 ms para cada ponto
             ponto.testaPonto(0.2, tempo_resposta)
             DadosExame.total_de_pontos_testados += 1
             if ponto.response_received:
-                pontos_vistos.append(ponto)           
-
+                pontos_vistos.append(ponto)
             ponto.limiar_encontrado = True
             tempos.append(ponto.tempo_resposta)
             testemancha += 1
             testenegativo += 1
             testepositivo += 1
             if testemancha == 10 and teste_de_fixacao:
-                DadosExame.perda_de_fixacao += self.testa_mancha_cega(DadosExame.posicao_mancha_cega)
+                DadosExame.perda_de_fixacao += self.testa_mancha_cega(
+                    DadosExame.posicao_mancha_cega
+                )
                 testemancha = 0
-                DadosExame.total_testes_mancha += 1               
+                DadosExame.total_testes_mancha += 1
                 continue
             if testepositivo == 15 and len(pontos_vistos) > 1:
                 pontos_vistos[-1].cor = Colors.BACKGROUND
@@ -93,7 +103,7 @@ class Screening:
                 testepositivo = 0
             if testenegativo == 12 and len(pontos_vistos) > 1:
                 pontos_vistos[-1].cor = Ponto.db_para_intensidade(25)
-                pontos_vistos[-1].testaPonto(0.2,tempo_resposta)
+                pontos_vistos[-1].testaPonto(0.2, tempo_resposta)
                 DadosExame.total_testes_falsos_negativo += 1
                 if not pontos_vistos[-1].response_received:
                     DadosExame.falso_negativo_respondidos += 1
@@ -106,10 +116,10 @@ class Screening:
         DadosExame.matriz_pontos = pontos
 
     def iniciar_screening(self):
-        running = True       
+        running = True
         teste_fixacao = True
 
-        while running:
+        while self.running:
             ContagemRegressiva.iniciar_contagem(5)
             pygame.display.get_surface().fill(Colors.BACKGROUND)
             pygame.display.update()
@@ -124,20 +134,20 @@ class Screening:
 
             pygame.time.delay(2000)
             mancha_cega = TesteLimiarManchaCega().teste_mancha_cega(DadosExame.olho)
-            if mancha_cega == True:                
+            if mancha_cega == True:
                 continue
             elif mancha_cega == False:
                 teste_fixacao = False
                 pygame.time.delay(1500)
             start_time = pygame.time.get_ticks()
-            
+
             self.exame_screening(
-                ponto_mancha_cega=DadosExame.posicao_mancha_cega, fixacao=teste_fixacao
+                 fixacao=teste_fixacao
             )
             end_time = pygame.time.get_ticks() - start_time
             DadosExame.duracao_do_exame = end_time
             ResultadoScreening.desenha_pontos()
 
             pygame.display.flip()
-            running = False
-            
+            self.running = False
+        return

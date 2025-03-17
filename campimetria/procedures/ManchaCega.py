@@ -167,35 +167,50 @@ class TesteLimiarManchaCega:
 
     @staticmethod
     def teste_mancha_cega(olho):
-        
-        matriz_mancha_cega = []
-        if olho == Constantes().olho_direito:
-            matriz_mancha_cega = cordenadas_mcdir
-        elif olho == Constantes().olho_esquerdo:
-            matriz_mancha_cega = cordenadas_mcesq
+        matriz_mancha_cega = (
+            cordenadas_mcdir if olho == Constantes().olho_direito else cordenadas_mcesq
+        )
         pontos_naorespondidos = []
         random.shuffle(matriz_mancha_cega)
-        for ponto in matriz_mancha_cega:
+
+        # Variáveis de controle para processar pontos gradualmente
+        total_pontos = len(matriz_mancha_cega)
+        indice_atual = 0
+        tempo_inicial = pygame.time.get_ticks()
+        delay_entre_pontos = 100  # 100 ms entre pontos
+
+        while indice_atual < total_pontos:
+            # Processa eventos a cada iteração
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_j:  # Tecla ESC para sair
-                        pygame.quit()
-                        exit()
-            x, y = ponto
-            cor_ponto = Ponto.db_para_intensidade(0)
-            teste = Ponto(x, y, 3, cor_ponto)
-            teste.testaPonto(0.2, 2)
-            if not teste.response_received:
-                pontos_naorespondidos.append((teste.xg, teste.yg))
-        resultado = TesteLimiarManchaCega.calculo_centro_de_massa(pontos_naorespondidos)
+                    if event.key == pygame.K_j:  # Sai se j for pressionado
+                        indice_atual = total_pontos
+                        return False
 
+            tempo_atual = pygame.time.get_ticks()
+            # Se passou o delay, processa o próximo ponto
+            if tempo_atual - tempo_inicial >= delay_entre_pontos:
+                ponto = matriz_mancha_cega[indice_atual]
+                x, y = ponto
+                cor_ponto = Ponto.db_para_intensidade(0)
+                teste = Ponto(x, y, 3, cor_ponto)
+                teste.testaPonto(0.2, 2)
+                if not teste.response_received:
+                    pontos_naorespondidos.append((teste.xg, teste.yg))
+                indice_atual += 1
+                tempo_inicial = tempo_atual
+
+            # Você pode incluir aqui uma chamada para atualizar a tela, se necessário
+            pygame.display.flip()
+
+        resultado = TesteLimiarManchaCega.calculo_centro_de_massa(pontos_naorespondidos)
         if resultado == False:
             return verifica_mensagem()
-
         else:
             DadosExame.posicao_mancha_cega = resultado
-            
-            
+
+                
+                

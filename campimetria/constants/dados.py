@@ -1,3 +1,5 @@
+import pygame
+
 class Constantes:
     dbMin = 0
     dbMax = 40
@@ -22,6 +24,12 @@ class Colors:
     MEDIUM_BLACK = (50,50,50)
     GRAY = (122,122,122)
     
+
+class Fonts:
+    
+    pass
+
+
 
 class DadosExame:
 
