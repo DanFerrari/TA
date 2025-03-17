@@ -28,6 +28,7 @@ class Screening:
     def __init__(self, game):
         self.game = game
         self.running = True
+        self.pontos = self.criar_pontos()
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
         tempo_medio = sum(tempos) / len(tempos)
@@ -38,7 +39,7 @@ class Screening:
         return tempo_medio
 
     def criar_pontos(self):
-        return [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
+        return [Ponto(x, y, 3, (255, 255, 255), self.game) for x, y in cordenadas_30]
 
     def testa_mancha_cega(self, ponto):
         x, y = ponto
@@ -56,12 +57,11 @@ class Screening:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_j:  # Volta para o menu ou sai
                     from strategy_screen import StrategyScreen
-
                     self.game.change_screen(StrategyScreen(self.game))
 
     def exame_screening(self, fixacao=False):
-        pontos = self.criar_pontos()
-        random.shuffle(pontos)
+        
+        random.shuffle(self.pontos)
         tempo_resposta = 2.0
         tempos = []
         # mancha_cega = ponto_mancha_cega
@@ -74,7 +74,7 @@ class Screening:
         testenegativo = 0
         testepositivo = 0
 
-        for ponto in pontos:
+        for ponto in self.pontos:
             self.handle_events()
             ponto.cor = ponto.db_para_intensidade(DadosExame.atenuacao_screening)
             pygame.time.delay(100)  # Aguarda 100 ms para cada ponto
@@ -130,13 +130,15 @@ class Screening:
                     running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_j:  # Fecha ao pressionar ESC
-                        running = False
+                        self.running = False
 
             pygame.time.delay(2000)
-            mancha_cega = TesteLimiarManchaCega().teste_mancha_cega(DadosExame.olho)
-            if mancha_cega == True:
+            mancha_cega = TesteLimiarManchaCega(self.game)
+            mancha_cega.teste_mancha_cega(DadosExame.olho)
+
+            if mancha_cega.resultado == True:
                 continue
-            elif mancha_cega == False:
+            elif mancha_cega.resultado == False:
                 teste_fixacao = False
                 pygame.time.delay(1500)
             start_time = pygame.time.get_ticks()

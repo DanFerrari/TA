@@ -25,8 +25,7 @@ class Colors:
     GRAY = (122,122,122)
     
 
-class Fonts:
-    
+class Fonts:    
     pass
 
 

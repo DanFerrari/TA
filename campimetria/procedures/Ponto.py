@@ -19,7 +19,7 @@ from dados import *
 
 
 class Ponto:
-    def __init__(self, xg, yg, tamanhoPonto, cor):
+    def __init__(self, xg, yg, tamanhoPonto, cor,game = ""):
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
@@ -60,6 +60,8 @@ class Ponto:
         self.y = ymm / self.resolucaoY
         self.x = self.x + (self.screen_width / 2)
         self.y = self.y + (self.screen_height / 2)
+        
+        self.game = game
 
     @staticmethod
     def db_para_intensidade(db, db_min=40, db_max=0, i_min=150, i_max=255):
@@ -131,8 +133,9 @@ class Ponto:
                         self.tempo_resposta = (
                             pygame.time.get_ticks() - trial_start_time
                         ) / 1000
-                        print("yrmpo_resposta_no_ponto: ", self.tempo_resposta)
+                        print("tempo_resposta_no_ponto: ", self.tempo_resposta)
                         self.response_received = True
+                  
                    
 
             if not self.response_received:

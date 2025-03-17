@@ -137,8 +137,9 @@ botao_continuar = None
 
 class TesteLimiarManchaCega:
 
-    def __init__(self):
-        pass
+    def __init__(self,game):
+        self.game = game
+        self.resultado = False
 
     @staticmethod
     def calculo_centro_de_massa(pontos):
@@ -165,8 +166,8 @@ class TesteLimiarManchaCega:
 
 
 
-    @staticmethod
-    def teste_mancha_cega(olho):
+    
+    def teste_mancha_cega(self,olho):
         matriz_mancha_cega = (
             cordenadas_mcdir if olho == Constantes().olho_direito else cordenadas_mcesq
         )
@@ -185,10 +186,7 @@ class TesteLimiarManchaCega:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_j:  # Sai se j for pressionado
-                        indice_atual = total_pontos
-                        return False
+           
 
             tempo_atual = pygame.time.get_ticks()
             # Se passou o delay, processa o próximo ponto
@@ -196,7 +194,7 @@ class TesteLimiarManchaCega:
                 ponto = matriz_mancha_cega[indice_atual]
                 x, y = ponto
                 cor_ponto = Ponto.db_para_intensidade(0)
-                teste = Ponto(x, y, 3, cor_ponto)
+                teste = Ponto(x, y, 3, cor_ponto,self.game)
                 teste.testaPonto(0.2, 2)
                 if not teste.response_received:
                     pontos_naorespondidos.append((teste.xg, teste.yg))
@@ -206,11 +204,11 @@ class TesteLimiarManchaCega:
             # Você pode incluir aqui uma chamada para atualizar a tela, se necessário
             pygame.display.flip()
 
-        resultado = TesteLimiarManchaCega.calculo_centro_de_massa(pontos_naorespondidos)
-        if resultado == False:
+        self.resultado = TesteLimiarManchaCega.calculo_centro_de_massa(pontos_naorespondidos)
+        if self.resultado == False:
             return verifica_mensagem()
         else:
-            DadosExame.posicao_mancha_cega = resultado
+            DadosExame.posicao_mancha_cega = self.resultado
 
                 
                 

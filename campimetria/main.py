@@ -2,6 +2,7 @@ import pygame
 import os
 import sys
 import numpy as np
+import OPi.GPIO as GPIO
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants")))
@@ -13,6 +14,24 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "s
 from constants.dados import *
 from pages.strategy_screen import StrategyScreen
 
+BOTAO_PINO = 98
+
+GPIO.setmode(GPIO)
+GPIO.setup(BOTAO_PINO,GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
+
+
+def testeGPIO():
+    try:
+        while True:
+            estado = GPIO.input(BOTAO_PINO)  # Lê o pino
+            if estado == GPIO.HIGH:
+                print("Botão pressionado!")
+            else:
+                print("Botão solto!")
+            pygame.time.delay(100)  # Pequeno delay para evitar leituras muito rápidas
+    except KeyboardInterrupt:
+        print("\nEncerrando...")
+        GPIO.cleanup()  # Libera os pinos ao sair
 
 
 class Campimetria:
@@ -60,8 +79,10 @@ class Campimetria:
     
 
 if __name__ == "__main__":
-    game = Campimetria()
-    game.run()    
-    caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', "lib","mainTA.py"))
-    os.execvp("python", ["python", caminho])
+    testeGPIO()
+
+    # game = Campimetria()
+    # game.run()    
+    # caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', "lib","mainTA.py"))
+    # os.execvp("python", ["python", caminho])
         

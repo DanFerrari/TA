@@ -5,6 +5,7 @@ from CAMPFullThreshold import FullThreshold
 from strategy_screen import StrategyScreen
 
 
+
 class SelectEyeScreen:
     def __init__(self, game):
         self.game = game
@@ -138,3 +139,11 @@ class SelectEyeScreen:
         surface.blit(texto_botao, (self.width // 2 - texto_botao.get_width() // 2, pos_y_botao + 20))
         if self.selecao_atual == "botao":
             pygame.draw.rect(surface, (255, 255, 255), rect_botao, 5, border_radius=10)
+    
+    def draw_button(self, surface, text, y, width, height, selected):
+        x = (self.game.width - width) // 2
+        cor_atual = self.cor_botao_hover if selected else self.cor_botao
+        pygame.draw.rect(surface, cor_atual, (x, y, width, height), border_radius=10)
+        texto_render = self.font.render(text, True, self.cor_fundo)
+        text_rect = texto_render.get_rect(center=(x + width // 2, y + height // 2))
+        surface.blit(texto_render, text_rect)
