@@ -1,272 +1,254 @@
 import pygame
-import os, sys
+import os
+import sys
 import numpy as np
 
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
-)
+# Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants")))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "pages")))
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "procedures"))
-)
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies"))
-)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "procedures")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies")))
 
 from CAMPScreening import Screening
 from dados import *
 from CAMPFullThreshold import FullThreshold
-from Ponto import Ponto
-from cordenadas_30 import cordenadas_30
-from fixacao_central import FixacaoCentral
-
-# Inicializa o pygame
-pygame.init()
-
-# Configurações da tela (FULLSCREEN)
-tela = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-LARGURA, ALTURA = tela.get_size()
-pygame.display.set_caption("Seleção de Estratégia")
-
-# Fonte e cores estilizadas
-fonte = pygame.font.Font(None, int(ALTURA * 0.07))  # Fonte escalável
-cor_fundo = (0, 0, 0)
-cor_botao = (122, 122, 122)
-cor_botao_hover = (255, 255, 255)
-cor_borda_selecao = (255, 215, 0)  # Dourado para destacar o botão selecionado
-cor_texto = (255, 255, 255)
 
 
-# Índice do botão selecionado (0 = "Estratégia 1", 1 = "Estratégia 2")
-botao_selecionado = 0
+class Game:
+    def __init__(self):
+        pygame.init()
+        # Configura a tela em FULLSCREEN e captura dimensões
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.width, self.height = self.screen.get_size()
+        pygame.display.set_caption("Seleção de Estratégia")
+        self.clock = pygame.time.Clock()
+        self.running = True
+
+        # Definições de cores e fontes
+        self.cor_fundo = (20, 20, 20)
+        self.cor_botao = (122, 122, 122)
+        self.cor_botao_hover = (255, 255, 255)
+        self.cor_texto = (255, 255, 255)
+        self.font_main = pygame.font.Font(None, int(self.height * 0.07))
+        
+        # Estado inicial: tela de seleção de estratégia
+        self.current_screen = StrategyScreen(self)
+
+    def run(self):
+        while self.running:
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    self.running = False
+
+            # Delegamos o tratamento de eventos, atualização e desenho para a tela ativa
+            self.current_screen.handle_events(events)
+            self.current_screen.update()
+            self.current_screen.draw(self.screen)
+            pygame.display.flip()
+            self.clock.tick(60)
+        pygame.quit()
+
+    def change_screen(self, new_screen):
+        self.current_screen = new_screen
 
 
-# Funções para cada botão
-def selecionar_olho():
-    fonte_titulo = pygame.font.Font(None, int(ALTURA * 0.08))
-    fonte_opcoes = pygame.font.Font(None, int(ALTURA * 0.06))
-    fonte_numero = pygame.font.Font(None, int(ALTURA * 0.07))
-    fonte_botao = pygame.font.Font(None, int(ALTURA * 0.06))
-    cor_fundo = (20, 20, 20)
-    cor_texto = (255, 255, 255)
-    cor_texto_fade = (100, 100, 100)  # Cor mais fraca para opção não selecionada
-    cor_caixa = (50, 50, 50)
-    cor_caixa_selecao = (70, 70, 70)  # Branco para destacar a caixa de seleção
-    cor_botao = (0, 200, 0)  # Verde
-    cor_botao_hover = (0, 255, 0)  # Verde mais brilhante para hover
-    cor_font_olho = (255, 255, 255)  # Branco
-    # Opções do topo
-    opcoes = ["Olho Esquerdo", "Olho Direito"]
-    opcao_selecionada = 0  # 0 = Esquerda, 1 = Direita
 
-    # Controle da seleção
-    selecao_atual = "opcoes"  # Pode ser "opcoes", "numero" ou "botao"
+class StrategyScreen:
+    def __init__(self, game):
+        self.game = game
+        self.botao_selecionado = 0  # 0 = Screening, 1 = FullThreshold
+        self.font = game.font_main
+        self.cor_fundo = game.cor_fundo
+        self.cor_botao = game.cor_botao
+        self.cor_botao_hover = game.cor_botao_hover
+        self.cor_texto = game.cor_texto
 
-    # Caixa numérica
-    numero = 25
-    NUMERO_MIN = 0
-    NUMERO_MAX = 40
+    def handle_events(self, events):
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    self.botao_selecionado = 0
+                elif event.key == pygame.K_RIGHT:
+                    self.botao_selecionado = 1
+                elif event.key == pygame.K_e:  # Confirma a seleção
+                    if self.botao_selecionado == 0:
+                        DadosExame.exame_selecionado = Constantes.screening
+                    elif self.botao_selecionado == 1:
+                        DadosExame.exame_selecionado = Constantes.fullthreshold
+                    # Troca para a tela de seleção de olho e configuração
+                    self.game.change_screen(SelectEyeScreen(self.game))
+                elif event.key == pygame.K_j:
+                    self.game.running = False
 
-    rodando = True
-    while rodando:
-        tela.fill(cor_fundo)  # Fundo da tela
-        DadosExame.olho = Constantes.olho_direito
-        # Renderiza as opções do topo
-        pos_y_opcoes = ALTURA * 0.2
+    def update(self):
+        pass
 
-        if selecao_atual == "opcoes":
-            cor_font_olho = (255, 255, 255)
-        else:
-            cor_font_olho = (0, 255, 0)
+    def draw(self, surface):
+        surface.fill(self.cor_fundo)
+        # Renderiza o título centralizado
+        label_text = self.font.render("Selecione a estratégia", True, self.cor_texto)
+        surface.blit(label_text, (self.game.width // 2 - label_text.get_width() // 2, int(self.game.height * 0.2)))
+        
+        # Define dimensões dos botões
+        largura_botao = int(self.game.width * 0.3)
+        altura_botao = int(self.game.height * 0.1)
+        espacamento = int(self.game.height * 0.15)
+        
+        # Desenha os botões
+        self.draw_button(surface, "Screening", int(self.game.height * 0.4), largura_botao, altura_botao, self.botao_selecionado == 0)
+        self.draw_button(surface, "FullThreshold", int(self.game.height * 0.4 + espacamento), largura_botao, altura_botao, self.botao_selecionado == 1)
 
-        texto_esquerda = fonte_opcoes.render(
-            opcoes[0], True, cor_font_olho if opcao_selecionada == 0 else cor_texto_fade
-        )
-        texto_direita = fonte_opcoes.render(
-            opcoes[1], True, cor_font_olho if opcao_selecionada == 1 else cor_texto_fade
-        )
-        # Desenha uma borda para o texto à esquerda, se selecionado
+    def draw_button(self, surface, text, y, width, height, selected):
+        x = (self.game.width - width) // 2
+        cor_atual = self.cor_botao_hover if selected else self.cor_botao
+        pygame.draw.rect(surface, cor_atual, (x, y, width, height), border_radius=10)
+        texto_render = self.font.render(text, True, self.cor_fundo)
+        text_rect = texto_render.get_rect(center=(x + width // 2, y + height // 2))
+        surface.blit(texto_render, text_rect)
 
-        tela.blit(
-            texto_esquerda,
-            (LARGURA * 0.25 - texto_esquerda.get_width() // 2, pos_y_opcoes),
-        )
-        tela.blit(
-            texto_direita,
-            (LARGURA * 0.75 - texto_direita.get_width() // 2, pos_y_opcoes),
-        )
 
-        # Renderiza a caixa numérica
-        if DadosExame.exame_selecionado == Constantes.screening:
-            cor_caixa_atual = (
-                cor_caixa_selecao if selecao_atual == "numero" else cor_caixa
-            )
-            pos_y_numero = ALTURA * 0.4
-            pygame.draw.rect(
-                tela,
-                cor_caixa_atual,
-                (LARGURA // 2 - 100, pos_y_numero, 200, 100),
-                border_radius=10,
-            )
-            texto_numero = fonte_numero.render(str(numero), True, cor_texto)
-            tela.blit(
-                texto_numero,
-                (LARGURA // 2 - texto_numero.get_width() // 2, pos_y_numero + 25),
-            )
-            if selecao_atual == "numero":
-                pygame.draw.rect(
-                    tela,
-                    (255, 255, 255),  # Cor da borda (branca)
-                    (LARGURA // 2 - 100, pos_y_numero, 200, 100),
-                    5,  # Espessura da borda
-                    border_radius=10,  # Mesma curvatura que a caixa
-                )
 
-        # Renderiza o botão "Iniciar Exame"
-        pos_y_botao = ALTURA * 0.6
-        cor_botao_atual = cor_botao_hover if selecao_atual == "botao" else cor_botao
-        pygame.draw.rect(
-            tela,
-            cor_botao_atual,
-            (LARGURA // 2 - 150, pos_y_botao, 300, 80),
-            border_radius=10,
-        )
-        texto_botao = fonte_botao.render("Iniciar Exame", True, cor_fundo)
-        tela.blit(
-            texto_botao, (LARGURA // 2 - texto_botao.get_width() // 2, pos_y_botao + 20)
-        )
-        if selecao_atual == "botao":
-            pygame.draw.rect(
-                tela,
-                (255, 255, 255),  # Cor da borda (branca)
-                (LARGURA // 2 - 150, pos_y_botao, 300, 80),
-                5,  # Espessura da borda
-                border_radius=10,  # Mesma curvatura que o botão
-            )
+class SelectEyeScreen:
+    def __init__(self, game):
+        self.game = game
+        self.width, self.height = game.width, game.height
 
-        # Captura eventos do teclado
-        for event in pygame.event.get():
+        # Fontes utilizadas na tela
+        self.fonte_titulo = pygame.font.Font(None, int(self.height * 0.08))
+        self.fonte_opcoes = pygame.font.Font(None, int(self.height * 0.06))
+        self.fonte_numero = pygame.font.Font(None, int(self.height * 0.07))
+        self.fonte_botao = pygame.font.Font(None, int(self.height * 0.06))
+        
+        # Cores e configurações visuais
+        self.cor_texto = (255, 255, 255)
+        self.cor_texto_fade = (100, 100, 100)
+        self.cor_caixa = (50, 50, 50)
+        self.cor_caixa_selecao = (70, 70, 70)
+        self.cor_botao = (0, 200, 0)
+        self.cor_botao_hover = (0, 255, 0)
+        self.cor_font_olho = (255, 255, 255)
+        self.cor_fundo = game.cor_fundo
+
+        # Opções de olho
+        self.opcoes = ["Olho Esquerdo", "Olho Direito"]
+        self.opcao_selecionada = 0
+
+        # Controle de qual item está selecionado:
+        # Pode ser "opcoes", "numero" ou "botao"
+        self.selecao_atual = "opcoes"
+        
+        # Caixa numérica (para exame screening)
+        self.numero = 25
+        self.NUMERO_MIN = 0
+        self.NUMERO_MAX = 40
+
+    def handle_events(self, events):
+        for event in events:
             if event.type == pygame.QUIT:
-                rodando = False
+                self.game.running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_j:  # Tecla ESC para sair
-                    rodando = False
-                
-                # Alterna entre seleção de opções, número e botão
+                if event.key == pygame.K_j:  # Volta para o menu ou sai
+                    self.game.change_screen(StrategyScreen(self.game))
                 elif event.key == pygame.K_x:
-                    if selecao_atual == "numero":
-                        selecao_atual = "opcoes"
-                    elif selecao_atual == "botao":
+                    if self.selecao_atual == "numero":
+                        self.selecao_atual = "opcoes"
+                    elif self.selecao_atual == "botao":
                         if DadosExame.exame_selecionado == Constantes.screening:
-                            selecao_atual = "numero"
+                            self.selecao_atual = "numero"
                         else:
-                            selecao_atual = "opcoes"
+                            self.selecao_atual = "opcoes"
                 elif event.key == pygame.K_e:
-                    if selecao_atual == "opcoes":
+                    if self.selecao_atual == "opcoes":
                         if DadosExame.exame_selecionado == Constantes.screening:
-                            selecao_atual = "numero"
+                            self.selecao_atual = "numero"
                         else:
-                            selecao_atual = "botao"
-                    elif selecao_atual == "numero":
-                        selecao_atual = "botao"
-                    elif selecao_atual == "botao":
+                            self.selecao_atual = "botao"
+                    elif self.selecao_atual == "numero":
+                        self.selecao_atual = "botao"
+                    elif self.selecao_atual == "botao":
+                        # Ao confirmar no botão, inicia o exame conforme a estratégia selecionada
                         if DadosExame.exame_selecionado == Constantes.screening:
+                            DadosExame.atenuacao_screening = self.numero
                             exame = Screening()
-                            DadosExame.atenuacao_screening = numero
                             exame.iniciar_screening()
-                            rodando = False                            
+                            # Após o exame, retorna ao menu
+                            self.game.change_screen(StrategyScreen(self.game))
                         elif DadosExame.exame_selecionado == Constantes.fullthreshold:
                             exame = FullThreshold()
                             exame.main()
-                            rodando = False
+                            self.game.change_screen(StrategyScreen(self.game))
                         else:
                             print("Exame não implementado!")
-
-                # Navegação dentro da seleção ativa
-                elif selecao_atual == "opcoes":
+                elif self.selecao_atual == "opcoes":
                     if event.key == pygame.K_LEFT:
-                        opcao_selecionada = 0
+                        self.opcao_selecionada = 0
                         DadosExame.olho = Constantes.olho_esquerdo
                     elif event.key == pygame.K_RIGHT:
-                        opcao_selecionada = 1
+                        self.opcao_selecionada = 1
                         DadosExame.olho = Constantes.olho_direito
+                elif self.selecao_atual == "numero":
+                    if event.key == pygame.K_LEFT and self.numero > self.NUMERO_MIN:
+                        self.numero -= 1
+                    elif event.key == pygame.K_RIGHT and self.numero < self.NUMERO_MAX:
+                        self.numero += 1
 
-                elif selecao_atual == "numero":
-                    if event.key == pygame.K_LEFT and numero > NUMERO_MIN:
-                        numero -= 1
-                    elif event.key == pygame.K_RIGHT and numero < NUMERO_MAX:
-                        numero += 1
+    def update(self):
+        # Atualizações de animações ou lógicas adicionais podem ser inseridas aqui
+        pass
 
-                
-
-        pygame.display.flip()  # Atualiza a tela
-
-
-# Função para desenhar um botão centralizado
-def desenhar_botao(texto, y, largura, altura, selecionado):
-    x = (LARGURA - largura) // 2  # Centraliza o botão horizontalmente
-    cor_atual = cor_botao_hover if selecionado else cor_botao
-    texto_renderizado = fonte.render(texto, True, cor_atual)
-    texto_rect = texto_renderizado.get_rect(center=(x + largura // 2, y + altura // 2))
-    tela.blit(texto_renderizado, texto_rect)
-    return pygame.Rect(x, y, largura, altura)  # Retorna a área do botão
-
-
-
-
-
-
-# Loop principal
-rodando = True
-while rodando:
-
-   
-    tela.fill(cor_fundo)  # Preenche o fundo
-
-    # Renderiza a label no topo da tela
-    label_texto = fonte.render("Selecione a estratégia", True, cor_texto)
-    tela.blit(label_texto, (LARGURA // 2 - label_texto.get_width() // 2, ALTURA * 0.2))
-
-    # Dimensões dos botões proporcionais à tela
-    largura_botao = int(LARGURA * 0.3)
-    altura_botao = int(ALTURA * 0.1)
-    espacamento = int(ALTURA * 0.15)
-
-    # Desenha os botões com destaque no botão selecionado
-    botao1 = desenhar_botao(
-        "Screnning", ALTURA * 0.4, largura_botao, altura_botao, botao_selecionado == 0
-    )
-    botao2 = desenhar_botao(
-        "Fulltheshold",
-        ALTURA * 0.4 + espacamento,
-        largura_botao,
-        altura_botao,
-        botao_selecionado == 1,
-    )
-
-    # Captura eventos do teclado
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            rodando = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:  # Mover para cima
-                botao_selecionado = 0  # Seleciona "Estratégia 1"
-            elif event.key == pygame.K_RIGHT:  # Mover para baixo
-                botao_selecionado = 1  # Seleciona "Estratégia 2"
-            elif event.key == pygame.K_e:  # Tecla ENTER para confirmar
-                if botao_selecionado == 0:
-                    DadosExame.exame_selecionado = Constantes.screening
-                    selecionar_olho()
-                elif botao_selecionado == 1:
-                    DadosExame.exame_selecionado = Constantes.fullthreshold
-                    selecionar_olho()
-            elif event.key == pygame.K_j:  # Tecla ESC para sair
-                rodando = False
-
-    pygame.display.flip()  # Atualiza a tela
+    def draw(self, surface):
+        surface.fill(self.cor_fundo)
+        # Garante um valor default para teste (pode ser removido se necessário)
+        DadosExame.olho = Constantes.olho_direito
+        
+        # Renderiza as opções de olho no topo
+        pos_y_opcoes = self.height * 0.2
+        if self.selecao_atual == "opcoes":
+            self.cor_font_olho = (255, 255, 255)
+        else:
+            self.cor_font_olho = (0, 255, 0)
+        
+        texto_esquerda = self.fonte_opcoes.render(
+            self.opcoes[0],
+            True,
+            self.cor_font_olho if self.opcao_selecionada == 0 else self.cor_texto_fade
+        )
+        texto_direita = self.fonte_opcoes.render(
+            self.opcoes[1],
+            True,
+            self.cor_font_olho if self.opcao_selecionada == 1 else self.cor_texto_fade
+        )
+        surface.blit(texto_esquerda, (self.width * 0.25 - texto_esquerda.get_width() // 2, pos_y_opcoes))
+        surface.blit(texto_direita, (self.width * 0.75 - texto_direita.get_width() // 2, pos_y_opcoes))
+        
+        # Renderiza a caixa numérica (se o exame selecionado for Screening)
+        if DadosExame.exame_selecionado == Constantes.screening:
+            cor_caixa_atual = self.cor_caixa_selecao if self.selecao_atual == "numero" else self.cor_caixa
+            pos_y_numero = self.height * 0.4
+            rect_box = pygame.Rect(self.width // 2 - 100, pos_y_numero, 200, 100)
+            pygame.draw.rect(surface, cor_caixa_atual, rect_box, border_radius=10)
+            texto_numero = self.fonte_numero.render(str(self.numero), True, self.cor_texto)
+            surface.blit(texto_numero, (self.width // 2 - texto_numero.get_width() // 2, pos_y_numero + 25))
+            if self.selecao_atual == "numero":
+                pygame.draw.rect(surface, (255, 255, 255), rect_box, 5, border_radius=10)
+        
+        # Renderiza o botão "Iniciar Exame"
+        pos_y_botao = self.height * 0.6
+        cor_botao_atual = self.cor_botao_hover if self.selecao_atual == "botao" else self.cor_botao
+        rect_botao = pygame.Rect(self.width // 2 - 150, pos_y_botao, 300, 80)
+        pygame.draw.rect(surface, cor_botao_atual, rect_botao, border_radius=10)
+        texto_botao = self.fonte_botao.render("Iniciar Exame", True, self.cor_fundo)
+        surface.blit(texto_botao, (self.width // 2 - texto_botao.get_width() // 2, pos_y_botao + 20))
+        if self.selecao_atual == "botao":
+            pygame.draw.rect(surface, (255, 255, 255), rect_botao, 5, border_radius=10)
 
 
 
-caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..',"mainTA.py"))
-os.execvp("python", ["python", caminho])
 
+if __name__ == "__main__":
+    game = Game()
+    game.run()
+    
+    caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', "mainTA.py"))
+    os.execvp("python", ["python", caminho])

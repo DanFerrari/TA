@@ -166,6 +166,8 @@ class ResultadoScreening:
 
         pygame.display.flip()
         visualizando = True
+        
+        
         while visualizando:
             for evento in pygame.event.get():
                 if (

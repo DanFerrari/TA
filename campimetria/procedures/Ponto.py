@@ -136,13 +136,15 @@ class Ponto:
                 self.apagarPonto()
 
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    self.tempo_resposta = (
-                        pygame.time.get_ticks() - trial_start_time
-                    ) / 1000
-                    print("yrmpo_resposta_no_ponto: ", self.tempo_resposta)
-                    self.response_received = True
-
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.tempo_resposta = (
+                            pygame.time.get_ticks() - trial_start_time
+                        ) / 1000
+                        print("yrmpo_resposta_no_ponto: ", self.tempo_resposta)
+                        self.response_received = True
+                    elif event.key == pygame.K_j:
+                        exit()
               
 
             if not self.response_received:

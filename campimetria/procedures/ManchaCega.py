@@ -162,8 +162,12 @@ class TesteLimiarManchaCega:
             print(f"XCM1: {xcm}, YCM1: {ycm}")
             return xcm, ycm
 
+
+
+
     @staticmethod
     def teste_mancha_cega(olho):
+        
         matriz_mancha_cega = []
         if olho == Constantes().olho_direito:
             matriz_mancha_cega = cordenadas_mcdir
@@ -171,8 +175,15 @@ class TesteLimiarManchaCega:
             matriz_mancha_cega = cordenadas_mcesq
         pontos_naorespondidos = []
         random.shuffle(matriz_mancha_cega)
-        FixacaoCentral.plotar_fixacao_central()
         for ponto in matriz_mancha_cega:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_j:  # Tecla ESC para sair
+                        pygame.quit()
+                        exit()
             x, y = ponto
             cor_ponto = Ponto.db_para_intensidade(0)
             teste = Ponto(x, y, 3, cor_ponto)

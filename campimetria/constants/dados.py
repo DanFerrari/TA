@@ -14,7 +14,14 @@ class Colors:
     BACKGROUND = (155, 155, 155)
     ERASE_INTENSITY = 155
     DEFAULT = (53, 43, 54)
-
+    WHITE = (255,255,255)
+    SOFT_GREEN = (0,200,0)
+    GREEN = (0,255,0)
+    BLACK = (0,0,0)
+    SOFT_BLACK = (20,20,20)
+    MEDIUM_BLACK = (50,50,50)
+    GRAY = (122,122,122)
+    
 
 class DadosExame:
 
