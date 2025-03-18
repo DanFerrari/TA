@@ -22,6 +22,7 @@ from dados import *
 from TelaResultadoScreening import ResultadoScreening
 from fixacao_central import FixacaoCentral
 from MenuPausa import MenuPausa
+from strategy_screen import StrategyScreen
 
 
 class Screening:
@@ -30,8 +31,15 @@ class Screening:
         self.game = game
         self.running = True
         self.pontos = self.criar_pontos()
-        self.menu = MenuPausa(game)
-        
+        self.indice_atual = 0
+        self.menu = MenuPausa()
+        self.voltar_ao_menu_inicial = False
+
+        self.estado = "inicio"
+        self.teste_fixacao = True
+        self.aviso_inicial_respondido: bool = None
+
+        self.mancha_cega = TesteLimiarManchaCega()
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
         tempo_medio = sum(tempos) / len(tempos)
@@ -42,7 +50,7 @@ class Screening:
         return tempo_medio
 
     def criar_pontos(self):
-        return [Ponto(x, y, 3, (255, 255, 255), self.game) for x, y in cordenadas_30]
+        return [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
 
     def testa_mancha_cega(self, ponto):
         x, y = ponto
@@ -53,13 +61,8 @@ class Screening:
         else:
             return 0.0
 
- 
-
-
-
-
     def exame_screening(self, fixacao=False):
-        
+
         random.shuffle(self.pontos)
         tempo_resposta = 2.0
         tempos = []
@@ -74,11 +77,10 @@ class Screening:
         testepositivo = 0
 
         for ponto in self.pontos:
-         
+
             ponto.cor = ponto.db_para_intensidade(DadosExame.atenuacao_screening)
             ponto.testaPonto(0.2, tempo_resposta)
-          
-                        
+
             DadosExame.total_de_pontos_testados += 1
             if ponto.response_received:
                 pontos_vistos.append(ponto)
@@ -112,9 +114,9 @@ class Screening:
             if len(tempos) == 5:
                 tempo_resposta = self.media_de_tempo_de_resposta_paciente(tempos)
             tempos = []
-           
-            if ponto.menu_active:   
-                selecionando = True                 
+
+            if ponto.menu_active:
+                selecionando = True
                 while selecionando:
                     self.menu.handle_event()
                     self.menu.draw()
@@ -129,42 +131,59 @@ class Screening:
         DadosExame.matriz_pontos = self.pontos
 
     def iniciar_screening(self):
-        running = True
-        teste_fixacao = True
 
-    
-        verifica_posicionamento =  ContagemRegressiva.iniciar_contagem(5)
-        if verifica_posicionamento == False:
-            self.running = False
-            return
-        
-        # Captura eventos
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:  # Fecha ao clicar no botão de fechar
-                running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_j:  # Fecha ao pressionar ESC
-                    self.running = False
-
-        pygame.time.delay(1000)
-        mancha_cega = TesteLimiarManchaCega(self.game)
-        mancha_cega.teste_mancha_cega(DadosExame.olho)
-        
-       
-       
-        if mancha_cega.resultado == False:
-            teste_fixacao = False
-            pygame.time.delay(1500)
-        start_time = pygame.time.get_ticks()
-
-        self.exame_screening(
-                fixacao=teste_fixacao
-        )
+        self.exame_screening(fixacao=self.teste_fixacao)
         if self.menu.sair:
             return
-            
+
         end_time = pygame.time.get_ticks() - start_time
         DadosExame.duracao_do_exame = end_time
         ResultadoScreening.desenha_pontos()
-        pygame.display.flip()        
-        
+        pygame.display.flip()
+
+    def handle_events(self, events):
+        for event in events:
+            if event.type == pygame.QUIT:
+                self.game.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_j:  # Volta para o menu ou sai
+                    print("entrei no for")
+                    while self.menu.selecionando:
+                        self.menu.handle_event()
+                        self.menu.draw()
+                        self.menu.update()
+                    self.menu.selecionando = True
+                    if self.menu.sair:
+                        self.voltar_ao_menu_inicial = True
+                        return
+
+    def update(self):
+        pygame.display.update()
+        if self.voltar_ao_menu_inicial:
+            self.game.change_screen(StrategyScreen(self.game))
+
+    def draw(self, surface):
+        if self.estado == "inicio":
+            self.aviso_inicial_respondido = ContagemRegressiva.iniciar_contagem(5)
+            if self.aviso_inicial_respondido == False:
+                self.voltar_ao_menu_inicial = True
+                
+            else:
+                self.estado = "encontrando_mancha"
+                
+
+        elif self.estado == "encontrando_mancha":
+            self.mancha_cega.teste_mancha_cega()
+            if self.mancha_cega.encontrou_mancha != None:
+                if self.mancha_cega.encontrou_mancha:
+                    self.teste_fixacao = True
+                elif self.mancha_cega.encontrou_mancha == False:
+                    self.teste_fixacao = False
+                self.estado = "exame"
+                
+
+            
+
+        elif self.estado == "exame":
+            print("Iniciando exame")
+            

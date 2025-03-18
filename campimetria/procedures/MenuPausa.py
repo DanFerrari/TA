@@ -17,8 +17,8 @@ from ContagemRegressiva import ContagemRegressiva
 
 class MenuPausa:
 
-    def __init__(self,game):
-        self.game = game
+    def __init__(self):
+      
         self.botao_selecionado = 0
         self.selecionando = True
         self.sair = False
@@ -51,9 +51,9 @@ class MenuPausa:
                     self.botao_selecionado = 1
                 if event.key == pygame.K_e:
                     if self.botao_selecionado == 0:                        
-                        self.selecionando = False                        
-                    if self.botao_selecionado == 1:
-                        self.game.change_screen(StrategyScreen(self.game))
+                        self.selecionando = False         
+                        self.sair = False               
+                    if self.botao_selecionado == 1:                        
                         self.sair = True
                         self.selecionando = False
                     event.key = None

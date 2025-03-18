@@ -23,7 +23,7 @@ from fixacao_central import FixacaoCentral
 pygame.font.init()
 fonte = pygame.font.Font(None, 36)
 cor_texto = (255, 255, 255)
-cor_alerta = Colors.BACKGROUND # Vermelho
+cor_alerta = Colors.BACKGROUND  # Vermelho
 cor_botao = (100, 100, 100)
 cor_botao_hover = (150, 150, 150)
 cor_borda_selecao = (255, 255, 255)  # Branco (para o botão selecionado)
@@ -75,7 +75,7 @@ def mostrar_alerta(botao_reiniciar_estado, botao_continuar_estado):
         True,
         cor_texto,
     )
-    texto_rect = texto.get_rect(center=(960,405))
+    texto_rect = texto.get_rect(center=(960, 405))
     pygame.display.get_surface().blit(texto, texto_rect)
 
     # Desenha os botões com a seleção destacada
@@ -92,132 +92,107 @@ def mostrar_alerta(botao_reiniciar_estado, botao_continuar_estado):
     )  # Retorna os retângulos dos botões para referência
 
 
-def verifica_mensagem():
-    rodando = True
-    mostrar_mensagem = True
-    botao_reiniciar = None
-    botao_continuar = None
-    pygame.display.get_surface().fill(Colors.BACKGROUND)
-    pygame.display.update()
-    botao_selecionado = 0
-    botao_reiniciar, botao_continuar = mostrar_alerta(True, False)
-    while rodando:
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                rodando = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    mostrar_alerta(
-                        botao_reiniciar_estado=True, botao_continuar_estado=False
-                    )
-                    botao_selecionado = 0
-                elif event.key == pygame.K_RIGHT:
-                    mostrar_alerta(
-                        botao_reiniciar_estado=False, botao_continuar_estado=True
-                    )
-                    botao_selecionado = 1
-                elif event.key == pygame.K_e and mostrar_mensagem:
-                    if botao_selecionado == 0:
-                        rodando = False  # Fecha o jogo
-                        pygame.display.get_surface().fill(Colors.BACKGROUND)
-                        FixacaoCentral.plotar_fixacao_central()
-                        return True
-                    elif botao_selecionado == 1:
-                        rodando = False  # Fecha o jogo
-                        pygame.display.get_surface().fill(Colors.BACKGROUND)
-                        FixacaoCentral.plotar_fixacao_central()
-                        return False
-                    mostrar_mensagem = False  # Fecha a notificação
-
-
-botao_reiniciar = None
-botao_continuar = None
-
-
 class TesteLimiarManchaCega:
 
-    def __init__(self,game):
-        self.game = game
-        self.resultado = False
+    def __init__(self):
+        self.encontrou_mancha = None
+        self.resultado = None
+        self.indice_atual = 0
+        self.pontos_naorespondidos = []
+        self.matriz_mancha_cega = (
+            cordenadas_mcdir
+            if DadosExame.olho == Constantes().olho_direito
+            else cordenadas_mcesq
+        )
+        random.shuffle(self.matriz_mancha_cega)
+        self.total_pontos = len(self.matriz_mancha_cega)
+        self.delay_entre_pontos = 100
+        self.reiniciar = False
 
-    @staticmethod
-    def calculo_centro_de_massa(pontos):
+    def verifica_mensagem(self):
+        rodando = True
+        mostrar_mensagem = True
+        botao_reiniciar = None
+        botao_continuar = None
+        pygame.display.get_surface().fill(Colors.BACKGROUND)
+        pygame.display.update()
+        botao_selecionado = 0
+        botao_reiniciar, botao_continuar = mostrar_alerta(True, False)
+        while rodando:
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    rodando = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        mostrar_alerta(
+                            botao_reiniciar_estado=True, botao_continuar_estado=False
+                        )
+                        botao_selecionado = 0
+                    elif event.key == pygame.K_RIGHT:
+                        mostrar_alerta(
+                            botao_reiniciar_estado=False, botao_continuar_estado=True
+                        )
+                        botao_selecionado = 1
+                    elif event.key == pygame.K_e and mostrar_mensagem:
+                        if botao_selecionado == 0:
+                            rodando = False  # Fecha o jogo
+                            pygame.display.get_surface().fill(Colors.BACKGROUND)
+                            FixacaoCentral.plotar_fixacao_central()
+                            self.reiniciar = True
+                            return
+                        elif botao_selecionado == 1:
+                            rodando = False  # Fecha o jogo
+                            pygame.display.get_surface().fill(Colors.BACKGROUND)
+                            FixacaoCentral.plotar_fixacao_central()
+                            self.reiniciar = False
+                            return
+                        mostrar_mensagem = False  # Fecha a notificação
+
+    def calculo_centro_de_massa(self):
         somaMx = 0
         somaMy = 0
         icont = 0
-        if len(pontos) == 0:
+        if len(self.pontos_naorespondidos) == 0:
             return False
-        for i in range(len(pontos)):
-            for pontoNaoRespondido in pontos:
+        for i in range(len(self.pontos_naorespondidos)):
+            for pontoNaoRespondido in self.pontos_naorespondidos:
                 x, y = pontoNaoRespondido
                 somaMx += x
                 somaMy += y
                 icont += 1
                 print(f"SOMAM {somaMx} SOMAMY: {somaMy} ICONT:{icont}")
-        if icont == 0:
-            return False
-        else:
-            xcm = round(somaMx / icont)
-            ycm = round(somaMy / icont)
-            print(f"XCM1: {xcm}, YCM1: {ycm}")
-            return xcm, ycm
 
+        xcm = round(somaMx / icont)
+        ycm = round(somaMy / icont)
+        print(f"XCM1: {xcm}, YCM1: {ycm}")
+        return xcm, ycm
 
+    def teste_mancha_cega(self):
+        
 
+        if self.indice_atual < self.total_pontos:
 
-    
-    def teste_mancha_cega(self,olho):
-        matriz_mancha_cega = (
-            cordenadas_mcdir if olho == Constantes().olho_direito else cordenadas_mcesq
-        )
-        pontos_naorespondidos = []
-        random.shuffle(matriz_mancha_cega)
+            ponto = self.matriz_mancha_cega[self.indice_atual]
+            x, y = ponto
+            cor_ponto = Ponto.db_para_intensidade(0)
+            teste = Ponto(x, y, 3, cor_ponto)
+            teste.testaPonto(0.2, 2)
+            if not teste.response_received:
+                self.pontos_naorespondidos.append((teste.xg, teste.yg))
+            self.indice_atual += 1
 
-        # Variáveis de controle para processar pontos gradualmente
-        total_pontos = len(matriz_mancha_cega)
-        indice_atual = 0
-        tempo_inicial = pygame.time.get_ticks()
-        delay_entre_pontos = 100  # 100 ms entre pontos
+        if self.indice_atual == self.total_pontos:
 
-        while indice_atual < total_pontos:
-            # Processa eventos a cada iteração
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_j:  # Fecha ao pressionar ESC
-                        indice_atual = total_pontos
-                        self.resultado = False
-                        break
-                        
-           
-            if indice_atual == total_pontos:
-                break
-            tempo_atual = pygame.time.get_ticks()
-            # Se passou o delay, processa o próximo ponto
-            if tempo_atual - tempo_inicial >= delay_entre_pontos:
-                ponto = matriz_mancha_cega[indice_atual]
-                x, y = ponto
-                cor_ponto = Ponto.db_para_intensidade(0)
-                teste = Ponto(x, y, 3, cor_ponto,self.game)
-                teste.testaPonto(0.2, 2)
-                if not teste.response_received:
-                    pontos_naorespondidos.append((teste.xg, teste.yg))
-                indice_atual += 1
-                tempo_inicial = tempo_atual
-
-            # Você pode incluir aqui uma chamada para atualizar a tela, se necessário
-            pygame.display.flip()
-
-        self.resultado = TesteLimiarManchaCega.calculo_centro_de_massa(pontos_naorespondidos)
-        if len(pontos_naorespondidos) == 0:
-            return verifica_mensagem()
-        elif self.resultado == False:
-            return False
-        else:
-            DadosExame.posicao_mancha_cega = self.resultado
-
-                
-                
+            if len(self.pontos_naorespondidos) == 0:
+                self.verifica_mensagem()
+                if self.reiniciar:
+                    self.indice_atual = 0
+                    self.pontos_naorespondidos = []
+                    self.reiniciar = False
+                else:
+                    self.encontrou_mancha = False
+            else:
+                self.resultado = self.calculo_centro_de_massa()
+                self.encontrou_mancha = True
+                DadosExame.posicao_mancha_cega = self.resultado

@@ -28,7 +28,7 @@ from dados import *
 
 
 class Ponto:
-    def __init__(self, xg, yg, tamanhoPonto, cor,game = ""):
+    def __init__(self, xg, yg, tamanhoPonto, cor):
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
@@ -70,7 +70,7 @@ class Ponto:
         self.x = self.x + (self.screen_width / 2)
         self.y = self.y + (self.screen_height / 2)
         
-        self.game = game
+      
 
     @staticmethod
     def db_para_intensidade(db, db_min=40, db_max=0, i_min=150, i_max=255):
@@ -145,11 +145,7 @@ class Ponto:
             #     self.response_received = True
             #     print("Respondi o estimulo")
               
-            for event in pygame.event.get():
-                
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_j:  # Fecha ao pressionar ESC
-                        self.menu_active = True
+        
 
             if not self.response_received:
                 self.tempo_resposta = 2.0

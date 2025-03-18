@@ -67,10 +67,11 @@ class SelectEyeScreen:
                         # Ao confirmar no botão, inicia o exame conforme a estratégia selecionada
                         if DadosExame.exame_selecionado == Constantes.screening:
                             DadosExame.atenuacao_screening = self.numero
-                            exame = Screening(self.game)
-                            exame.iniciar_screening()
-                            # Após o exame, retorna ao menu
-                            self.game.change_screen(StrategyScreen(self.game))
+                            # exame = Screening(self.game)
+                            # exame.iniciar_screening()
+                            # self.game.change_screen(StrategyScreen(self.game))
+                            self.game.change_screen(Screening(self.game))
+                            
                         elif DadosExame.exame_selecionado == Constantes.fullthreshold:
                             exame = FullThreshold()
                             exame.main()
