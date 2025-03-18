@@ -176,3 +176,4 @@ class ResultadoScreening:
                     and evento.key == pygame.K_j
                 ):
                     visualizando = False
+                    

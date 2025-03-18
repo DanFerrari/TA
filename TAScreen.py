@@ -505,8 +505,8 @@ class TAView(QGraphicsView):
                 self.scene().setExam("Menu")
 
             elif self._menuSuccess and event.key() == Qt.Key_F10:
-                caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), 'campimetria', 'pages',"TelaInicial.py"))
-                os.execvp("python3", ["python3", caminho])
+                caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..',"..","inicia_campo.sh"))
+                os.execvp("bash", ["bash", caminho])
 
             elif self._menuSuccess and event.key() == Qt.Key_J:  # Change Optotypes Sizes
 
