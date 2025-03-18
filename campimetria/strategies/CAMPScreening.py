@@ -113,7 +113,7 @@ class Screening:
                 tempo_resposta = self.media_de_tempo_de_resposta_paciente(tempos)
                 tempos = []
 
-        DadosExame.matriz_pontos = pontos
+        DadosExame.matriz_pontos = self.pontos
 
     def iniciar_screening(self):
         running = True
