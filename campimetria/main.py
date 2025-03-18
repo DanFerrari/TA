@@ -1,30 +1,27 @@
 import pygame
 import os
 import sys
-import numpy as np
 
-import time
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants")))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
+)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "pages")))
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "procedures")))
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies")))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "procedures"))
+)
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies"))
+)
 
 
 from constants.dados import *
 from pages.strategy_screen import StrategyScreen
 
 
-
-
-
-    
-
 class Campimetria:
-    
 
-    
     def __init__(self):
         pygame.init()
         # Configura a tela em FULLSCREEN e captura dimensões
@@ -40,7 +37,7 @@ class Campimetria:
         self.cor_botao_hover = (255, 255, 255)
         self.cor_texto = (255, 255, 255)
         self.font_main = pygame.font.Font(None, int(self.height * 0.07))
-        
+
         # Estado inicial: tela de seleção de estratégia
         self.current_screen = StrategyScreen(self)
 
@@ -61,15 +58,13 @@ class Campimetria:
 
     def change_screen(self, new_screen):
         self.current_screen = new_screen
-        
 
+
+if __name__ == "__main__":    
     
-
-if __name__ == "__main__":
     game = Campimetria()
-    game.run()    
-    caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', "lib","mainTA.py"))
+    game.run()
+    caminho = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "..", "lib", "mainTA.py")
+    )
     os.execvp("python", ["python", caminho])
-        
-
-

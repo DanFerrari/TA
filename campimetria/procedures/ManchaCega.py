@@ -117,7 +117,7 @@ def verifica_mensagem():
                         botao_reiniciar_estado=False, botao_continuar_estado=True
                     )
                     botao_selecionado = 1
-                elif event.key == pygame.K_RETURN and mostrar_mensagem:
+                elif event.key == pygame.K_e and mostrar_mensagem:
                     if botao_selecionado == 0:
                         rodando = False  # Fecha o jogo
                         pygame.display.get_surface().fill(Colors.BACKGROUND)
@@ -185,9 +185,16 @@ class TesteLimiarManchaCega:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_j:  # Fecha ao pressionar ESC
+                        indice_atual = total_pontos
+                        self.resultado = False
+                        break
+                        
            
-
+            if indice_atual == total_pontos:
+                break
             tempo_atual = pygame.time.get_ticks()
             # Se passou o delay, processa o próximo ponto
             if tempo_atual - tempo_inicial >= delay_entre_pontos:
@@ -205,8 +212,10 @@ class TesteLimiarManchaCega:
             pygame.display.flip()
 
         self.resultado = TesteLimiarManchaCega.calculo_centro_de_massa(pontos_naorespondidos)
-        if self.resultado == False:
+        if len(pontos_naorespondidos) == 0:
             return verifica_mensagem()
+        elif self.resultado == False:
+            return False
         else:
             DadosExame.posicao_mancha_cega = self.resultado
 

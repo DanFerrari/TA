@@ -5,11 +5,12 @@ import os
 import sys
 import OPi.GPIO as GPIO
 
+
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)   
 
 PIN_ENTRADA = 'PD22'
-GPIO.setup(PIN_ENTRADA, GPIO.IN)
+# GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 sys.path.append(
@@ -47,7 +48,7 @@ class Ponto:
         self.resolucao_video = 0.2599
         self.x = 0
         self.y = 0
-        
+        self.menu_active = False
         self.tempo_resposta = 0.0
         self.clock = pygame.time.Clock()
 
@@ -136,15 +137,19 @@ class Ponto:
                 self.apagarPonto()
 
         
-            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-                self.tempo_resposta = (
-                    pygame.time.get_ticks() - trial_start_time
-                ) / 1000
-                print("tempo_resposta_no_ponto: ", self.tempo_resposta)
-                self.response_received = True
-                print("Respondi o estimulo")
-                  
-                   
+            # if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+            #     self.tempo_resposta = (
+            #         pygame.time.get_ticks() - trial_start_time
+            #     ) / 1000
+            #     print("tempo_resposta_no_ponto: ", self.tempo_resposta)
+            #     self.response_received = True
+            #     print("Respondi o estimulo")
+              
+            for event in pygame.event.get():
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_j:  # Fecha ao pressionar ESC
+                        self.menu_active = True
 
             if not self.response_received:
                 self.tempo_resposta = 2.0

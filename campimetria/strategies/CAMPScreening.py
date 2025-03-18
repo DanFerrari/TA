@@ -21,6 +21,7 @@ from ContagemRegressiva import ContagemRegressiva
 from dados import *
 from TelaResultadoScreening import ResultadoScreening
 from fixacao_central import FixacaoCentral
+from MenuPausa import MenuPausa
 
 
 class Screening:
@@ -29,6 +30,8 @@ class Screening:
         self.game = game
         self.running = True
         self.pontos = self.criar_pontos()
+        self.menu = MenuPausa(game)
+        
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
         tempo_medio = sum(tempos) / len(tempos)
@@ -50,14 +53,10 @@ class Screening:
         else:
             return 0.0
 
-    def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.game.running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_j:  # Volta para o menu ou sai
-                    from strategy_screen import StrategyScreen
-                    self.game.change_screen(StrategyScreen(self.game))
+ 
+
+
+
 
     def exame_screening(self, fixacao=False):
         
@@ -75,10 +74,11 @@ class Screening:
         testepositivo = 0
 
         for ponto in self.pontos:
-            self.handle_events()
+         
             ponto.cor = ponto.db_para_intensidade(DadosExame.atenuacao_screening)
-            pygame.time.delay(100)  # Aguarda 100 ms para cada ponto
             ponto.testaPonto(0.2, tempo_resposta)
+          
+                        
             DadosExame.total_de_pontos_testados += 1
             if ponto.response_received:
                 pontos_vistos.append(ponto)
@@ -111,45 +111,60 @@ class Screening:
 
             if len(tempos) == 5:
                 tempo_resposta = self.media_de_tempo_de_resposta_paciente(tempos)
-                tempos = []
-
+            tempos = []
+           
+            if ponto.menu_active:   
+                selecionando = True                 
+                while selecionando:
+                    self.menu.handle_event()
+                    self.menu.draw()
+                    self.menu.update()
+                    if not self.menu.selecionando:
+                        if not self.menu.sair:
+                            self.menu = MenuPausa(self.game)
+                        selecionando = False
+            if self.menu.sair:
+                self.running = False
+                break
         DadosExame.matriz_pontos = self.pontos
 
     def iniciar_screening(self):
         running = True
         teste_fixacao = True
 
-        while self.running:
-            ContagemRegressiva.iniciar_contagem(5)
-            pygame.display.get_surface().fill(Colors.BACKGROUND)
-            pygame.display.update()
-            FixacaoCentral.plotar_fixacao_central()
-            # Captura eventos
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:  # Fecha ao clicar no botão de fechar
-                    running = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_j:  # Fecha ao pressionar ESC
-                        self.running = False
-
-            pygame.time.delay(2000)
-            mancha_cega = TesteLimiarManchaCega(self.game)
-            mancha_cega.teste_mancha_cega(DadosExame.olho)
-
-            if mancha_cega.resultado == True:
-                continue
-            elif mancha_cega.resultado == False:
-                teste_fixacao = False
-                pygame.time.delay(1500)
-            start_time = pygame.time.get_ticks()
-
-            self.exame_screening(
-                 fixacao=teste_fixacao
-            )
-            end_time = pygame.time.get_ticks() - start_time
-            DadosExame.duracao_do_exame = end_time
-            ResultadoScreening.desenha_pontos()
-
-            pygame.display.flip()
+    
+        verifica_posicionamento =  ContagemRegressiva.iniciar_contagem(5)
+        if verifica_posicionamento == False:
             self.running = False
-        return
+            return
+        
+        # Captura eventos
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # Fecha ao clicar no botão de fechar
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_j:  # Fecha ao pressionar ESC
+                    self.running = False
+
+        pygame.time.delay(1000)
+        mancha_cega = TesteLimiarManchaCega(self.game)
+        mancha_cega.teste_mancha_cega(DadosExame.olho)
+        
+       
+       
+        if mancha_cega.resultado == False:
+            teste_fixacao = False
+            pygame.time.delay(1500)
+        start_time = pygame.time.get_ticks()
+
+        self.exame_screening(
+                fixacao=teste_fixacao
+        )
+        if self.menu.sair:
+            return
+            
+        end_time = pygame.time.get_ticks() - start_time
+        DadosExame.duracao_do_exame = end_time
+        ResultadoScreening.desenha_pontos()
+        pygame.display.flip()        
+        
