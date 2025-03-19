@@ -34,7 +34,7 @@ class Screening:
 
     def __init__(self, game):
         self.game = game
-        self.running = True
+        
         self.pontos = self.criar_pontos()
         self.indice_atual = 0
         self.menu = MenuPausa()

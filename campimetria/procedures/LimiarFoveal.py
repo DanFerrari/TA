@@ -16,11 +16,7 @@ from dados import *
 
 
 
-def fixacao_diamante():
-    Ponto(0, 6, 3, pygame.Color("yellow")).plotarPonto()
-    Ponto(0, -6, 3, pygame.Color("yellow")).plotarPonto()
-    Ponto(6, 0, 3, pygame.Color("yellow")).plotarPonto()
-    Ponto(-6, 0, 3, pygame.Color("yellow")).plotarPonto()
+
 
 
 def db_para_intensidade(db, db_min=40, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
@@ -38,70 +34,12 @@ def db_para_intensidade(db, db_min=40, db_max=0, i_min=Colors.ERASE_INTENSITY, i
     # return 110 + (255 - 110) * ((10**(db / 40) - 1) / (10**(1) - 1))
 
 
-def contagem_regressiva():
-    """
-    Exibe uma contagem regressiva de 3 segundos na tela.
-
-    Args:
-        surface: A tela do pygame onde o texto será desenhado.
-        fonte: Objeto pygame.font.Font para renderizar o texto.
-        posicao: Tupla (x, y) indicando onde exibir o texto na tela.
-    """
-
-    for i in range(5, 0, -1):
-        pygame.display.get_surface().fill(Colors.BACKGROUND)  # Limpa a tela (preto)
-        texto = pygame.font.Font(None, 150).render(
-            str(i), True, (255, 255, 255)
-        )  # Texto branco
-        pygame.display.get_surface().blit(texto, (1920 / 2 - 37, 1080 / 2 - 37))
-        pygame.display.update()
-        time.sleep(1)  # Aguarda 1 segundo
 
 
-def tela_resultado(db):
-    PRETO = (0, 0, 0)
-    BRANCO = (255, 255, 255)
-    AZUL = (50, 150, 255)
-    AZUL_ESCURO = (30, 100, 200)
-
-    # Fonte para exibição
-    fonte = pygame.font.Font(None, 150)
-    fonte_botao = pygame.font.Font(None, 40)
-
-    # Número grande de exemplo
-    numero_grande = db
-
-    # Configuração do botão OK
-    botao_rect = pygame.Rect(1920 // 2 - 50, 1080 // 2 + 50, 100, 50)
-    esperando_clique = True
-    while esperando_clique:
-        pygame.display.get_surface().fill((0, 0, 0))  # Fundo preto
-
-        # Renderiza o texto
-        texto = fonte.render(f"{numero_grande}", True, BRANCO)
-        rect_texto = texto.get_rect(center=(1920 // 2, 1080 // 2 - 50))
-        pygame.display.get_surface().blit(texto, rect_texto)
-
-       
-
-        pygame.display.flip()  # Atualiza a tela
-        
-        # Captura eventos
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                esperando_clique = False  # Sai do loop ao fechar a janela
-            if evento.type == pygame.MOUSEBUTTONDOWN:
-                if botao_rect.collidepoint(evento.pos):
-                    esperando_clique = False  # Fecha a tela quando clica no botão
-        pygame.time.delay(3000)
-        esperando_clique = False
 
 class CalcularLimiar():
     
     def iniciar_teste_limiar_foveal():
-        contagem_regressiva()
-        pygame.display.get_surface().fill(Colors.BACKGROUND)
-        pygame.display.update()
         UV = 0
         AT = 0
         UNV = 0
@@ -118,7 +56,7 @@ class CalcularLimiar():
         tempoRespostaPaciente = 2.0
         tamanhoPonto = 3
         sairAplicacao = False
-        fixacao_diamante()
+
         limiarok = False
 
         ponto_limiar = Ponto(
@@ -221,7 +159,7 @@ class CalcularLimiar():
             DadosExame.limiar_foveal = limiar
             print(f"Limiar Foveal: {limiar} dB")
             limiarok = True  
-            tela_resultado(limiar)      
+     
         
 
 

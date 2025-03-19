@@ -42,7 +42,7 @@ class ResultadoScreening:
             if DadosExame.falso_positivo_respondidos > 0
             else 0
         )
-        DadosExame.duracao_do_exame = (DadosExame.duracao_do_exame / 1000) / 60
+        DadosExame.duracao_do_exame = (DadosExame.duracao_do_exame / 1000)
 
         labels = [
             f"Exame: {DadosExame.exame_selecionado}",
