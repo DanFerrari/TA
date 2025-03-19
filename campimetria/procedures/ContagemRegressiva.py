@@ -32,7 +32,7 @@ class ContagemRegressiva:
             1,
             (255, 255, 255),
         )
-        textpos = text.get_rect(centerx=960, centery=540 - 200)
+        textpos = text.get_rect(centerx=960, centery=540 - 400)
         pygame.display.get_surface().blit(text, textpos)
 
         font = pygame.font.Font(None, 42)
@@ -41,7 +41,7 @@ class ContagemRegressiva:
             1,
             (255, 255, 255),
         )
-        textpos2 = text2.get_rect(centerx=960, centery=540 - 100)
+        textpos2 = text2.get_rect(centerx=960, centery=540 - 300)
         pygame.display.get_surface().blit(text2, textpos2)
 
         pygame.display.update()

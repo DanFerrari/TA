@@ -72,6 +72,12 @@ class Screening:
         self.total_pontos_exame = len(self.pontos)
         print(self.total_pontos_exame)
         
+        
+        self.tempo_inicial_exame = 0
+        self.tempo_final_exame = 0
+        self.tempo_decorrido_exame = 0
+        self.tempo_pausado = 0
+        
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
         tempo_medio = sum(tempos) / len(tempos)
@@ -104,11 +110,15 @@ class Screening:
                 if event.key == pygame.K_j:  # Volta para o menu ou sai
                     print("entrei no for")
                     self.menu.usuario = "operador"
+                    tempo_inicial = pygame.time.get_ticks()
                     while self.menu.selecionando:
                         self.menu.handle_event()
                         self.menu.draw()
                         self.menu.update()
                     self.menu.selecionando = True
+                    tempo_final = pygame.time.get_ticks()
+                    tempo_decorrido = tempo_final - tempo_inicial
+                    self.tempo_pausado += tempo_decorrido
                     if self.menu.sair:
                         self.voltar_ao_menu_inicial = True
           
@@ -150,11 +160,15 @@ class Screening:
                 self.pausa_paciente(reiniciar=True)
                 print("entrei no menu")
                 self.menu.usuario = "paciente"
+                tempo_inicial = pygame.time.get_ticks()
                 while self.menu.selecionando:
                     self.menu.handle_event()
                     self.menu.draw()
                     self.menu.update()
                 self.menu.selecionando = True
+                tempo_final = pygame.time.get_ticks()
+                tempo_decorrido = tempo_final - tempo_inicial
+                self.tempo_pausado += tempo_decorrido
                 if self.menu.sair:
                     self.voltar_ao_menu_inicial = True
               
@@ -172,6 +186,7 @@ class Screening:
                 self.voltar_ao_menu_inicial = True               
             else:
                 self.estado = "encontrando_mancha"
+                self.tempo_inicial_exame = pygame.time.get_ticks()
                 
 
         elif self.estado == "encontrando_mancha":
@@ -259,6 +274,10 @@ class Screening:
 
                 
             if self.indice_atual == self.total_pontos_exame:
+                self.tempo_final_exame = pygame.time.get_ticks()
+                self.tempo_decorrido_exame = self.tempo_final_exame - self.tempo_inicial_exame - self.tempo_pausado
+                DadosExame.duracao_do_exame = self.tempo_decorrido_exame
+               
                 DadosExame.matriz_pontos = self.pontos
                 self.estado = "resultado"
                 
