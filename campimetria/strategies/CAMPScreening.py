@@ -70,7 +70,7 @@ class Screening:
         self.testepositivo = 0
 
         self.total_pontos_exame = len(self.pontos)
-    
+        print(self.total_pontos_exame)
         
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
@@ -141,8 +141,11 @@ class Screening:
             self.game.change_screen(StrategyScreen(self.game))
         
         if self.cronometrar:
-            self.tempo_pausa = pygame.time.get_ticks() - self.tempo_pausa
-            if self.tempo_pausa > 3000:
+            tempo_inicial = self.tempo_pausa
+            tempo_atual = pygame.time.get_ticks()
+            tempo_decorrido = tempo_atual - tempo_inicial
+            
+            if tempo_decorrido > 3000:
                 self.cronometrar = False
                 self.pausa_paciente(reiniciar=True)
                 print("entrei no menu")
@@ -257,7 +260,7 @@ class Screening:
                 
             if self.indice_atual == self.total_pontos_exame:
                 DadosExame.matriz_pontos = self.pontos
-                self.estado == "resultado"
+                self.estado = "resultado"
                 
                     
         
