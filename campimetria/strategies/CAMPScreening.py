@@ -266,6 +266,6 @@ class Screening:
         
         
         elif self.estado == "resultado":
-            #self.game.change_screen(ResultadoScreening(self.game))
             ResultadoScreening.desenha_pontos()
+            self.game.change_screen(StrategyScreen(self.game))
             
