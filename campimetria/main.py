@@ -1,6 +1,14 @@
 import pygame
 import os
 import sys
+import OPi.GPIO as GPIO
+
+
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.SUNXI)   
+
+PIN_ENTRADA = 'PD22'
+GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)

@@ -168,8 +168,7 @@ class TesteLimiarManchaCega:
         print(f"XCM1: {xcm}, YCM1: {ycm}")
         return xcm, ycm
 
-    def teste_mancha_cega(self):
-        
+    def teste_mancha_cega(self):        
 
         if self.indice_atual < self.total_pontos:
 

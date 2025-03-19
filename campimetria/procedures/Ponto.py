@@ -6,12 +6,8 @@ import sys
 import OPi.GPIO as GPIO
 
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.SUNXI)   
 
 PIN_ENTRADA = 'PD22'
-# GPIO.setup(PIN_ENTRADA, GPIO.IN)
-
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
@@ -137,13 +133,13 @@ class Ponto:
                 self.apagarPonto()
 
         
-            # if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-            #     self.tempo_resposta = (
-            #         pygame.time.get_ticks() - trial_start_time
-            #     ) / 1000
-            #     print("tempo_resposta_no_ponto: ", self.tempo_resposta)
-            #     self.response_received = True
-            #     print("Respondi o estimulo")
+            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+                self.tempo_resposta = (
+                    pygame.time.get_ticks() - trial_start_time
+                ) / 1000
+                print("tempo_resposta_no_ponto: ", self.tempo_resposta)
+                self.response_received = True
+                print("Respondi o estimulo")
               
         
 

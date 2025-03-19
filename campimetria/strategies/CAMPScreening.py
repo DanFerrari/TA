@@ -2,6 +2,9 @@ import pygame
 import random
 import sys
 import os
+import OPi.GPIO as GPIO
+
+PIN_ENTRADA = 'PD22'
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
@@ -23,6 +26,8 @@ from TelaResultadoScreening import ResultadoScreening
 from fixacao_central import FixacaoCentral
 from MenuPausa import MenuPausa
 from strategy_screen import StrategyScreen
+from cordenadas_mcdir import cordenadas_mcdir
+from cordenadas_mcesq import cordenadas_mcesq
 
 
 class Screening:
@@ -39,7 +44,35 @@ class Screening:
         self.teste_fixacao = True
         self.aviso_inicial_respondido: bool = None
 
-        self.mancha_cega = TesteLimiarManchaCega()
+        self.mancha_cega = TesteLimiarManchaCega()       
+        self.indice_atual = 0
+        self.pontos_naorespondidos = []
+        self.matriz_mancha_cega = (
+            cordenadas_mcdir
+            if DadosExame.olho == Constantes().olho_direito
+            else cordenadas_mcesq
+        )
+        random.shuffle(self.matriz_mancha_cega)
+        self.total_pontos_mancha = len(self.matriz_mancha_cega)
+        self.delay_entre_pontos = 100
+        self.reiniciar = False
+        
+        self.tempo_pausa = 0
+        self.cronometrar = False
+        
+        
+    
+        random.shuffle(self.pontos)
+        self.tempo_resposta = 2.0
+        self.tempos = []
+        self.pontos_vistos = []
+        self.testemancha = 0
+        self.testenegativo = 0
+        self.testepositivo = 0
+
+        self.total_pontos_exame = len(self.pontos)
+    
+        
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
         tempo_medio = sum(tempos) / len(tempos)
@@ -61,85 +94,8 @@ class Screening:
         else:
             return 0.0
 
-    def exame_screening(self, fixacao=False):
 
-        random.shuffle(self.pontos)
-        tempo_resposta = 2.0
-        tempos = []
-        # mancha_cega = ponto_mancha_cega
-        mancha_cega = False
 
-        teste_de_fixacao = fixacao
-        pontos_vistos = []
-
-        testemancha = 0
-        testenegativo = 0
-        testepositivo = 0
-
-        for ponto in self.pontos:
-
-            ponto.cor = ponto.db_para_intensidade(DadosExame.atenuacao_screening)
-            ponto.testaPonto(0.2, tempo_resposta)
-
-            DadosExame.total_de_pontos_testados += 1
-            if ponto.response_received:
-                pontos_vistos.append(ponto)
-            ponto.limiar_encontrado = True
-            tempos.append(ponto.tempo_resposta)
-            testemancha += 1
-            testenegativo += 1
-            testepositivo += 1
-            if testemancha == 10 and teste_de_fixacao:
-                DadosExame.perda_de_fixacao += self.testa_mancha_cega(
-                    DadosExame.posicao_mancha_cega
-                )
-                testemancha = 0
-                DadosExame.total_testes_mancha += 1
-                continue
-            if testepositivo == 15 and len(pontos_vistos) > 1:
-                pontos_vistos[-1].cor = Colors.BACKGROUND
-                pontos_vistos[-1].plotarPonto()
-                DadosExame.total_testes_falsos_positivo += 1
-                if pontos_vistos[-1].response_received:
-                    DadosExame.falso_positivo_respondidos += 1
-                testepositivo = 0
-            if testenegativo == 12 and len(pontos_vistos) > 1:
-                pontos_vistos[-1].cor = Ponto.db_para_intensidade(25)
-                pontos_vistos[-1].testaPonto(0.2, tempo_resposta)
-                DadosExame.total_testes_falsos_negativo += 1
-                if not pontos_vistos[-1].response_received:
-                    DadosExame.falso_negativo_respondidos += 1
-                testenegativo = 0
-
-            if len(tempos) == 5:
-                tempo_resposta = self.media_de_tempo_de_resposta_paciente(tempos)
-            tempos = []
-
-            if ponto.menu_active:
-                selecionando = True
-                while selecionando:
-                    self.menu.handle_event()
-                    self.menu.draw()
-                    self.menu.update()
-                    if not self.menu.selecionando:
-                        if not self.menu.sair:
-                            self.menu = MenuPausa(self.game)
-                        selecionando = False
-            if self.menu.sair:
-                self.running = False
-                break
-        DadosExame.matriz_pontos = self.pontos
-
-    def iniciar_screening(self):
-
-        self.exame_screening(fixacao=self.teste_fixacao)
-        if self.menu.sair:
-            return
-
-        end_time = pygame.time.get_ticks() - start_time
-        DadosExame.duracao_do_exame = end_time
-        ResultadoScreening.desenha_pontos()
-        pygame.display.flip()
 
     def handle_events(self, events):
         for event in events:
@@ -148,6 +104,7 @@ class Screening:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_j:  # Volta para o menu ou sai
                     print("entrei no for")
+                    self.menu.usuario = "operador"
                     while self.menu.selecionando:
                         self.menu.handle_event()
                         self.menu.draw()
@@ -155,25 +112,91 @@ class Screening:
                     self.menu.selecionando = True
                     if self.menu.sair:
                         self.voltar_ao_menu_inicial = True
-                        return
+                        
+        if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+            self.cronometrar = True
+            self.pausa_paciente(reiniciar = False)
+        elif GPIO.input(PIN_ENTRADA) == GPIO.LOW:        
+            self.cronometrar = False
+            self.pausa_paciente(reiniciar=True)
+
+
+
+
+    def pausa_paciente(self,reiniciar):
+        if reiniciar:
+            self.tempo_pausa = 0
+            self.cronometrar = False
+        else:
+            self.tempo_pausa = pygame.time.get_ticks()
+            
+
 
     def update(self):
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
             self.game.change_screen(StrategyScreen(self.game))
+        
+        if self.cronometrar:
+            self.tempo_pausa = pygame.time.get_ticks() - self.tempo_pausa
+            if self.tempo_pausa > 3000:
+                self.cronometrar = False
+                self.pausa_paciente(reiniciar=True)
+                print("entrei no menu")
+                self.menu.usuario = "paciente"
+                while self.menu.selecionando:
+                    self.menu.handle_event()
+                    self.menu.draw()
+                    self.menu.update()
+                self.menu.selecionando = True
+                if self.menu.sair:
+                    self.voltar_ao_menu_inicial = True
+              
+                    
+                
 
     def draw(self, surface):
+        if self.menu.sair:
+            return
+        
         if self.estado == "inicio":
             self.aviso_inicial_respondido = ContagemRegressiva.iniciar_contagem(5)
             if self.aviso_inicial_respondido == False:
-                self.voltar_ao_menu_inicial = True
-                
+                self.voltar_ao_menu_inicial = True               
             else:
                 self.estado = "encontrando_mancha"
                 
 
         elif self.estado == "encontrando_mancha":
-            self.mancha_cega.teste_mancha_cega()
+            if self.indice_atual < self.total_pontos_mancha:
+                ponto = self.matriz_mancha_cega[self.indice_atual]
+                x, y = ponto
+                cor_ponto = Ponto.db_para_intensidade(0)
+                teste = Ponto(x, y, 3, cor_ponto)
+                teste.testaPonto(0.2, 2)
+                if not teste.response_received:
+                    self.mancha_cega.pontos_naorespondidos.append((teste.xg, teste.yg))
+                self.indice_atual += 1
+
+            if self.indice_atual == self.total_pontos_mancha:
+                self.indice_atual = 0
+                if len(self.pontos_naorespondidos) == 0:
+                    self.mancha_cega.verifica_mensagem()
+                    if self.mancha_cega.reiniciar:                        
+                        self.mancha_cega.pontos_naorespondidos = []
+                        self.mancha_cega.reiniciar = False
+                        voltando = ContagemRegressiva.iniciar_contagem(5)
+                        if voltando == False:
+                            self.voltar_ao_menu_inicial = True
+                            return
+                    else:
+                        self.mancha_cega.encontrou_mancha = False
+                else:
+                    self.resultado = self.mancha_cega.calculo_centro_de_massa()
+                    self.mancha_cega.encontrou_mancha = True
+                    DadosExame.posicao_mancha_cega = self.resultado               
+            
+            
             if self.mancha_cega.encontrou_mancha != None:
                 if self.mancha_cega.encontrou_mancha:
                     self.teste_fixacao = True
@@ -185,5 +208,55 @@ class Screening:
             
 
         elif self.estado == "exame":
-            print("Iniciando exame")
+
+            if self.indice_atual < self.total_pontos_exame:
+
+                ponto[self.indice_atual].cor = ponto[self.indice_atual].db_para_intensidade(DadosExame.atenuacao_screening)
+                ponto[self.indice_atual].testaPonto(0.2,self.tempo_resposta)
+
+                DadosExame.total_de_pontos_testados += 1
+                if ponto[self.indice_atual].response_received:
+                    self.pontos_vistos.append(ponto[self.indice_atual])
+                ponto[self.indice_atual].limiar_encontrado = True
+                self.tempos.append(ponto[self.indice_atual].tempo_resposta)
+                self.testemancha += 1
+                self.testenegativo += 1
+                self.testepositivo += 1
+                if self.testemancha == 10 and self.teste_fixacao:
+                    DadosExame.perda_de_fixacao += self.testa_mancha_cega(
+                        DadosExame.posicao_mancha_cega
+                    )
+                    self.testemancha = 0
+                    DadosExame.total_testes_mancha += 1
+                    
+                if self.testepositivo == 15 and len(self.pontos_vistos) > 1:
+                    self.pontos_vistos[-1].cor = Colors.BACKGROUND
+                    self.pontos_vistos[-1].plotarPonto()
+                    DadosExame.total_testes_falsos_positivo += 1
+                    if self.pontos_vistos[-1].response_received:
+                        DadosExame.falso_positivo_respondidos += 1
+                    self.testepositivo = 0
+                if self.testenegativo == 12 and len(self.pontos_vistos) > 1:
+                    self.pontos_vistos[-1].cor = Ponto.db_para_intensidade(25)
+                    self.pontos_vistos[-1].testaPonto(0.2,self.tempo_resposta)
+                    DadosExame.total_testes_falsos_negativo += 1
+                    if not self.pontos_vistos[-1].response_received:
+                        DadosExame.falso_negativo_respondidos += 1
+                    self.testenegativo = 0
+
+                if len(self.tempos) == 5:
+                   self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(self.tempos)
+                self.tempos = []
+
+                
+            if self.indice_atual == self.total_pontos_exame:
+                DadosExame.matriz_pontos = self.pontos
+                self.estado == "resultado"
+                
+                    
+        
+        
+        elif self.estado == "resultado":
+            #self.game.change_screen(ResultadoScreening(self.game))
+            ResultadoScreening.desenha_pontos()
             

@@ -11,8 +11,7 @@ sys.path.append(
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies"))
 )
-from strategy_screen import StrategyScreen
-from fixacao_central import FixacaoCentral
+
 from ContagemRegressiva import ContagemRegressiva
 
 class MenuPausa:
@@ -22,6 +21,7 @@ class MenuPausa:
         self.botao_selecionado = 0
         self.selecionando = True
         self.sair = False
+        self.usuario = "operador"
         
     def update(self):      
         pygame.display.update()
@@ -36,7 +36,10 @@ class MenuPausa:
             self.draw_button(540,180,"Continuar", (0,255,0),False)
             self.draw_button(540,-100,"Sair", (255,0,0),True)
         if self.selecionando == False and self.sair == False:            
-            ContagemRegressiva.iniciar_contagem(5)
+            teste = ContagemRegressiva.iniciar_contagem(5)
+            if teste == False:
+                self.sair = True
+                self.selecionando = False
             
        
 
@@ -67,7 +70,7 @@ class MenuPausa:
         pygame.draw.rect(pygame.display.get_surface(), (220, 220, 220), rect, 0, 25)
 
         font = pygame.font.Font(None, 56)
-        text = font.render("Exame Parado", 1, (255, 0, 0))
+        text = font.render(f"Exame parado pelo {self.usuario}", 1, (255, 0, 0))
         textpos = text.get_rect(centerx=960, centery=540 - 200)
         pygame.display.get_surface().blit(text, textpos)
         
