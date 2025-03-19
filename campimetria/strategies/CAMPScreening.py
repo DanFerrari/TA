@@ -45,8 +45,7 @@ class Screening:
         self.aviso_inicial_respondido: bool = None
 
         self.mancha_cega = TesteLimiarManchaCega()       
-        self.indice_atual = 0
-        self.pontos_naorespondidos = []
+        self.indice_atual = 0     
         self.matriz_mancha_cega = (
             cordenadas_mcdir
             if DadosExame.olho == Constantes().olho_direito
@@ -136,6 +135,7 @@ class Screening:
 
 
     def update(self):
+        print(f"indice atual: {self.indice_atual}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
             self.game.change_screen(StrategyScreen(self.game))
@@ -159,6 +159,7 @@ class Screening:
                 
 
     def draw(self, surface):
+        
         if self.menu.sair:
             return
         
@@ -183,7 +184,7 @@ class Screening:
 
             if self.indice_atual == self.total_pontos_mancha:
                 self.indice_atual = 0
-                if len(self.pontos_naorespondidos) == 0:
+                if len(self.mancha_cega.pontos_naorespondidos) == 0:
                     self.mancha_cega.verifica_mensagem()
                     if self.mancha_cega.reiniciar:                        
                         self.mancha_cega.pontos_naorespondidos = []
@@ -250,6 +251,8 @@ class Screening:
                 if len(self.tempos) == 5:
                    self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(self.tempos)
                 self.tempos = []
+                
+                self.indice_atual += 1
 
                 
             if self.indice_atual == self.total_pontos_exame:
