@@ -112,8 +112,11 @@ class Screening:
                     self.menu.selecionando = True
                     if self.menu.sair:
                         self.voltar_ao_menu_inicial = True
+          
                         
         if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+            if self.cronometrar:
+                return
             self.cronometrar = True
             self.pausa_paciente(reiniciar = False)
         elif GPIO.input(PIN_ENTRADA) == GPIO.LOW:        
@@ -211,14 +214,14 @@ class Screening:
 
             if self.indice_atual < self.total_pontos_exame:
 
-                ponto[self.indice_atual].cor = ponto[self.indice_atual].db_para_intensidade(DadosExame.atenuacao_screening)
-                ponto[self.indice_atual].testaPonto(0.2,self.tempo_resposta)
+                self.pontos[self.indice_atual].cor = self.pontos[self.indice_atual].db_para_intensidade(DadosExame.atenuacao_screening)
+                self.pontos[self.indice_atual].testaPonto(0.2,self.tempo_resposta)
 
                 DadosExame.total_de_pontos_testados += 1
-                if ponto[self.indice_atual].response_received:
-                    self.pontos_vistos.append(ponto[self.indice_atual])
-                ponto[self.indice_atual].limiar_encontrado = True
-                self.tempos.append(ponto[self.indice_atual].tempo_resposta)
+                if self.pontos[self.indice_atual].response_received:
+                    self.pontos_vistos.append(self.pontos[self.indice_atual])
+                self.pontos[self.indice_atual].limiar_encontrado = True
+                self.tempos.append(self.pontos[self.indice_atual].tempo_resposta)
                 self.testemancha += 1
                 self.testenegativo += 1
                 self.testepositivo += 1
