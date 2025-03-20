@@ -66,10 +66,18 @@ class SelectEyeScreen:
                     elif self.selecao_atual == "botao":
                         # Ao confirmar no botão, inicia o exame conforme a estratégia selecionada
                         if DadosExame.exame_selecionado == Constantes.screening:
+                            if self.opcao_selecionada == 0:
+                                DadosExame.olho = Constantes.olho_esquerdo
+                            else:
+                                DadosExame.olho = Constantes.olho_direito
                             DadosExame.atenuacao_screening = self.numero                           
                             self.game.change_screen(Screening(self.game))
                             
                         elif DadosExame.exame_selecionado == Constantes.fullthreshold:
+                            if self.opcao_selecionada == 0:
+                                DadosExame.olho = Constantes.olho_esquerdo
+                            else:
+                                DadosExame.olho = Constantes.olho_direito
                             DadosExame.faixa_etaria = self.escolha_faixa
                             self.game.change_screen(FullThreshold(self.game))
                          
