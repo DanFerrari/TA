@@ -75,8 +75,7 @@ class FullThreshold:
         self.delay_entre_pontos = 100
         self.reiniciar = False
         
-        self.tempo_pausa = 0
-        self.cronometrar = False
+
         
         random.shuffle(self.pontos)
         self.tempo_resposta = 2.0
@@ -205,27 +204,7 @@ class FullThreshold:
         if self.voltar_ao_menu_inicial:
             self.game.change_screen(StrategyScreen(self.game))
 
-        if self.cronometrar:
-            tempo_inicial = self.tempo_pausa
-            tempo_atual = pygame.time.get_ticks()
-            tempo_decorrido = tempo_atual - tempo_inicial
-            
-            if tempo_decorrido > 5000:
-                self.cronometrar = False
-                self.pausa_paciente(reiniciar=True)
-                print("entrei no menu")
-                self.menu.usuario = "PACIENTE"
-                tempo_inicial = pygame.time.get_ticks()
-                while self.menu.selecionando:
-                    self.menu.handle_event()
-                    self.menu.draw()
-                    self.menu.update()
-                self.menu.selecionando = True
-                tempo_final = pygame.time.get_ticks()
-                tempo_decorrido = tempo_final - tempo_inicial
-                self.tempo_pausado += tempo_decorrido
-                if self.menu.sair:
-                    self.voltar_ao_menu_inicial = True
+        
         
     
     
@@ -237,7 +216,7 @@ class FullThreshold:
             if event.type == pygame.QUIT:
                 self.game.running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_j:  # Volta para o menu ou sai
+                if event.key == pygame.K_j: 
                     
                     print("entrei no for")
                     self.menu.usuario = "OPERADOR"
@@ -254,30 +233,22 @@ class FullThreshold:
                         self.voltar_ao_menu_inicial = True
           
                         
-        if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-            if self.cronometrar:
-                return
-            self.cronometrar = True
-            self.pausa_paciente(reiniciar = False)
-        elif GPIO.input(PIN_ENTRADA) == GPIO.LOW:        
-            self.cronometrar = False
-            self.pausa_paciente(reiniciar=True)
 
 
 
 
-    def pausa_paciente(self,reiniciar):
-        if reiniciar:
-            self.tempo_pausa = 0
-            self.cronometrar = False
-        else:
-            self.tempo_pausa = pygame.time.get_ticks()
+
+
 
     def verifica_tecla_pressionada_menu(self):
-        if self.tecla_menu_pressionada:
-            return True
-        else:
-            return False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.game.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_j: 
+                    return True
+                else:
+                    return False
     
     
         
