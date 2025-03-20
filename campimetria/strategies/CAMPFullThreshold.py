@@ -84,7 +84,8 @@ class FullThreshold:
         self.testepositivo = 0
 
         self.total_pontos_exame = len(self.pontos)
-        
+        self.pontos_fechados = 0
+        self.perda_de_fixacao = 0
         
     def criar_pontos(self):
         return [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
@@ -165,7 +166,8 @@ class FullThreshold:
 
         # if resp == 1 and not Dados.DadosExame.LF and not Dados.DadosExame.ThrRel and not Dados.LimQuad:
         #     VerifyFalseNegative()
-
+        if ponto.status == "=":
+            self.pontos_fechados += 1
         return resp
 
     def testa_mancha_cega(self, ponto):
@@ -197,7 +199,7 @@ class FullThreshold:
             tempo_atual = pygame.time.get_ticks()
             tempo_decorrido = tempo_atual - tempo_inicial
             
-            if tempo_decorrido > 3000:
+            if tempo_decorrido > 2500:
                 self.cronometrar = False
                 self.pausa_paciente(reiniciar=True)
                 print("entrei no menu")
@@ -321,62 +323,62 @@ class FullThreshold:
                 
                 
                 
+                
         elif self.estado == "exame":
-            while not all(
-                ponto.status == "=" for ponto in pontos
-            ):  # Enquanto nem todos estiverem ativados
-                random.shuffle(pontos)  # Embaralha a lista antes de testar
-                for ponto in pontos:
-                    if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
-                        ponto.cor = Ponto.db_para_intensidade(ponto.atenuacao)
-                        ponto.testaPonto(0.2, tempo_resposta)
-                        if ponto.response_received:
-                            paciente_viu = 2
-                        else:
-                            paciente_viu = 1
+            if self.total_pontos_exame < self.pontos_fechados:
+                random.shuffle(self.pontos)  # Embaralha a lista antes de testar
+                ponto = self.pontos[self.indice_atual]
+                if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
+                    ponto.cor = Ponto.db_para_intensidade(ponto.atenuacao)
+                    ponto.testaPonto(0.2, self.tempo_resposta)
+                    if ponto.response_received:
+                        paciente_viu = 2
+                    else:
+                        paciente_viu = 1
 
-                        self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto)
-                        tempos.append(ponto.tempo_resposta)
-                        testemancha += 1
+                    self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto)
+                    self.tempos.append(ponto.tempo_resposta)
+                    self.testemancha += 1
 
-                        if testemancha == 100 and teste_de_fixacao:
-                            perda_de_fixacao += self.testa_mancha_cega(
-                                DadosExame.posicao_mancha_cega
-                            )
-                            testemancha = 0
-                            testes_realizados += 1
-                        if len(tempos) == 5:
-                            tempo_resposta = self.media_de_tempo_de_resposta_paciente(
-                                tempos
-                            )
-                            tempos = []
-                        print(
-                            f"Ponto: ({ponto.x}, {ponto.y}), Atenuacao: {ponto.atenuacao}, Cor: {ponto.cor}"
+                    if self.testemancha == 100 and self.teste_fixacao:
+                        self.perda_de_fixacao += self.testa_mancha_cega(
+                            DadosExame.posicao_mancha_cega
                         )
-                        print(
-                            f"Ponto definidos: {DadosExame.total_pontos_definidos} Mancha: {testemancha}"
+                        self.testemancha = 0
+                        self.testes_realizados += 1
+                    if len(self.tempos) == 5:
+                        self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(
+                            self.tempos
                         )
-            DadosExame.matriz_pontos = pontos
+                        self.tempos = []
+                    print(
+                        f"Ponto: ({ponto.x}, {ponto.y}), Atenuacao: {ponto.atenuacao}, Cor: {ponto.cor}"
+                    )
+                    print(
+                        f"Ponto definidos: {DadosExame.total_pontos_definidos} Mancha: {self.testemancha}"
+                    )
+                    if self.indice_atual < 76:
+                        self.indice_atual += 1
+                    else:
+                        self.indice_atual = 0
+            
+            else:
+                DadosExame.matriz_pontos = self.pontos
 
-          
-            DadosExame.perda_de_fixacao = (
-                ((perda_de_fixacao / testes_realizados) * 100)
-                if perda_de_fixacao > 0.0
-                else 0
-            )
+            
+                DadosExame.perda_de_fixacao = (
+                    ((self.perda_de_fixacao / self.testes_realizados) * 100)
+                    if self.perda_de_fixacao > 0.0
+                    else 0
+                )
+                self.estado = "resultado"
             
            
         elif self.estado == "resultado":
             ResultadoFullthreshold.exibir_resultados()
-            while visualizando:
-                for evento in pygame.event.get():
-                    if (
-                        evento.type == pygame.QUIT
-                        or evento.type == pygame.KEYDOWN
-                        and evento.key == pygame.K_j
-                    ):
-                        visualizando = False
-                        
+            self.voltar_ao_menu_inicial = True
+            
+        
                         
     def db_para_intensidade(self,db, db_min=40, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
         """Converte dB para intensidade de cor (escala logarítmica)."""
