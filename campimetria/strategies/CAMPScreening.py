@@ -46,9 +46,8 @@ class Screening:
 
         self.mancha_cega = TesteLimiarManchaCega()       
         self.indice_atual = 0     
-        self.matriz_mancha_cega = (
-            cordenadas_mcdir
-            if DadosExame.olho == Constantes().olho_direito
+        self.matriz_mancha_cega = (cordenadas_mcdir
+            if DadosExame.olho == Constantes.olho_direito
             else cordenadas_mcesq
         )
         random.shuffle(self.matriz_mancha_cega)
