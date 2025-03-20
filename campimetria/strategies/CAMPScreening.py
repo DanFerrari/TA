@@ -157,7 +157,7 @@ class Screening:
             tempo_atual = pygame.time.get_ticks()
             tempo_decorrido = tempo_atual - tempo_inicial
             
-            if tempo_decorrido > 2500:
+            if tempo_decorrido > 5000:
                 self.cronometrar = False
                 self.pausa_paciente(reiniciar=True)
                 print("entrei no menu")

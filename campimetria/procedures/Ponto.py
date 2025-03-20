@@ -140,7 +140,7 @@ class Ponto:
             tempo_atual = pygame.time.get_ticks()
             tempo_decorrido = tempo_atual - tempo_inicial
             
-            if tempo_decorrido > 2500 and self.pause_continua_pressionado:
+            if tempo_decorrido > 5000 and self.pause_continua_pressionado:
                 return (self.pause_continua_pressionado,menu_pressionado,self.tempo_pressionado)
                 
            
