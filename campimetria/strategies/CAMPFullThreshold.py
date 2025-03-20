@@ -91,6 +91,10 @@ class FullThreshold:
         self.perda_de_fixacao = 0
         self.tempo_pausado = 0        
         self.testes_realizados = 0
+        
+        
+        self.tecla_menu_pressionada = False
+        self.tecla_pause_pressionada = False
     def criar_pontos(self):
         return [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
 
@@ -177,7 +181,9 @@ class FullThreshold:
     def testa_mancha_cega(self, ponto):
         x, y = ponto
         teste = Ponto(x, y, 3, Ponto.db_para_intensidade(0))
-        teste.testaPonto(0.2, 2.0)
+        continua = self.verifica_testa_ponto(teste.testaPonto(0.2, 2,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+        if not continua:
+            return
         if teste.response_received:
             return 1.0
         else:
@@ -265,8 +271,41 @@ class FullThreshold:
             self.cronometrar = False
         else:
             self.tempo_pausa = pygame.time.get_ticks()
-            
-            
+
+    def verifica_tecla_pressionada_menu(self):
+        if self.tecla_menu_pressionada:
+            return True
+        else:
+            return False
+    
+    def verifica_tecla_pressionada_pause(self):
+        tempo_decorrido_pause = 0
+        
+        if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+            self.tecla_pause_pressionada = True            
+            return (self.tecla_menu_pressionada,self.tempo_pausa if self.cronometrar == True else pygame.time.get_ticks())
+        else:
+            self.tecla_pause_pressionada = False
+            return (self.tecla_menu_pressionada,tempo_decorrido_pause)
+        
+    def verifica_testa_ponto(self,testaponto):
+        botao_pause,menu_pause,tempodecorrido = testaponto
+        if menu_pause:      
+            pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_j}))                 
+            return False
+        
+        elif botao_pause:
+            self.cronometrar = True
+            self.tempo_pausa = tempodecorrido
+            tempo_inicial = self.tempo_pausa
+            tempo_atual = pygame.time.get_ticks()
+            tempofinal = tempo_atual - tempo_inicial
+            if tempofinal > 2500:
+                return False
+        else:
+            return True
+        
+        
 
 
 
@@ -300,7 +339,9 @@ class FullThreshold:
                 x, y = ponto
                 cor_ponto = Ponto.db_para_intensidade(0)
                 teste = Ponto(x, y, 3, cor_ponto)
-                teste.testaPonto(0.2, 2)
+                continua = self.verifica_testa_ponto(teste.testaPonto(0.2, 2,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                if not continua:
+                    return
                 if not teste.response_received:
                     self.mancha_cega.pontos_naorespondidos.append((teste.xg, teste.yg))
                 self.indice_atual += 1
@@ -342,8 +383,9 @@ class FullThreshold:
                 ponto = self.pontos[self.indice_atual]
                 if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
                     ponto.cor = Ponto.db_para_intensidade(ponto.atenuacao)
-                    ponto.testaPonto(0.2, self.tempo_resposta)
-                   
+                    continua = self.verifica_testa_ponto(ponto.testaPonto(0.2, self.tempo_resposta,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                    if not continua:
+                        return            
                     if ponto.response_received:
                         paciente_viu = 2
                     else:
@@ -420,8 +462,9 @@ class FullThreshold:
                 self.db_para_intensidade(self.AT),
             )
 
-            self.ponto_limiar.testaPonto(0.2, 2.0)
-
+            continua = self.verifica_testa_ponto(self.ponto_limiar.testaPonto(0.2, 2,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+            if not continua:
+                return
             
             if self.ponto_limiar.response_received:
                 self.viu = 2

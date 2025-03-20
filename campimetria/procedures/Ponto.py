@@ -116,16 +116,33 @@ class Ponto:
         quadrado.center = (self.x, self.y)
         pygame.draw.rect(pygame.display.get_surface(), self.cor, quadrado)
 
-    def testaPonto(self, tempo_exposicao, tempo_resposta_paciente, eventos, botao_pressionado, menu_pressionado):
+    def testaPonto(self, tempo_exposicao, tempo_resposta_paciente, botao_pressionado = (False,0), menu_pressionado = False):
         trial_start_time = pygame.time.get_ticks()
         stimulus_end_time = trial_start_time + int(tempo_exposicao * 1000)
         response_deadline = trial_start_time + int(tempo_resposta_paciente * 1000)
         self.response_received = False
+        self.pause_continua_pressionado,self.tempo_pressionado = botao_pressionado
+        
+ 
         
 
         while pygame.time.get_ticks() < response_deadline:
             current_time = pygame.time.get_ticks()
+            if menu_pressionado:
+                return (self.pause_continua_pressionado,menu_pressionado,self.tempo_pressionado)
             
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_j:
+                        menu_pressionado = True
+                        
+            tempo_inicial = self.tempo_pressionado
+            tempo_atual = pygame.time.get_ticks()
+            tempo_decorrido = tempo_atual - tempo_inicial
+            
+            if tempo_decorrido > 2500:
+                return (self.pause_continua_pressionado,menu_pressionado,self.tempo_pressionado)
+                
            
             if current_time < stimulus_end_time:
                 pygame.draw.circle(
@@ -134,22 +151,30 @@ class Ponto:
                 pygame.display.update()
             else:
                 self.apagarPonto()
+                
+            
 
         
             if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+                self.pause_continua_pressionado = True
+                
                 self.tempo_resposta = (
                     pygame.time.get_ticks() - trial_start_time
                 ) / 1000
                 print("tempo_resposta_no_ponto: ", self.tempo_resposta)
                 self.response_received = True
                 print("Respondi o estimulo")
-              
+            
+            else:
+                self.pause_continua_pressionado = False
+                self.tempo_pressionado = pygame.time.get_ticks()
         
 
             if not self.response_received:
                 self.tempo_resposta = 2.0
                 self.response_received = False
             self.clock.tick(60)
+        return (self.pause_continua_pressionado,menu_pressionado,self.tempo_pressionado)
 
     def apagarPonto(self):
         pygame.draw.circle(
