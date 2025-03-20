@@ -214,7 +214,7 @@ class FullThreshold:
                 self.cronometrar = False
                 self.pausa_paciente(reiniciar=True)
                 print("entrei no menu")
-                self.menu.usuario = "paciente"
+                self.menu.usuario = "PACIENTE"
                 tempo_inicial = pygame.time.get_ticks()
                 while self.menu.selecionando:
                     self.menu.handle_event()
@@ -239,7 +239,7 @@ class FullThreshold:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_j:  # Volta para o menu ou sai
                     print("entrei no for")
-                    self.menu.usuario = "operador"
+                    self.menu.usuario = "OPERADOR"
                     tempo_inicial = pygame.time.get_ticks()
                     
                     while self.menu.selecionando:
@@ -360,6 +360,10 @@ class FullThreshold:
                             return
                     else:
                         self.mancha_cega.encontrou_mancha = False
+                        voltando = ContagemRegressiva.iniciar_contagem(5,fixacao = "central")
+                        if voltando == False:
+                            self.voltar_ao_menu_inicial = True
+                            return
                 else:
                     self.resultado = self.mancha_cega.calculo_centro_de_massa()
                     self.mancha_cega.encontrou_mancha = True

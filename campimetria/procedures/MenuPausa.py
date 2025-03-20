@@ -23,6 +23,8 @@ class MenuPausa:
         self.sair = False
         self.usuario = "operador"
         self.fixacao = "central"
+        self.testando = True
+    
         
     def update(self):      
         pygame.display.update()
@@ -31,11 +33,11 @@ class MenuPausa:
     def draw(self):
         self.quadrado_menu()
         if self.botao_selecionado == 0:
-            self.draw_button(540,180,"Continuar", (0,255,0),True)
-            self.draw_button(540,-100,"Sair", (255,0,0),False)
+            self.draw_button(540,180,"CONTINUAR", (45,167,8),True)
+            self.draw_button(540,-100,"SAIR", (209,41,41),False)
         elif self.botao_selecionado == 1:
-            self.draw_button(540,180,"Continuar", (0,255,0),False)
-            self.draw_button(540,-100,"Sair", (255,0,0),True)
+            self.draw_button(540,180,"CONTINUAR", (45,167,8),False)
+            self.draw_button(540,-100,"SAIR", (209,41,41),True)
         if self.selecionando == False and self.sair == False:            
             teste = ContagemRegressiva.iniciar_contagem(5,fixacao=self.fixacao)
             if teste == False:
@@ -71,7 +73,7 @@ class MenuPausa:
         pygame.draw.rect(pygame.display.get_surface(), (220, 220, 220), rect, 0, 25)
 
         font = pygame.font.Font(None, 56)
-        text = font.render(f"Exame parado pelo {self.usuario}", 1, (255, 0, 0))
+        text = font.render(f"EXAME PARADO PELO {self.usuario}", 1, (209,41,41))
         textpos = text.get_rect(centerx=960, centery=540 - 200)
         pygame.display.get_surface().blit(text, textpos)
         
@@ -80,8 +82,8 @@ class MenuPausa:
         
         
     def draw_button(self,x,y,name,cor_fundo,selecionado):
-        width = 540
-        height = 50
+        width = 530
+        height = 105
         centerx =  x / 2
         centery =  y / 2
         rect = pygame.Rect(960 - centerx, 540 - centery, width, height)
@@ -94,7 +96,7 @@ class MenuPausa:
         pygame.display.get_surface().blit(text, textpos)
         
         if selecionado:
-            pygame.draw.rect(pygame.display.get_surface(), (0, 0, 0), rect, 2, 5)
+            pygame.draw.rect(pygame.display.get_surface(), (255, 247, 28), rect, 2, 5)
         else:
             pass
 
@@ -104,8 +106,8 @@ if __name__ == "__main__":
     pygame.display.get_surface().fill((255, 255, 255))
 
     menu = MenuPausa()
-
     pygame.display.flip()
+    
     while menu.testando:
         menu.handle_event()
         menu.draw()
