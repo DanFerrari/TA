@@ -199,6 +199,7 @@ class FullThreshold:
 
 
     def update(self):
+        self.menu.fixacao = "diamante" if self.estado == "limiar" else self.menu.fixacao = "central"
         print(f"indice atual: {self.indice_atual}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
@@ -233,6 +234,7 @@ class FullThreshold:
 
 
     def handle_events(self, events):
+        self.menu.fixacao = "diamante" if self.estado == "limiar" else self.menu.fixacao = "central"
         for event in events:
             if event.type == pygame.QUIT:
                 self.game.running = False
@@ -241,6 +243,7 @@ class FullThreshold:
                     print("entrei no for")
                     self.menu.usuario = "operador"
                     tempo_inicial = pygame.time.get_ticks()
+                    
                     while self.menu.selecionando:
                         self.menu.handle_event()
                         self.menu.draw()

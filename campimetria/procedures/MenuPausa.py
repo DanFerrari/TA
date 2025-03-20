@@ -22,6 +22,7 @@ class MenuPausa:
         self.selecionando = True
         self.sair = False
         self.usuario = "operador"
+        self.fixacao = "central"
         
     def update(self):      
         pygame.display.update()
@@ -36,7 +37,7 @@ class MenuPausa:
             self.draw_button(540,180,"Continuar", (0,255,0),False)
             self.draw_button(540,-100,"Sair", (255,0,0),True)
         if self.selecionando == False and self.sair == False:            
-            teste = ContagemRegressiva.iniciar_contagem(5)
+            teste = ContagemRegressiva.iniciar_contagem(5,fixacao=self.fixacao)
             if teste == False:
                 self.sair = True
                 self.selecionando = False
