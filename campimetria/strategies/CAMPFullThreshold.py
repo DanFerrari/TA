@@ -31,7 +31,7 @@ class FullThreshold:
         self.game = game
         self.pontos = self.criar_pontos()
         self.indice_atual = 0
-        self.self.UV = 0
+        self.UV = 0
         self.AT = 20
         self.UNV = 0
         self.NC = 0
