@@ -226,9 +226,7 @@ class FullThreshold:
                 self.tempo_pausado += tempo_decorrido
                 if self.menu.sair:
                     self.voltar_ao_menu_inicial = True
-                return True
-            else:
-                return False
+        
     
     
 
@@ -397,6 +395,8 @@ class FullThreshold:
                     self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto)
                     self.tempos.append(ponto.tempo_resposta)
                     self.testemancha += 1
+                    self.testenegativo +=1
+                    self.testepositivo += 1
 
                     if self.testemancha == 100 and self.teste_fixacao:
                         self.perda_de_fixacao += self.testa_mancha_cega(
@@ -410,7 +410,28 @@ class FullThreshold:
                         )
                         self.tempos = []
                         
-                        
+                    
+                    if self.testepositivo == 50 and len(self.pontos_vistos) > 1:
+                        self.pontos_vistos[-1].cor = Colors.BACKGROUND
+                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        if not continua:
+                            return          
+                        DadosExame.total_testes_falsos_positivo += 1
+                        if self.pontos_vistos[-1].response_received:
+                            DadosExame.falso_positivo_respondidos += 1
+                        self.testepositivo = 0
+                    
+                    
+                    if self.testenegativo == 60 and len(self.pontos_vistos) > 1:
+                        self.pontos_vistos[-1].cor = Ponto.db_para_intensidade(self.pontos_vistos.atenuacao - 1)
+                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        if not continua:
+                            return  
+                        DadosExame.total_testes_falsos_negativo += 1
+                        if not self.pontos_vistos[-1].response_received:
+                            DadosExame.falso_negativo_respondidos += 1
+                        self.testenegativo = 0
+                                 
                     print(
                         f"Ponto: ({ponto.x}, {ponto.y}), Atenuacao: {ponto.atenuacao}, Cor: {ponto.cor}"
                     )
@@ -424,9 +445,10 @@ class FullThreshold:
                         random.shuffle(self.pontos)
             
             else:
-                DadosExame.matriz_pontos = self.pontos
-
-            
+                self.tempo_final_exame = pygame.time.get_ticks()
+                self.tempo_decorrido_exame = self.tempo_final_exame - self.tempo_inicial_exame
+                DadosExame.duracao_do_exame = self.tempo_decorrido_exame
+                DadosExame.matriz_pontos = self.pontos            
                 DadosExame.perda_de_fixacao = (
                     ((self.perda_de_fixacao / self.testes_realizados) * 100)
                     if self.perda_de_fixacao > 0.0
@@ -437,7 +459,7 @@ class FullThreshold:
            
         elif self.estado == "resultado":
             ResultadoFullthreshold.exibir_resultados()
-            self.voltar_ao_menu_inicial = True
+            self.game.change_screen(StrategyScreen(self.game))
             
         
                         

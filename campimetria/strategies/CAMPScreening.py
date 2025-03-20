@@ -92,8 +92,10 @@ class Screening:
 
     def testa_mancha_cega(self, ponto):
         x, y = ponto
-        teste = Ponto(x, y, 3, pygame.Color("red"))
-        teste.testaPonto(0.2, 2.0)
+        teste = Ponto(x, y, 3, pygame.Color("red"))       
+        continua = self.verifica_testa_ponto(teste.testaPonto(0.2, 2))
+        if not continua:
+            return
         if teste.response_received:
             return 1.0
         else:
@@ -155,7 +157,7 @@ class Screening:
             tempo_atual = pygame.time.get_ticks()
             tempo_decorrido = tempo_atual - tempo_inicial
             
-            if tempo_decorrido > 3000:
+            if tempo_decorrido > 2500:
                 self.cronometrar = False
                 self.pausa_paciente(reiniciar=True)
                 print("entrei no menu")
@@ -171,7 +173,43 @@ class Screening:
                 self.tempo_pausado += tempo_decorrido
                 if self.menu.sair:
                     self.voltar_ao_menu_inicial = True
-              
+                    
+                    
+                    
+                    
+                    
+    def verifica_tecla_pressionada_menu(self):
+        if self.tecla_menu_pressionada:
+            return True
+        else:
+            return False
+    
+    def verifica_tecla_pressionada_pause(self):
+        tempo_decorrido_pause = 0
+        
+        if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+            self.tecla_pause_pressionada = True            
+            return (self.tecla_menu_pressionada,self.tempo_pausa if self.cronometrar == True else pygame.time.get_ticks())
+        else:
+            self.tecla_pause_pressionada = False
+            return (self.tecla_menu_pressionada,tempo_decorrido_pause)
+        
+    def verifica_testa_ponto(self,testaponto):
+        botao_pause,menu_pause,tempodecorrido = testaponto
+        if menu_pause:      
+            pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_j}))                 
+            return False
+        
+        elif botao_pause:
+            self.cronometrar = True
+            self.tempo_pausa = tempodecorrido
+            tempo_inicial = self.tempo_pausa
+            tempo_atual = pygame.time.get_ticks()
+            tempofinal = tempo_atual - tempo_inicial
+            if tempofinal > 2500:
+                return False
+        else:
+            return True              
                     
                 
 
@@ -195,7 +233,10 @@ class Screening:
                 x, y = ponto
                 cor_ponto = Ponto.db_para_intensidade(0)
                 teste = Ponto(x, y, 3, cor_ponto)
-                teste.testaPonto(0.2, 2)
+                continua = self.verifica_testa_ponto(teste.testaPonto(0.2, 2))
+                if not continua:
+                    return
+                
                 if not teste.response_received:
                     self.mancha_cega.pontos_naorespondidos.append((teste.xg, teste.yg))
                 self.indice_atual += 1
@@ -234,8 +275,9 @@ class Screening:
             if self.indice_atual < self.total_pontos_exame:
 
                 self.pontos[self.indice_atual].cor = self.pontos[self.indice_atual].db_para_intensidade(DadosExame.atenuacao_screening)
-                self.pontos[self.indice_atual].testaPonto(0.2,self.tempo_resposta)
-
+                continua = self.verifica_testa_ponto(self.pontos[self.indice_atual].testaPonto(0.2,self.tempo_resposta))
+                if not continua:
+                    return
                 DadosExame.total_de_pontos_testados += 1
                 if self.pontos[self.indice_atual].response_received:
                     self.pontos_vistos.append(self.pontos[self.indice_atual])
@@ -253,14 +295,18 @@ class Screening:
                     
                 if self.testepositivo == 15 and len(self.pontos_vistos) > 1:
                     self.pontos_vistos[-1].cor = Colors.BACKGROUND
-                    self.pontos_vistos[-1].plotarPonto()
+                    continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                    if not continua:
+                        return    
                     DadosExame.total_testes_falsos_positivo += 1
                     if self.pontos_vistos[-1].response_received:
                         DadosExame.falso_positivo_respondidos += 1
                     self.testepositivo = 0
                 if self.testenegativo == 12 and len(self.pontos_vistos) > 1:
                     self.pontos_vistos[-1].cor = Ponto.db_para_intensidade(25)
-                    self.pontos_vistos[-1].testaPonto(0.2,self.tempo_resposta)
+                    continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                    if not continua:
+                        return    
                     DadosExame.total_testes_falsos_negativo += 1
                     if not self.pontos_vistos[-1].response_received:
                         DadosExame.falso_negativo_respondidos += 1
