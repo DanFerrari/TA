@@ -77,6 +77,8 @@ class Screening:
         self.tempo_final_exame = 0
         self.tempo_decorrido_exame = 0
         self.tempo_pausado = 0
+        self.tecla_pause_pressionada = False
+        self.tecla_menu_pressionada = False
         
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
@@ -186,13 +188,13 @@ class Screening:
     
     def verifica_tecla_pressionada_pause(self):
         tempo_decorrido_pause = 0
-        tecla_pause_pressionada
+        
         if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-            tecla_pause_pressionada = True            
-            return (tecla_pause_pressionada,self.tempo_pausa if self.cronometrar == True else pygame.time.get_ticks())
+            self.tecla_pause_pressionada = True            
+            return (self.tecla_menu_pressionada,self.tempo_pausa if self.cronometrar == True else pygame.time.get_ticks())
         else:
-            tecla_pause_pressionada = False
-            return (tecla_pause_pressionada,tempo_decorrido_pause)
+            self.tecla_pause_pressionada = False
+            return (self.tecla_menu_pressionada,tempo_decorrido_pause)
         
     def verifica_testa_ponto(self,testaponto):
         botao_pause,menu_pause,tempodecorrido = testaponto

@@ -284,10 +284,10 @@ class FullThreshold:
         
         if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
             self.tecla_pause_pressionada = True            
-            return (self.tecla_menu_pressionada,self.tempo_pausa if self.cronometrar == True else pygame.time.get_ticks())
+            return ( self.tecla_pause_pressionada,self.tempo_pausa if self.cronometrar == True else pygame.time.get_ticks())
         else:
             self.tecla_pause_pressionada = False
-            return (self.tecla_menu_pressionada,tempo_decorrido_pause)
+            return (self.tecla_pause_pressionada,tempo_decorrido_pause)
         
     def verifica_testa_ponto(self,testaponto):
         botao_pause,menu_pause,tempodecorrido = testaponto
