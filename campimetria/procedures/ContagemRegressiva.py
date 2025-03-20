@@ -15,17 +15,20 @@ sys.path.append(
 )
 from dados import Colors
 from fixacao_central import FixacaoCentral
+from fixacao_diamante import FixacaoDiamante
 
 
 class ContagemRegressiva:
     @staticmethod
-    def iniciar_contagem(start_time):
+    def iniciar_contagem(start_time, fixacao = "central"):
 
         pygame.display.get_surface().fill(Colors.BACKGROUND)
 
         iniciar_exame = False
-        FixacaoCentral.plotar_fixacao_central()
-
+        if fixacao == "central":
+            FixacaoCentral.plotar_fixacao_central()
+        elif fixacao == "diamante":
+            FixacaoDiamante.plotar_fixacao_diamante()
         font = pygame.font.Font(None, 42)
         text = font.render(
             "Posicione corretamente o paciente na distância recomendada, apoie bem o queixo e a testa!",
@@ -55,7 +58,10 @@ class ContagemRegressiva:
 
         for i in range(start_time, -1, -1):
             pygame.display.get_surface().fill(Colors.BACKGROUND)  # Limpa a tela (preto)
-            FixacaoCentral.plotar_fixacao_central()
+            if fixacao == "central":
+                FixacaoCentral.plotar_fixacao_central()
+            elif fixacao == "diamante":
+                FixacaoDiamante.plotar_fixacao_diamante()
             texto = pygame.font.Font(None, 150).render(
                 str(i), True, (255, 255, 255)
             )  # Texto branco

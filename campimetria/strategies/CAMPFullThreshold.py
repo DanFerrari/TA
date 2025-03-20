@@ -25,6 +25,7 @@ from fixacao_central import FixacaoCentral
 from MenuPausa import MenuPausa
 from cordenadas_mcdir import cordenadas_mcdir
 from cordenadas_mcesq import cordenadas_mcesq
+from strategy_screen import StrategyScreen
 
 
 class FullThreshold:
@@ -88,7 +89,7 @@ class FullThreshold:
         self.total_pontos_exame = len(self.pontos)
         self.pontos_fechados = 0
         self.perda_de_fixacao = 0
-        
+        self.tempo_pausado = 0        
     def criar_pontos(self):
         return [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
 
@@ -269,7 +270,7 @@ class FullThreshold:
         if self.menu.sair:
             return
         if self.estado == "inicio":
-            self.aviso_inicial_respondido = ContagemRegressiva.iniciar_contagem(5)
+            self.aviso_inicial_respondido = ContagemRegressiva.iniciar_contagem(5,fixacao = "diamante")
             if self.aviso_inicial_respondido == False:
                 self.voltar_ao_menu_inicial = True               
             else:
@@ -327,7 +328,7 @@ class FullThreshold:
                 
                 
         elif self.estado == "exame":
-            if self.total_pontos_exame < self.pontos_fechados:
+            if self.total_pontos_exame > self.pontos_fechados:
                 random.shuffle(self.pontos)  # Embaralha a lista antes de testar
                 ponto = self.pontos[self.indice_atual]
                 if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
