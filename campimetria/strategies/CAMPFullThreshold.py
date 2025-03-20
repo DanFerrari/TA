@@ -232,7 +232,7 @@ class FullThreshold:
 
 
     def handle_events(self, events):
-        self.menu.fixacao = "diamante" if self.estado == "limiar" else self.menu.fixacao = "central"
+        self.menu.fixacao = "diamante" if self.estado == "limiar" else "central"
         for event in events:
             if event.type == pygame.QUIT:
                 self.game.running = False
