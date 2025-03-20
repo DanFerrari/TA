@@ -8,7 +8,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)   
 
 PIN_ENTRADA = 'PD22'
-GPIO.setup(PIN_ENTRADA, GPIO.IN)
+#GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)

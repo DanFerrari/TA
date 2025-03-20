@@ -23,6 +23,8 @@ from TelaResultadoFullThreshold import ResultadoFullthreshold
 from ManchaCega import TesteLimiarManchaCega
 from fixacao_central import FixacaoCentral
 from MenuPausa import MenuPausa
+from cordenadas_mcdir import cordenadas_mcdir
+from cordenadas_mcesq import cordenadas_mcesq
 
 
 class FullThreshold:
@@ -64,7 +66,7 @@ class FullThreshold:
         self.indice_atual = 0     
         self.matriz_mancha_cega = (
             cordenadas_mcdir
-            if DadosExame.olho == Contantes.olho_direito
+            if DadosExame.olho == Constantes.olho_direito
             else cordenadas_mcesq
         )
         random.shuffle(self.matriz_mancha_cega)
