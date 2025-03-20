@@ -197,12 +197,13 @@ class FullThreshold:
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
             self.game.change_screen(StrategyScreen(self.game))
+
         if self.cronometrar:
             tempo_inicial = self.tempo_pausa
             tempo_atual = pygame.time.get_ticks()
             tempo_decorrido = tempo_atual - tempo_inicial
             
-            if tempo_decorrido > 1000:
+            if tempo_decorrido > 2500:
                 self.cronometrar = False
                 self.pausa_paciente(reiniciar=True)
                 print("entrei no menu")
@@ -300,28 +301,6 @@ class FullThreshold:
                 cor_ponto = Ponto.db_para_intensidade(0)
                 teste = Ponto(x, y, 3, cor_ponto)
                 teste.testaPonto(0.2, 2)
-                tempo_atual = pygame.time.get_ticks()
-
-            if ponto.exibindo_ponto:  # Enquanto ainda precisa exibir o ponto
-                if tempo_atual < ponto.stimulus_end_time:
-                    pygame.draw.circle(self.surface, ponto.cor, (ponto.x, ponto.y), ponto.pontoPix)
-                    pygame.display.update()
-                else:
-                    ponto.apagarPonto()
-                    ponto.exibindo_ponto = False  # Parou de exibir
-
-            if ponto.aguardando_resposta:
-                if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-                    ponto.tempo_resposta = (pygame.time.get_ticks() - ponto.trial_start_time) / 1000
-                    print("tempo_resposta_no_ponto: ", ponto.tempo_resposta)
-                    ponto.response_received = True
-                    ponto.aguardando_resposta = False  # Já recebeu resposta
-
-                if tempo_atual >= ponto.response_deadline:
-                    ponto.tempo_resposta = 2.0  # Tempo máximo atingido
-                    ponto.aguardando_resposta = False  # Não aguarda mais
-
-            if not ponto.aguardando_resposta:  # Se terminou o tempo de resposta
                 if not teste.response_received:
                     self.mancha_cega.pontos_naorespondidos.append((teste.xg, teste.yg))
                 self.indice_atual += 1
@@ -364,28 +343,7 @@ class FullThreshold:
                 if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
                     ponto.cor = Ponto.db_para_intensidade(ponto.atenuacao)
                     ponto.testaPonto(0.2, self.tempo_resposta)
-                    tempo_atual = pygame.time.get_ticks()
-
-                if ponto.exibindo_ponto:  # Enquanto ainda precisa exibir o ponto
-                    if tempo_atual < ponto.stimulus_end_time:
-                        pygame.draw.circle(self.surface, ponto.cor, (ponto.x, ponto.y), ponto.pontoPix)
-                        pygame.display.update()
-                    else:
-                        ponto.apagarPonto()
-                        ponto.exibindo_ponto = False  # Parou de exibir
-
-                if ponto.aguardando_resposta:
-                    if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-                        ponto.tempo_resposta = (pygame.time.get_ticks() - ponto.trial_start_time) / 1000
-                        print("tempo_resposta_no_ponto: ", ponto.tempo_resposta)
-                        ponto.response_received = True
-                        ponto.aguardando_resposta = False  # Já recebeu resposta
-
-                    if tempo_atual >= ponto.response_deadline:
-                        ponto.tempo_resposta = 2.0  # Tempo máximo atingido
-                        ponto.aguardando_resposta = False  # Não aguarda mais
-
-                if not ponto.aguardando_resposta:  # Se terminou o tempo de resposta
+                   
                     if ponto.response_received:
                         paciente_viu = 2
                     else:
@@ -463,99 +421,77 @@ class FullThreshold:
             )
 
             self.ponto_limiar.testaPonto(0.2, 2.0)
-            tempo_atual = pygame.time.get_ticks()
-
-            if ponto.exibindo_ponto:  # Enquanto ainda precisa exibir o ponto
-                if tempo_atual < ponto.stimulus_end_time:
-                    pygame.draw.circle(self.surface, ponto.cor, (ponto.x, ponto.y), ponto.pontoPix)
-                    pygame.display.update()
-                else:
-                    ponto.apagarPonto()
-                    ponto.exibindo_ponto = False  # Parou de exibir
-
-            if ponto.aguardando_resposta:
-                if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-                    ponto.tempo_resposta = (pygame.time.get_ticks() - ponto.trial_start_time) / 1000
-                    print("tempo_resposta_no_ponto: ", ponto.tempo_resposta)
-                    ponto.response_received = True
-                    ponto.aguardando_resposta = False  # Já recebeu resposta
-
-                if tempo_atual >= ponto.response_deadline:
-                    ponto.tempo_resposta = 2.0  # Tempo máximo atingido
-                    ponto.aguardando_resposta = False  # Não aguarda mais
-
-            if not ponto.aguardando_resposta:  # Se terminou o tempo de resposta
 
             
-                if self.ponto_limiar.response_received:
-                    self.viu = 2
-                else:
-                    self.viu = 1
-                pygame.time.delay(500)
-                match self.viu:
-                    case 1:
-                        if self.AT <= 0:
-                            self.AT = -1
+            if self.ponto_limiar.response_received:
+                self.viu = 2
+            else:
+                self.viu = 1
+            pygame.time.delay(500)
+            match self.viu:
+                case 1:
+                    if self.AT <= 0:
+                        self.AT = -1
+                        self.limiar_status = "="
+                        return
+
+                    self.UNV = self.AT
+                    if self.primeiro == True:
+                        self.primeiro = False
+                        self.NC = 0
+                        self.UV = 0
+                        self.Delta = self.Dbig
+                        self.AT = self.AT - self.Delta
+                        self.limiar_status = "+"
+                        return
+                    if self.limiar_status == "-":
+                        self.NC += 1
+                        self.Delta = self.Dsmall
+                        if self.NC >= 2:
                             self.limiar_status = "="
+                            self.AT = (self.UV + self.UNV) / 2
                             return
-
-                        self.UNV = self.AT
-                        if self.primeiro == True:
-                            self.primeiro = False
-                            self.NC = 0
-                            self.UV = 0
-                            self.Delta = self.Dbig
-                            self.AT = self.AT - self.Delta
-                            self.limiar_status = "+"
-                            return
-                        if self.limiar_status == "-":
-                            self.NC += 1
-                            self.Delta = self.Dsmall
-                            if self.NC >= 2:
-                                self.limiar_status = "="
-                                self.AT = (self.UV + self.UNV) / 2
-                                return
-                            else:
-                                self.AT = self.AT - self.Delta
-                                self.limiar_status = "+"
-                                return
                         else:
                             self.AT = self.AT - self.Delta
                             self.limiar_status = "+"
                             return
+                    else:
+                        self.AT = self.AT - self.Delta
+                        self.limiar_status = "+"
+                        return
 
-                    case 2:
-                        self.UV = self.AT
-                        if self.primeiro == True:
-                            self.primeiro = False
-                            self.NC = 0
-                            self.UNV = 35
-                            self.Delta = self.Dbig
-                            self.AT = self.AT + self.Delta
-                            self.limiar_status = "-"
+                case 2:
+                    self.UV = self.AT
+                    if self.primeiro == True:
+                        self.primeiro = False
+                        self.NC = 0
+                        self.UNV = 35
+                        self.Delta = self.Dbig
+                        self.AT = self.AT + self.Delta
+                        self.limiar_status = "-"
+                        return
+
+                    if self.limiar_status == "+":
+                        self.NC = +1
+                        self.Delta = self.Dsmall
+
+                        if self.NC >= 2:
+                            self.limiar_status = "="
+                            self.AT = (self.UV + self.UNV) / 2
                             return
-
-                        if self.limiar_status == "+":
-                            self.NC = +1
-                            self.Delta = self.Dsmall
-
-                            if self.NC >= 2:
-                                self.limiar_status = "="
-                                self.AT = (self.UV + self.UNV) / 2
-                                return
-
-                            else:
-                                self.AT = self.AT + self.Delta
-                                self.limiar_status = "-"
-                                return
 
                         else:
                             self.AT = self.AT + self.Delta
                             self.limiar_status = "-"
                             return
 
-                if self.AT > 40:
-                    self.AT = 35
+                    else:
+                        self.AT = self.AT + self.Delta
+                        self.limiar_status = "-"
+                        return
+
+            if self.AT > 40:
+                self.AT = 35
         else:
             self.limiar = self.AT
             DadosExame.limiar_foveal = self.limiar
