@@ -160,13 +160,13 @@ class TesteLimiarManchaCega:
                         botao_selecionado = 1
                     elif event.key == pygame.K_e and mostrar_mensagem:
                         if botao_selecionado == 0:
-                            rodando = False  # Fecha o jogo
+                            rodando = False  
                             pygame.display.get_surface().fill(Colors.BACKGROUND)
                             FixacaoCentral.plotar_fixacao_central()
                             self.reiniciar = True
                             return
                         elif botao_selecionado == 1:
-                            rodando = False  # Fecha o jogo
+                            rodando = False  
                             pygame.display.get_surface().fill(Colors.BACKGROUND)
                             FixacaoCentral.plotar_fixacao_central()
                             self.reiniciar = False

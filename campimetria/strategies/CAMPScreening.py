@@ -248,7 +248,7 @@ class Screening:
                     if self.mancha_cega.reiniciar:                        
                         self.mancha_cega.pontos_naorespondidos = []
                         self.mancha_cega.reiniciar = False
-                        voltando = ContagemRegressiva.iniciar_contagem(5)
+                        voltando = ContagemRegressiva.iniciar_contagem(5,fixacao = "central")
                         if voltando == False:
                             self.voltar_ao_menu_inicial = True
                             return
