@@ -181,7 +181,7 @@ class FullThreshold:
     def testa_mancha_cega(self, ponto):
         x, y = ponto
         teste = Ponto(x, y, 3, Ponto.db_para_intensidade(0))
-        continua = self.verifica_testa_ponto(teste.testaPonto(0.2, 2,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+        continua = self.verifica_testa_ponto(teste.testaPonto(0.2, 2, menu_pressionado = self.verifica_tecla_pressionada_menu()))
         if not continua:
             return
         if teste.response_received:
@@ -279,30 +279,14 @@ class FullThreshold:
         else:
             return False
     
-    def verifica_tecla_pressionada_pause(self):
-        tempo_decorrido_pause = 0
-        
-        if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-            self.tecla_pause_pressionada = True            
-            return ( self.tecla_pause_pressionada,self.tempo_pausa if self.cronometrar == True else pygame.time.get_ticks())
-        else:
-            self.tecla_pause_pressionada = False
-            return (self.tecla_pause_pressionada,tempo_decorrido_pause)
+    
         
     def verifica_testa_ponto(self,testaponto):
-        botao_pause,menu_pause,tempodecorrido = testaponto
+        menu_pause = testaponto
         if menu_pause:      
             pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_j}))                 
             return False
         
-        elif botao_pause:
-            self.cronometrar = True
-            self.tempo_pausa = tempodecorrido
-            tempo_inicial = self.tempo_pausa
-            tempo_atual = pygame.time.get_ticks()
-            tempofinal = tempo_atual - tempo_inicial
-            if tempofinal > 2500:
-                return False
         else:
             return True
         
@@ -340,7 +324,7 @@ class FullThreshold:
                 x, y = ponto
                 cor_ponto = Ponto.db_para_intensidade(0)
                 teste = Ponto(x, y, 3, cor_ponto)
-                continua = self.verifica_testa_ponto(teste.testaPonto(0.2, 2,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                continua = self.verifica_testa_ponto(teste.testaPonto(0.2, 2, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                 if not continua:
                     return
                 if not teste.response_received:
@@ -388,7 +372,7 @@ class FullThreshold:
                 ponto = self.pontos[self.indice_atual]
                 if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
                     ponto.cor = Ponto.db_para_intensidade(ponto.atenuacao)
-                    continua = self.verifica_testa_ponto(ponto.testaPonto(0.2, self.tempo_resposta,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                    continua = self.verifica_testa_ponto(ponto.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                     if not continua:
                         return            
                     if ponto.response_received:
@@ -417,7 +401,7 @@ class FullThreshold:
                     
                     if self.testepositivo == 50 and len(self.pontos_vistos) > 1:
                         self.pontos_vistos[-1].cor = Colors.BACKGROUND
-                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                         if not continua:
                             return          
                         DadosExame.total_testes_falsos_positivo += 1
@@ -428,7 +412,7 @@ class FullThreshold:
                     
                     if self.testenegativo == 60 and len(self.pontos_vistos) > 1:
                         self.pontos_vistos[-1].cor = Ponto.db_para_intensidade(self.pontos_vistos.atenuacao - 1)
-                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                         if not continua:
                             return  
                         DadosExame.total_testes_falsos_negativo += 1
@@ -491,7 +475,7 @@ class FullThreshold:
                 self.db_para_intensidade(self.AT),
             )
 
-            continua = self.verifica_testa_ponto(self.ponto_limiar.testaPonto(0.2, 2,botao_pressionado = self.verifica_tecla_pressionada_pause(), menu_pressionado = self.verifica_tecla_pressionada_menu()))
+            continua = self.verifica_testa_ponto(self.ponto_limiar.testaPonto(0.2, 2, menu_pressionado = self.verifica_tecla_pressionada_menu()))
             if not continua:
                 return
             
