@@ -199,7 +199,7 @@ class FullThreshold:
 
 
     def update(self):
-        self.menu.fixacao = "diamante" if self.estado == "limiar" else self.menu.fixacao = "central"
+        self.menu.fixacao = "diamante" if self.estado == "limiar"  else "central"
         print(f"indice atual: {self.indice_atual}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:

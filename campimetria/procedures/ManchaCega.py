@@ -21,69 +21,91 @@ from dados import *
 from fixacao_central import FixacaoCentral
 
 pygame.font.init()
-fonte = pygame.font.Font(None, 36)
-cor_texto = (255, 255, 255)
-cor_alerta = Colors.BACKGROUND  # Vermelho
-cor_botao = (100, 100, 100)
-cor_botao_hover = (150, 150, 150)
-cor_borda_selecao = (255, 255, 255)  # Branco (para o botão selecionado)
-botao_selecionado = 0
+fonte_titulo = pygame.font.Font(None,64)
+fonte_subtitulo = pygame.font.Font(None,48)
+fonte_button = pygame.font.Font(None, 40)
+cor_titulo = (209,41,41)
+cor_texto = (0, 0, 0)
+cor_texto_botao = (255,255,255)
+cor_alerta = (255,255,255)
+cor_botao = (133, 137, 131)
+cor_botao_hover = (255, 247, 28)
+cor_botao_selecao = (45,167,8 )  
+botao_selecionado = 1
+largura, altura = 1744, 925
+x, y = (1920 - largura) // 2, (
+    1080 - altura
+) // 2  # Centro da tela
+rect_fundo = pygame.Rect(x, y, largura, altura)
 
 
-def desenhar_botao(texto, x, y, largura, altura, selecionado):
-    cor_atual = cor_botao_hover if selecionado else cor_botao
+def desenhar_botao(texto, rect, selecionado):
+    this_x, this_y, this_largura, this_altura = rect
+    cor_atual = cor_botao_selecao if selecionado else cor_botao
     pygame.draw.rect(
         pygame.display.get_surface(),
         cor_atual,
-        (x, y, largura, altura),
-        border_radius=5,
+        (this_x, this_y, this_largura, this_altura),
+        border_radius=15,
     )
+    
 
     # Se for o botão selecionado, desenha uma borda ao redor
     if selecionado:
         pygame.draw.rect(
             pygame.display.get_surface(),
-            cor_borda_selecao,
-            (x - 2, y - 2, largura + 4, altura + 4),
+            cor_botao_hover,
+            (this_x - 2, this_y - 2, this_largura + 4, this_altura + 4),
             2,
-            border_radius=5,
+            border_radius=15,
         )
-
-    texto_renderizado = fonte.render(texto, True, cor_texto)
-    texto_rect = texto_renderizado.get_rect(center=(x + largura // 2, y + altura // 2))
+        
+    texto_renderizado = fonte_button.render(texto, True, cor_texto_botao)
+    texto_rect = texto_renderizado.get_rect(center=(this_x + this_largura // 2, this_y + this_altura // 2))
     pygame.display.get_surface().blit(texto_renderizado, texto_rect)
     pygame.display.update()
-    return pygame.Rect(x, y, largura, altura)  # Retorna a área do botão
+    return pygame.Rect(this_x, this_y, this_largura, this_altura)  # Retorna a área do botão
 
 
 def mostrar_alerta(botao_reiniciar_estado, botao_continuar_estado):
-    largura, altura = 800, 600
-    x, y = (pygame.display.get_surface().get_width() - largura) // 2, (
-        pygame.display.get_surface().get_height() - altura
-    ) // 2  # Centro da tela
-
+    
     pygame.draw.rect(
         pygame.display.get_surface(),
         cor_alerta,
-        (x, y, largura, altura),
-        border_radius=10,
+      rect_fundo ,
+        border_radius=25,
     )
 
-    # Renderiza o texto da notificação
-    texto = fonte.render(
-        "Mancha cega nao encontrada, deseja continuar mesmo assim ou deseja reiniciar",
-        True,
-        cor_texto,
-    )
-    texto_rect = texto.get_rect(center=(960, 405))
-    pygame.display.get_surface().blit(texto, texto_rect)
-
-    # Desenha os botões com a seleção destacada
+    titulo = fonte_titulo.render("MANCHA CEGA NÃO ENCONTRADA",True,cor_titulo)
+    titulo_pos = titulo.get_rect()
+    titulo_pos.center = rect_fundo.center
+    titulo_pos.y -= 224
+    pygame.display.get_surface().blit(titulo, titulo_pos)
+    
+    
+    sub_titulo = fonte_subtitulo.render("Caso opte por continuar os testes de perda de fixação não serão feitos",True,cor_texto)
+    sub_titulo_pos = sub_titulo.get_rect()
+    
+    sub_titulo_pos.center = rect_fundo.center
+    sub_titulo_pos.y -= 49
+    pygame.display.get_surface().blit(sub_titulo,sub_titulo_pos)
+    
+    
+    rect_botao_reiniciar = pygame.Rect(0,0,529,105)
+    rect_botao_continuar = pygame.Rect(0,0,529,105)
+    rect_botao_reiniciar.center = rect_fundo.center
+    rect_botao_continuar.center = rect_fundo.center
+    rect_botao_reiniciar.x -= 350
+    rect_botao_continuar.x += 350
+    rect_botao_continuar.y += 105
+    rect_botao_reiniciar.y += 105
+    
+    # Desenha os botões com a seleção destacada  
     botao_reiniciar = desenhar_botao(
-        "Reiniciar", 960 - 150, 455, 120, 40, botao_reiniciar_estado
+        "REINCIAR", rect_botao_reiniciar, botao_reiniciar_estado
     )
     botao_continuar = desenhar_botao(
-        "Continuar", 960 + 150, 455, 120, 40, botao_continuar_estado
+        "CONTINUAR", rect_botao_continuar, botao_continuar_estado
     )
     pygame.display.update()
     return (
@@ -124,6 +146,8 @@ class TesteLimiarManchaCega:
                 if event.type == pygame.QUIT:
                     rodando = False
                 elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_j:
+                        pygame.quit()
                     if event.key == pygame.K_LEFT:
                         mostrar_alerta(
                             botao_reiniciar_estado=True, botao_continuar_estado=False
@@ -195,3 +219,21 @@ class TesteLimiarManchaCega:
                 self.resultado = self.calculo_centro_de_massa()
                 self.encontrou_mancha = True
                 DadosExame.posicao_mancha_cega = self.resultado
+
+
+if __name__ == "__main__":
+    pygame.init()
+    pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+    testando = True
+    mensagem = TesteLimiarManchaCega()
+    
+    while testando:
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    rodando = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_j:
+                        pygame.quit()
+        mensagem.verifica_mensagem()
+    
+    pygame.quit()
