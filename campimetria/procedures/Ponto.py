@@ -117,36 +117,13 @@ class Ponto:
         pygame.draw.rect(pygame.display.get_surface(), self.cor, quadrado)
 
     def testaPonto(self, tempo_exposicao, tempo_resposta_paciente):
-        trial_start_time = pygame.time.get_ticks()
-        stimulus_end_time = trial_start_time + int(tempo_exposicao * 1000)
-        response_deadline = trial_start_time + int(tempo_resposta_paciente * 1000)
+        self.trial_start_time = pygame.time.get_ticks()
+        self.stimulus_end_time = self.trial_start_time + int(tempo_exposicao * 1000)
+        self.response_deadline = self.trial_start_time + int(tempo_resposta_paciente * 1000)
         self.response_received = False
-
-        while pygame.time.get_ticks() < response_deadline:
-            current_time = pygame.time.get_ticks()
-            if current_time < stimulus_end_time:
-                pygame.draw.circle(
-                    self.surface, self.cor, (self.x, self.y), self.pontoPix
-                )
-                pygame.display.update()
-            else:
-                self.apagarPonto()
-
-        
-            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-                self.tempo_resposta = (
-                    pygame.time.get_ticks() - trial_start_time
-                ) / 1000
-                print("tempo_resposta_no_ponto: ", self.tempo_resposta)
-                self.response_received = True
-                print("Respondi o estimulo")
-              
-        
-
-            if not self.response_received:
-                self.tempo_resposta = 2.0
-                self.response_received = False
-            self.clock.tick(60)
+        self.tempo_resposta = None  # Ainda não foi registrado
+        self.exibindo_ponto = True  # Flag para controlar a exibição
+        self.aguardando_resposta = True  # Flag para indicar que ainda estamos no tempo de resposta
 
     def apagarPonto(self):
         pygame.draw.circle(
