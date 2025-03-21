@@ -12,8 +12,11 @@ from TAExamScene import TAExamScene
 #from PyQt4.QtGui import QGraphicsView,QMatrix,QBrush,QImage,QBrush,QColor,QApplication
 from PyQt4.QtGui import QApplication
 
+
 if __name__ == '__main__':
     import sys
+    import os
+   
 
     app = QApplication(sys.argv)
 

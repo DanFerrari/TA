@@ -2,6 +2,9 @@ import pygame
 import os
 import sys
 import OPi.GPIO as GPIO
+import shutil
+import subprocess
+import time
 
 
 GPIO.setwarnings(False)
@@ -47,7 +50,8 @@ class Campimetria:
         self.font_main = pygame.font.Font(None, int(self.height * 0.07))
 
         # Estado inicial: tela de seleção de estratégia
-        self.current_screen = StrategyScreen(self)
+        self.current_screen = StrategyScreen(self)        
+      
 
     def run(self):
         while self.running:
@@ -66,7 +70,8 @@ class Campimetria:
 
     def change_screen(self, new_screen):
         self.current_screen = new_screen
-
+        
+  
 
 if __name__ == "__main__":
 

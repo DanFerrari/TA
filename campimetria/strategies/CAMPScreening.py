@@ -88,7 +88,7 @@ class Screening:
 
     def testa_mancha_cega(self, ponto):
         x, y = ponto
-        teste = Ponto(x, y, 3, pygame.Color("red"))
+        teste = Ponto(x, y, 3, (255,255,255))
         continua = self.verifica_testa_ponto(
             teste.testaPonto(
                 0.2, 2, menu_pressionado=self.verifica_tecla_pressionada_menu()
@@ -234,6 +234,7 @@ class Screening:
                 self.testenegativo += 1
                 self.testepositivo += 1
                 if self.testemancha == 10 and self.teste_fixacao:
+                    print("testando mancha cega...")
                     DadosExame.perda_de_fixacao += self.testa_mancha_cega(
                         DadosExame.posicao_mancha_cega
                     )
@@ -241,8 +242,8 @@ class Screening:
                     DadosExame.total_testes_mancha += 1
 
                 if self.testepositivo == 15 and len(self.pontos_vistos) > 1:
-                    #self.pontos_vistos[-1].cor = Colors.BACKGROUND
-                    self.pontos_vistos[-1].cor = (0,0,255)                    
+                    print("testando falso positivo...")
+                    self.pontos_vistos[-1].cor = Colors.BACKGROUND                                       
                     continua = self.verifica_testa_ponto(
                         self.pontos_vistos[-1].testaPonto(
                             0.2,
@@ -257,6 +258,7 @@ class Screening:
                         DadosExame.falso_positivo_respondidos += 1
                     self.testepositivo = 0
                 if self.testenegativo == 12 and len(self.pontos_vistos) > 1:
+                    print("testando falso negativo...")
                     self.pontos_vistos[-1].cor = Ponto.db_para_intensidade(25)
                     continua = self.verifica_testa_ponto(
                         self.pontos_vistos[-1].testaPonto(

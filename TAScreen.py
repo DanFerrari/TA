@@ -395,7 +395,9 @@ class TAView(QGraphicsView):
         os.system("sudo shutdown -r +1")
 
     def msgAlterado(self):
-        self.scene().notify(u"Foram detectadas alterações no sistema.Pressione Enter no botão salvar para aplica-las.",Qt.red)    	
+        self.scene().notify(u"Foram detectadas alterações no sistema.Pressione Enter no botão salvar para aplica-las.",Qt.red)    
+        
+   
 
     def keyPressEvent(self,event):
         """
@@ -505,8 +507,12 @@ class TAView(QGraphicsView):
                 self.scene().setExam("Menu")
 
             elif self._menuSuccess and event.key() == Qt.Key_F10:
+                
                 caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..',"..","inicia_campo.sh"))
                 os.execvp("bash", ["bash", caminho])
+
+
+
 
             elif self._menuSuccess and event.key() == Qt.Key_J:  # Change Optotypes Sizes
 
