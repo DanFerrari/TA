@@ -184,16 +184,59 @@ class SelectEyeScreen:
                 
                 
                 
+        
+        #caixa selecao distancia do paciente
+        cor_caixa_distancia = self.cor_caixa_selecao if self.selecao_atual == "distancia" else self.cor_caixa
+        pos_y_distancia = self.height * 0.4
+        rect_box_distancia = pygame.Rect(self.width // 2 - 150 -400, pos_y_distancia, 300, 130)
+        pygame.draw.rect(surface, cor_caixa_distancia, rect_box_distancia, border_radius=10)
+
+        texto_distancia = self.fonte_numero.render("20 CM", True, self.cor_texto)
+        texto_distancia_pos = texto_distancia.get_rect(center=((self.width // 2 ) -400 , pos_y_distancia + 65))
+
+        surface.blit(texto_distancia, texto_distancia_pos)
+
+        label_distancia_texto = self.fonte.render("DISTANCIA PACIENTE", True, self.cor_texto)
+        label_distancia_pos = label_distancia_texto.get_rect(center=((self.width // 2) - 400 , pos_y_distancia -50))
+        surface.blit(label_distancia_texto, label_distancia_pos)
+
+        if self.selecao_atual == "distancia":
+            pygame.draw.rect(surface, self.cor_selecao, rect_box_distancia, 5, border_radius=10)  
+            
+            
+            
+        #caixa selecao tamanho estimulo
+        
+        cor_caixa_estimulo = self.cor_caixa_selecao if self.selecao_atual == "estimulo" else self.cor_caixa
+        pos_y_estimulo = self.height * 0.4
+        rect_box_estimulo = pygame.Rect(self.width // 2 - 150 +400, pos_y_estimulo, 300, 130)
+        pygame.draw.rect(surface, cor_caixa_estimulo, rect_box_estimulo, border_radius=10)
+        texto_estimulo = self.fonte_numero.render("III", True, self.cor_texto)
+        texto_estimulo_pos = texto_estimulo.get_rect(center=((self.width // 2 ) +400 , pos_y_estimulo + 65))
+        surface.blit(texto_estimulo, texto_estimulo_pos)
+        label_estimulo_texto = self.fonte.render("TAMANHO ESTIMULO", True, self.cor_texto)
+        label_estimulo_pos = label_estimulo_texto.get_rect(center=((self.width // 2) + 400 , pos_y_estimulo -50))
+        surface.blit(label_estimulo_texto, label_estimulo_pos)
+        if self.selecao_atual == "estimulo":
+            pygame.draw.rect(surface, self.cor_selecao, rect_box_estimulo, 5, border_radius=10)      
+            
+                         
+                
+                
+                
+                
+                
+                
                 
                 
         
         # Renderiza o botão "Iniciar Exame"
         pos_y_botao = self.height * 0.70
         cor_botao_atual = self.cor_botao_hover if self.selecao_atual == "botao" else self.cor_botao
-        rect_botao = pygame.Rect(self.width // 2 - 715, pos_y_botao, 1430, 170)
+        rect_botao = pygame.Rect(self.width // 2 - 750, pos_y_botao, 1500, 170)
         pygame.draw.rect(surface, cor_botao_atual, rect_botao, border_radius=10)
         texto_botao = self.fonte.render("INICIAR EXAME", True, (255,255,255))
-        texto_botao_pos = texto_botao.get_rect(center=((self.width // 2 - 715) + 715, pos_y_botao + 85))  
+        texto_botao_pos = texto_botao.get_rect(center=((self.width // 2 ) , pos_y_botao + 85))  
         surface.blit(texto_botao, texto_botao_pos)
         if self.selecao_atual == "botao":
             pygame.draw.rect(surface, self.cor_selecao, rect_botao, 5, border_radius=10)

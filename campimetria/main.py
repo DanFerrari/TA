@@ -2,16 +2,13 @@ import pygame
 import os
 import sys
 import OPi.GPIO as GPIO
-import shutil
-import subprocess
-import time
 
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)
 
 PIN_ENTRADA = "PD22"
-GPIO.setup(PIN_ENTRADA, GPIO.IN)
+#GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
@@ -59,7 +56,6 @@ class Campimetria:
             for event in events:
                 if event.type == pygame.QUIT:
                     self.running = False
-
             # Delegamos o tratamento de eventos, atualização e desenho para a tela ativa
             self.current_screen.handle_events(events)
             self.current_screen.update()

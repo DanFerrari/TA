@@ -24,7 +24,7 @@ from dados import *
 
 
 class Ponto:
-    def __init__(self, xg, yg, tamanhoPonto, cor):
+    def __init__(self, xg, yg, tamanhoPonto = DadosExame.tamanho_estimulo, cor = (0,0,0),distancia = DadosExame.distancia_paciente):
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
@@ -34,9 +34,11 @@ class Ponto:
         self.numero_cruzamentos = 0
         self.ultima_atenuacao_vista = 0
         self.ultima_atenuacao_nao_vista = 0
+        self.distanciaPacienteTela = distancia
         self.delta = 0
         self.status = ""
-        self.tamanhoPonto = tamanhoPonto / 2
+        self.tamanhoPonto = tamanhoPonto
+        self.raio_ponto = self.calcula_tamanho_do_ponto()
         self.xg = xg
         self.yg = yg
         self.resolucaoX = 0.25
@@ -47,27 +49,42 @@ class Ponto:
         self.menu_active = False
         self.tempo_resposta = 0.0
         self.clock = pygame.time.Clock()
-
         self.cor = cor
-        self.distanciaPacienteTela = 200
+        #self.distanciaPacienteTela = 200
         self.screen_width = pygame.display.Info().current_w
         self.screen_height = pygame.display.Info().current_h
         self.surface = pygame.display.get_surface()
-
-        xrad = math.radians(self.xg)
-        xmm = self.distanciaPacienteTela * math.tan(xrad)
-        yrad = math.radians(self.yg)
-        ymm = self.distanciaPacienteTela * math.tan(yrad)
-        self.pontoPix = self.tamanhoPonto / self.resolucao_video
+        self.xrad = math.radians(self.xg)
+        self.xmm = self.distanciaPacienteTela * math.tan(self.xrad)
+        self.yrad = math.radians(self.yg)
+        self.ymm = self.distanciaPacienteTela * math.tan(self.yrad)
+        self.pontoPix = self.raio_ponto / self.resolucao_video
         # Converte para pixels
-
-        self.x = xmm / self.resolucaoX
-        self.y = ymm / self.resolucaoY
+        self.x = self.xmm / self.resolucaoX
+        self.y = self.ymm / self.resolucaoY
         self.x = self.x + (self.screen_width / 2)
         self.y = self.y + (self.screen_height / 2)
         
       
-
+    def calcula_tamanho_do_ponto(self):
+        grau = 0
+        match self.tamanhoPonto:
+            case 1:
+                grau = 0.13                
+            case 2:
+                grau = 0.26
+            case 3:
+                grau = 0.52
+            case 4:
+                grau = 1.04
+            case 5:
+                grau = 2.08
+                
+        print(f"grau: {grau}")
+        
+        raio_ponto = (2 * self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
+        print(f"raio: {raio_ponto}")
+        return raio_ponto
     @staticmethod
     def db_para_intensidade(db, db_min=40, db_max=0, i_min=150, i_max=255):
         """Converte dB para intensidade de cor (escala logarítmica)."""
@@ -87,7 +104,7 @@ class Ponto:
 
     @staticmethod
     def plotarPontoStatic(xg, yg, tamanhoPonto, cor):
-
+        
         tamanhoPonto = tamanhoPonto / 2
         resolucaoX = 0.25
         resolucaoY = 0.25
@@ -111,7 +128,7 @@ class Ponto:
         pygame.draw.circle(surface, cor, (x, y), pontoPix)
 
     def desenha_quadrado(self):
-        tamanho = (self.tamanhoPonto, self.tamanhoPonto)
+        tamanho = (self.raio_ponto, self.raio_ponto)
         quadrado = pygame.Rect(0, 0, *tamanho)
         quadrado.center = (self.x, self.y)
         pygame.draw.rect(pygame.display.get_surface(), self.cor, quadrado)
