@@ -152,7 +152,7 @@ class ResultadoScreening:
 
         for ponto in pontos_ajustados:
             if ponto.response_received:
-                ponto.atenuacao = 25
+                ponto.atenuacao = DadosExame.atenuacao_screening
             else:
                 ponto.atenuacao = 0
             fonte = pygame.font.Font(None, 20)

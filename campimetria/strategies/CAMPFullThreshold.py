@@ -382,7 +382,7 @@ class FullThreshold:
                     
                     
                     if self.testenegativo == 60 and len(self.pontos_vistos) > 1:
-                        self.pontos_vistos[-1].cor = Ponto.db_para_intensidade(self.pontos_vistos.atenuacao - 1)
+                        self.pontos_vistos[-1].cor = Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0)
                         continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                         if not continua:
                             return  
@@ -402,6 +402,7 @@ class FullThreshold:
                     else:
                         self.indice_atual = 0
                         random.shuffle(self.pontos)
+                    DadosExame.total_de_pontos_testados += 1
             
             else:
                 self.tempo_final_exame = pygame.time.get_ticks()

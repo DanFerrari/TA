@@ -106,7 +106,7 @@ class Screening:
             if event.type == pygame.QUIT:
                 self.game.running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_j:  # Volta para o menu ou sai
+                if event.key == pygame.K_j: 
                     print("entrei no for")
                     self.menu.usuario = "OPERADOR"
                     tempo_inicial = pygame.time.get_ticks()
@@ -225,7 +225,7 @@ class Screening:
                 )
                 if not continua:
                     return
-                DadosExame.total_de_pontos_testados += 1
+                
                 if self.pontos[self.indice_atual].response_received:
                     self.pontos_vistos.append(self.pontos[self.indice_atual])
                 self.pontos[self.indice_atual].limiar_encontrado = True
@@ -259,7 +259,7 @@ class Screening:
                     self.testepositivo = 0
                 if self.testenegativo == 12 and len(self.pontos_vistos) > 1:
                     print("testando falso negativo...")
-                    self.pontos_vistos[-1].cor = Ponto.db_para_intensidade(25)
+                    self.pontos_vistos[-1].cor = Ponto.db_para_intensidade((DadosExame.atenuacao_screening - 9) if DadosExame.atenuacao_screening >= 9 else 0)
                     continua = self.verifica_testa_ponto(
                         self.pontos_vistos[-1].testaPonto(
                             0.2,
@@ -281,6 +281,7 @@ class Screening:
                 self.tempos = []
 
                 self.indice_atual += 1
+                DadosExame.total_de_pontos_testados += 1
 
             if self.indice_atual == self.total_pontos_exame:
                 self.tempo_final_exame = pygame.time.get_ticks()
