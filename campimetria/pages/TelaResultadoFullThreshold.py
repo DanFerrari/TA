@@ -435,7 +435,7 @@ class ResultadoFullthreshold:
         minutos,segundos = divmod((DadosExame.duracao_do_exame / 1000),60)
         labels = [
             f"Exame: {DadosExame.exame_selecionado}",
-            f"Duração (min): {minutos}:{segundos}",
+            f"Duração (min): {int(minutos)}:{int(segundos)}",
             f"Total de pontos: {DadosExame.total_de_pontos_testados}",
             f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
             f"Falso negativo: {DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
