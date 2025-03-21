@@ -5,9 +5,9 @@ import OPi.GPIO as GPIO
 
 
 GPIO.setwarnings(False)
-GPIO.setmode(GPIO.SUNXI)   
+GPIO.setmode(GPIO.SUNXI)
 
-PIN_ENTRADA = 'PD22'
+PIN_ENTRADA = "PD22"
 GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
@@ -68,8 +68,8 @@ class Campimetria:
         self.current_screen = new_screen
 
 
-if __name__ == "__main__":    
-    
+if __name__ == "__main__":
+
     game = Campimetria()
     game.run()
     caminho = os.path.abspath(
