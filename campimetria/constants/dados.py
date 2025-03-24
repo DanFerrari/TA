@@ -1,5 +1,11 @@
 import pygame
 
+
+
+
+
+
+
 class Constantes:
     dbMin = 0
     dbMax = 40
@@ -64,8 +70,6 @@ class DadosExame:
     @staticmethod
     def reset():
         DadosExame.faixa_etaria = 0
-        DadosExame.distancia_paciente = 200
-        DadosExame.tamanho_estimulo = 3
         DadosExame.olho = ""
         DadosExame.exame_selecionado = ""
         DadosExame.atenuacao_screening = 0
