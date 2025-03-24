@@ -6,8 +6,7 @@ import sys
 import OPi.GPIO as GPIO
 
 
-
-PIN_ENTRADA = 'PD22'
+PIN_ENTRADA = "PD22"
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
@@ -24,7 +23,14 @@ from dados import *
 
 
 class Ponto:
-    def __init__(self, xg, yg, tamanhoPonto = DadosExame.tamanho_estimulo, cor = (0,0,0),distancia = DadosExame.distancia_paciente):
+    def __init__(
+        self,
+        xg,
+        yg,
+        tamanhoPonto=DadosExame.tamanho_estimulo,
+        cor=(0, 0, 0),
+        distancia=DadosExame.distancia_paciente,
+    ):
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
@@ -50,7 +56,7 @@ class Ponto:
         self.tempo_resposta = 0.0
         self.clock = pygame.time.Clock()
         self.cor = cor
-        #self.distanciaPacienteTela = 200
+        # self.distanciaPacienteTela = 200
         self.screen_width = pygame.display.Info().current_w
         self.screen_height = pygame.display.Info().current_h
         self.surface = pygame.display.get_surface()
@@ -64,13 +70,12 @@ class Ponto:
         self.y = self.ymm / self.resolucaoY
         self.x = self.x + (self.screen_width / 2)
         self.y = self.y + (self.screen_height / 2)
-        
-      
+
     def calcula_tamanho_do_ponto(self):
         grau = 0
         match self.tamanhoPonto:
             case 1:
-                grau = 0.13                
+                grau = 0.13
             case 2:
                 grau = 0.26
             case 3:
@@ -79,12 +84,13 @@ class Ponto:
                 grau = 1.04
             case 5:
                 grau = 2.08
-                
+
         print(f"grau: {grau}")
-        
+
         raio_ponto = (2 * self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
         print(f"raio: {raio_ponto}")
         return raio_ponto
+
     @staticmethod
     def db_para_intensidade(db, db_min=40, db_max=0, i_min=150, i_max=255):
         """Converte dB para intensidade de cor (escala logarítmica)."""
@@ -104,7 +110,7 @@ class Ponto:
 
     @staticmethod
     def plotarPontoStatic(xg, yg, tamanhoPonto, cor):
-        
+
         tamanhoPonto = tamanhoPonto / 2
         resolucaoX = 0.25
         resolucaoY = 0.25
@@ -133,27 +139,19 @@ class Ponto:
         quadrado.center = (self.x, self.y)
         pygame.draw.rect(pygame.display.get_surface(), self.cor, quadrado)
 
-    def testaPonto(self, tempo_exposicao, tempo_resposta_paciente, menu_pressionado = False):
+    def testaPonto(
+        self, tempo_exposicao, tempo_resposta_paciente, menu_pressionado=False
+    ):
         trial_start_time = pygame.time.get_ticks()
         stimulus_end_time = trial_start_time + int(tempo_exposicao * 1000)
         response_deadline = trial_start_time + int(tempo_resposta_paciente * 1000)
         self.response_received = False
-        
-        
- 
-        
 
         while pygame.time.get_ticks() < response_deadline:
             current_time = pygame.time.get_ticks()
             if menu_pressionado:
-                return (menu_pressionado)
-            
-           
+                return menu_pressionado
 
-            
-
-                
-           
             if current_time < stimulus_end_time:
                 pygame.draw.circle(
                     self.surface, self.cor, (self.x, self.y), self.pontoPix
@@ -161,40 +159,33 @@ class Ponto:
                 pygame.display.update()
             else:
                 self.apagarPonto()
-                
-            
+
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_j:
                         menu_pressionado = True
-                
-                    if event.key == pygame.K_e:                        
+
+                    if event.key == pygame.K_e:
                         self.tempo_resposta = (
                             pygame.time.get_ticks() - trial_start_time
                         ) / 1000
                         print("tempo_resposta_no_ponto: ", self.tempo_resposta)
                         self.response_received = True
                         print("Respondi o estimulo")
-                        
-                        
-            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:                    
-                    self.tempo_resposta = (
-                        pygame.time.get_ticks() - trial_start_time
-                    ) / 1000
-                    print("tempo_resposta_no_ponto: ", self.tempo_resposta)
-                    self.response_received = True
-                    print("Respondi o estimulo")
 
-        
-            
-
-        
+            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+                self.tempo_resposta = (
+                    pygame.time.get_ticks() - trial_start_time
+                ) / 1000
+                print("tempo_resposta_no_ponto: ", self.tempo_resposta)
+                self.response_received = True
+                print("Respondi o estimulo")
 
             if not self.response_received:
                 self.tempo_resposta = 2.0
                 self.response_received = False
             self.clock.tick(60)
-            
+
         return menu_pressionado
 
     def apagarPonto(self):

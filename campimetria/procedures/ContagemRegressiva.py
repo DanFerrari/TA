@@ -16,6 +16,7 @@ sys.path.append(
 from dados import Colors
 from fixacao_central import FixacaoCentral
 from fixacao_diamante import FixacaoDiamante
+from area_exame_desenho import DesenhoAreaExame
 
 
 class ContagemRegressiva:
@@ -47,8 +48,10 @@ class ContagemRegressiva:
         textpos2 = text2.get_rect(centerx=960, centery=540 - 300)
         pygame.display.get_surface().blit(text2, textpos2)
 
+        DesenhoAreaExame.desenhar()
         pygame.display.update()
         while not iniciar_exame:
+            
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_e:
