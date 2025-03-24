@@ -1,4 +1,4 @@
-import pygame, random, time, os, sys, math
+import pygame, random, time, os, sys, math,json
 import numpy as np
 from scipy.spatial import KDTree
 
@@ -496,8 +496,45 @@ class ResultadoFullthreshold:
 
 
 
+
+     
+    @staticmethod
+    def carregar_config(CONFIG_FILE,DEFAULT_CONFIG):
+        """Lê as variáveis do arquivo JSON ou usa valores padrão."""
+        if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",CONFIG_FILE))):
+            with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",CONFIG_FILE)), "r") as f:
+                return json.load(f)
+        else:
+            return DEFAULT_CONFIG
+    @staticmethod
+    def salvar_config(config,CONFIG_FILE):
+        """Salva as variáveis no arquivo JSON."""
+        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",CONFIG_FILE)), "w") as f:
+            json.dump(config, f, indent=4)
+
+
+
+
     @staticmethod
     def exibir_resultados():
+        CONFIG_FILE = "config.json"
+
+        DEFAULT_CONFIG ={
+            "distancia_paciente":200,
+            "tamanho_estimulo":3,
+            "exame_id":1
+        }
+        config = ResultadoFullthreshold.carregar_config(CONFIG_FILE,DEFAULT_CONFIG)        
+        config["exame_id"] = (DadosExame.exame_id + 1) if DadosExame.exame_id < 999 else 1
+        config["distancia_paciente"] = DadosExame.distancia_paciente
+        config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
+        
+        ResultadoFullthreshold.salvar_config(config,CONFIG_FILE)
+        
+        
+        
+        
+        
         ResultadoFullthreshold.inicializar_matrizes()
         pygame.font.init()
         ResultadoFullthreshold.status_resultado(carregado=False)      

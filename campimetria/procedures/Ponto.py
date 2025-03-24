@@ -173,13 +173,13 @@ class Ponto:
                         self.response_received = True
                         print("Respondi o estimulo")
 
-            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-                self.tempo_resposta = (
-                    pygame.time.get_ticks() - trial_start_time
-                ) / 1000
-                print("tempo_resposta_no_ponto: ", self.tempo_resposta)
-                self.response_received = True
-                print("Respondi o estimulo")
+            # if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+            #     self.tempo_resposta = (
+            #         pygame.time.get_ticks() - trial_start_time
+            #     ) / 1000
+            #     print("tempo_resposta_no_ponto: ", self.tempo_resposta)
+            #     self.response_received = True
+            #     print("Respondi o estimulo")
 
             if not self.response_received:
                 self.tempo_resposta = 2.0

@@ -201,7 +201,7 @@ class FullThreshold:
 
     def update(self):
         self.menu.fixacao = "diamante" if self.estado == "limiar_foveal"  else "central"
-        print(f"indice atual: {self.indice_atual}")
+        print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {self.pontos_fechados}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
             from select_eye_screen import SelectEyeScreen
@@ -418,6 +418,8 @@ class FullThreshold:
                     else 0
                 )
                 self.estado = "resultado"
+                
+          
             
            
         elif self.estado == "resultado":

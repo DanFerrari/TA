@@ -38,6 +38,7 @@ class Fonts:
 
 class DadosExame:
     #  faixa_etaria =>  1:"0 - 20", 2:"21 - 30", 3:"31 - 40", 4:"41 - 50", 5:"51 - 60", 6:"61 - 70", 7:"71 - 80"
+    exame_id = 0
     faixa_etaria = 0
     distancia_paciente = 200
     tamanho_estimulo = 3

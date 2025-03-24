@@ -1,4 +1,4 @@
-import pygame,os,sys
+import pygame,os,sys,json
 
 
 
@@ -26,6 +26,27 @@ class StrategyScreen:
         self.cor_botao = game.cor_botao
         self.cor_botao_hover = game.cor_botao_hover
         self.cor_texto = game.cor_texto
+        self.CONFIG_FILE = "config.json"
+
+        self.DEFAULT_CONFIG ={
+            "distancia_paciente":200,
+            "tamanho_estimulo":3,
+            "exame_id":1
+        }
+        self.config = self.carregar_config()
+        DadosExame.tamanho_estimulo = self.config["tamanho_estimulo"]
+        DadosExame.distancia_paciente = self.config["distancia_paciente"]
+        DadosExame.exame_id = self.config["exame_id"]
+
+    def carregar_config(self):
+        """Lê as variáveis do arquivo JSON ou usa valores padrão."""
+        if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE))):
+            with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE)), "r") as f:
+                return json.load(f)
+        else:
+            return self.DEFAULT_CONFIG
+
+
 
     def handle_events(self, events):
         for event in events:
@@ -58,6 +79,12 @@ class StrategyScreen:
         largura_botao = int(self.game.width * 0.3)
         altura_botao = int(self.game.height * 0.1)
         espacamento = int(self.game.height * 0.15)
+        
+        #label exame_id
+        fonte_exame = pygame.font.Font(None, 80)
+        label_exame_id_texto = fonte_exame.render(f"EXAME ID {DadosExame.exame_id}", True,self.cor_texto)
+        label_exame_id_pos = label_exame_id_texto.get_rect(center=(960,800))
+        surface.blit(label_exame_id_texto,label_exame_id_pos)
         
         # Desenha os botões
         self.draw_button(surface, "Screening", int(self.game.height * 0.4), largura_botao, altura_botao, self.botao_selecionado == 0)

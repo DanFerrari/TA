@@ -53,11 +53,13 @@ class SelectEyeScreen:
 
         self.DEFAULT_CONFIG ={
             "distancia_paciente":200,
-            "tamanho_estimulo":3
+            "tamanho_estimulo":3,
+            "exame_id":1
         }
         self.config = self.carregar_config()
         DadosExame.tamanho_estimulo = self.config["tamanho_estimulo"]
         DadosExame.distancia_paciente = self.config["distancia_paciente"]
+        DadosExame.exame_id = self.config["exame_id"]
 
     def carregar_config(self):
         """Lê as variáveis do arquivo JSON ou usa valores padrão."""
@@ -274,13 +276,7 @@ class SelectEyeScreen:
             
                          
                 
-                
-                
-                
-                
-                
-                
-                
+
         
         # Renderiza o botão "Iniciar Exame"
         pos_y_botao = self.height * 0.70

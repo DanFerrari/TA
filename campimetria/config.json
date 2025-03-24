@@ -1,4 +1,5 @@
 {
     "distancia_paciente": 240,
-    "tamanho_estimulo": 4
+    "tamanho_estimulo": 3,
+    "exame_id":1
 }

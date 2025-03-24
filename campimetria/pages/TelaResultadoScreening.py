@@ -1,4 +1,4 @@
-import pygame, random, time, os, sys, math
+import pygame, random, time, os, sys, math,json
 
 
 sys.path.append(
@@ -82,9 +82,40 @@ class ResultadoScreening:
             pygame.display.get_surface().blit(
                 texto_renderizado, (pos_x - 200, pos_y + i * espacamento)
             )
+            
+            
+            
+    @staticmethod
+    def carregar_config(CONFIG_FILE,DEFAULT_CONFIG):
+        """Lê as variáveis do arquivo JSON ou usa valores padrão."""
+        if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",CONFIG_FILE))):
+            with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",CONFIG_FILE)), "r") as f:
+                return json.load(f)
+        else:
+            return DEFAULT_CONFIG
+    @staticmethod
+    def salvar_config(config,CONFIG_FILE):
+        """Salva as variáveis no arquivo JSON."""
+        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",CONFIG_FILE)), "w") as f:
+            json.dump(config, f, indent=4)
 
     @staticmethod
     def desenha_pontos():
+        CONFIG_FILE = "config.json"
+
+        DEFAULT_CONFIG ={
+            "distancia_paciente":200,
+            "tamanho_estimulo":3,
+            "exame_id":1
+        }
+        config = ResultadoScreening.carregar_config(CONFIG_FILE,DEFAULT_CONFIG)        
+        config["exame_id"] = (DadosExame.exame_id + 1) if DadosExame.exame_id < 999 else 1
+        config["distancia_paciente"] = DadosExame.distancia_paciente
+        config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
+        
+        ResultadoScreening.salvar_config(config,CONFIG_FILE)
+        
+        
         pygame.display.get_surface().fill(pygame.Color("white"))
         perda_fixacao = 0.0
         LARGURA, ALTURA = 1920, 1080  # Tela original
