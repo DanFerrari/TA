@@ -44,6 +44,11 @@ class SelectEyeScreen:
         self.NUMERO_MAX = 40
         self.faixa_etaria = {1:"0 - 20", 2:"21 - 30", 3:"31 - 40", 4:"41 - 50", 5:"51 - 60", 6:"61 - 70", 7:"71 - 80"}
         self.escolha_faixa = 1
+        
+        #estimulo
+        self.estimulo = {1:"I",2:"II",3:"III",4:"IV",5:"V"}
+        
+        
 
     def handle_events(self, events):
         for event in events:
@@ -54,15 +59,23 @@ class SelectEyeScreen:
                     self.game.change_screen(StrategyScreen(self.game))
                 elif event.key == pygame.K_x:
                     if self.selecao_atual == "numero":
-                        self.selecao_atual = "opcoes"
+                        self.selecao_atual = "distancia"
                     elif self.selecao_atual == "botao":                       
+                        self.selecao_atual = "estimulo"
+                    elif self.selecao_atual == "estimulo":
                         self.selecao_atual = "numero"
+                    elif self.selecao_atual == "distancia":
+                        self.selecao_atual = "opcoes"                       
                      
                 elif event.key == pygame.K_e:
                     if self.selecao_atual == "opcoes":                        
-                        self.selecao_atual = "numero"                       
+                        self.selecao_atual = "distancia"                       
+                    elif self.selecao_atual == "distancia":
+                        self.selecao_atual = "numero"
                     elif self.selecao_atual == "numero":
-                        self.selecao_atual = "botao"
+                        self.selecao_atual = "estimulo"
+                    elif self.selecao_atual == "estimulo":
+                        self.selecao_atual = "botao"                    
                     elif self.selecao_atual == "botao":
                         # Ao confirmar no botão, inicia o exame conforme a estratégia selecionada
                         if DadosExame.exame_selecionado == Constantes.screening:
@@ -94,12 +107,24 @@ class SelectEyeScreen:
                     if event.key == pygame.K_LEFT and self.numero > self.NUMERO_MIN:
                         self.numero -= 1
                         if self.escolha_faixa > 1:
-                            self.escolha_faixa -= 1
-                        
+                            self.escolha_faixa -= 1                        
                     elif event.key == pygame.K_RIGHT and self.numero < self.NUMERO_MAX:
                         self.numero += 1
                         if self.escolha_faixa < 7:
                             self.escolha_faixa += 1
+                
+                elif self.selecao_atual == "distancia":
+                    if event.key == pygame.K_LEFT and DadosExame.distancia_paciente > 100:
+                        DadosExame.distancia_paciente -= 10
+                    elif event.key == pygame.K_RIGHT and DadosExame.distancia_paciente < 240:
+                        DadosExame.distancia_paciente += 10                        
+                elif self.selecao_atual == "estimulo":
+                    if event.key == pygame.K_LEFT and DadosExame.tamanho_estimulo > 1:
+                        DadosExame.tamanho_estimulo -= 1                      
+                    elif event.key == pygame.K_RIGHT and DadosExame.tamanho_estimulo < 5:
+                        DadosExame.tamanho_estimulo += 1
+
+        print(f"estimulo: {DadosExame.tamanho_estimulo}, distancia:{DadosExame.distancia_paciente}, ")
                         
 
     def update(self):
@@ -191,7 +216,7 @@ class SelectEyeScreen:
         rect_box_distancia = pygame.Rect(self.width // 2 - 150 -400, pos_y_distancia, 300, 130)
         pygame.draw.rect(surface, cor_caixa_distancia, rect_box_distancia, border_radius=10)
 
-        texto_distancia = self.fonte_numero.render("20 CM", True, self.cor_texto)
+        texto_distancia = self.fonte_numero.render(f"{int(DadosExame.distancia_paciente/10)} CM", True, self.cor_texto)
         texto_distancia_pos = texto_distancia.get_rect(center=((self.width // 2 ) -400 , pos_y_distancia + 65))
 
         surface.blit(texto_distancia, texto_distancia_pos)
@@ -202,16 +227,15 @@ class SelectEyeScreen:
 
         if self.selecao_atual == "distancia":
             pygame.draw.rect(surface, self.cor_selecao, rect_box_distancia, 5, border_radius=10)  
-            
-            
-            
-        #caixa selecao tamanho estimulo
         
+        
+        
+        #caixa selecao tamanho estimulo
         cor_caixa_estimulo = self.cor_caixa_selecao if self.selecao_atual == "estimulo" else self.cor_caixa
         pos_y_estimulo = self.height * 0.4
         rect_box_estimulo = pygame.Rect(self.width // 2 - 150 +400, pos_y_estimulo, 300, 130)
         pygame.draw.rect(surface, cor_caixa_estimulo, rect_box_estimulo, border_radius=10)
-        texto_estimulo = self.fonte_numero.render("III", True, self.cor_texto)
+        texto_estimulo = self.fonte_numero.render(f"{self.estimulo.get(DadosExame.tamanho_estimulo)}", True, self.cor_texto)
         texto_estimulo_pos = texto_estimulo.get_rect(center=((self.width // 2 ) +400 , pos_y_estimulo + 65))
         surface.blit(texto_estimulo, texto_estimulo_pos)
         label_estimulo_texto = self.fonte.render("TAMANHO ESTIMULO", True, self.cor_texto)

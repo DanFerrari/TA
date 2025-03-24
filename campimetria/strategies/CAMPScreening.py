@@ -84,11 +84,11 @@ class Screening:
         return tempo_medio
 
     def criar_pontos(self):
-        return [Ponto(x, y, 3, (255, 255, 255)) for x, y in cordenadas_30]
+        return [Ponto(x, y, tamanhoPonto = DadosExame.tamanho_estimulo, cor =  (255, 255, 255), distancia = DadosExame.distancia_paciente) for x, y in cordenadas_30]
 
     def testa_mancha_cega(self, ponto):
         x, y = ponto
-        teste = Ponto(x, y, 3, (255,255,255))
+        teste = Ponto(x, y, tamanhoPonto = DadosExame.tamanho_estimulo, cor = (255,255,255), distancia = DadosExame.distancia_paciente)
         continua = self.verifica_testa_ponto(
             teste.testaPonto(
                 0.2, 2, menu_pressionado=self.verifica_tecla_pressionada_menu()
@@ -163,7 +163,7 @@ class Screening:
                 ponto = self.matriz_mancha_cega[self.indice_atual]
                 x, y = ponto
                 cor_ponto = Ponto.db_para_intensidade(0)
-                teste = Ponto(x, y, 3, cor_ponto)
+                teste = Ponto(x, y, tamanhoPonto = DadosExame.tamanho_estimulo,cor =  cor_ponto, distancia = DadosExame.distancia_paciente)
                 continua = self.verifica_testa_ponto(
                     teste.testaPonto(
                         0.2, 2, menu_pressionado=self.verifica_tecla_pressionada_menu()

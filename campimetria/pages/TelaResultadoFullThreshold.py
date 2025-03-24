@@ -20,26 +20,33 @@ from Ponto import Ponto
 
 
 class ResultadoFullthreshold:
-
+    
+    
 
     
     @staticmethod
     def gerar_pontos_mapa_textura():
         matriz = []
         for ponto in DadosExame.matriz_pontos:
-            ponto_novo = Ponto(0,0,1,(0,0,0))  
-            ponto_novo.x = int(ponto.x * 960 / 1920)
-            ponto_novo.y = int(ponto.y * 540 / 1080)
+            ponto_novo = Ponto(ponto.xg,ponto.yg,tamanhoPonto = 3, cor = (0,0,0), distancia = 200)
+            ponto_novo.raio_ponto = 6
+            ponto_novo.pontoPix = 4  
+            ponto_novo.x = int(ponto_novo.x * 960 / 1920)
+            ponto_novo.y = int(ponto_novo.y * 540 / 1080)
+            ponto_novo.atenuacao = ponto.atenuacao
             matriz.append(ponto_novo)
         return matriz
     @staticmethod
     def gerar_pontos_mapa_limiar():
         matriz = []
         for ponto in DadosExame.matriz_pontos:
-            ponto_novo = Ponto(0,0,3,(0,0,0))
-            ponto_novo.x = int(ponto.x * 960 / 1920)
-            ponto_novo.y = int(ponto.y * 540 / 1080)
+            ponto_novo = Ponto(ponto.xg,ponto.yg,tamanhoPonto = 3, cor = (0,0,0), distancia = 200)
+            ponto_novo.raio_ponto = 6
+            ponto_novo.pontoPix = 4  
+            ponto_novo.x = int(ponto_novo.x * 960 / 1920)
+            ponto_novo.y = int(ponto_novo.y * 540 / 1080)
             ponto_novo.y += 540 
+            ponto_novo.atenuacao = ponto.atenuacao
             matriz.append(ponto_novo)
         return matriz
     
@@ -528,3 +535,14 @@ class ResultadoFullthreshold:
 
         DadosExame.reset()
 
+
+
+if __name__ == "__main__":
+    from cordenadas_30 import cordenadas_30
+    from atenuacoes_personalizadas import atenuacoes_personalizadas
+    pygame.init()
+    pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+    DadosExame.matriz_pontos = [Ponto(x,y,tamanhoPonto = 3,cor = (0,0,0), distancia = 100) for x,y in cordenadas_30]
+    for ponto in DadosExame.matriz_pontos:
+        ponto.atenuacao = atenuacoes_personalizadas.get((ponto.xg,ponto.yg))
+    ResultadoFullthreshold.exibir_resultados()

@@ -133,21 +133,27 @@ class ResultadoScreening:
         pygame.display.get_surface().blit(
             label_legenda_red, label_legenda_red.get_rect(center=(900, 310))
         )
-        quadrado_legenda_vermelho = Ponto(0, 0, 16, pygame.Color("red"))
+        quadrado_legenda_vermelho = Ponto(0, 0, tamanhoPonto = 5,cor =  pygame.Color("red"),distancia = 200)
+        quadrado_legenda_vermelho.raio_ponto = 10
         quadrado_legenda_vermelho.x = 800
         quadrado_legenda_vermelho.y = 310
         quadrado_legenda_vermelho.desenha_quadrado()
 
-        pontos_ajustados = DadosExame.matriz_pontos
+        pontos_ajustados = []
+        for ponto in DadosExame.matriz_pontos:                    
+            ponto = Ponto(ponto.xg,ponto.yg,tamanhoPonto = 5, cor = (0,0,0), distancia = 200)
+            ponto.raio_ponto = 6
+            ponto.pontoPix = 4        
+            pontos_ajustados.append(ponto)
         for ponto in pontos_ajustados:
             ponto.x = int(ponto.x * nova_largura / LARGURA)  # Reduzindo a coordenada X
             ponto.y = int(ponto.y * nova_altura / ALTURA)  # Reduzindo a coordenada Y
+            
             if ponto.response_received:
                 ponto.cor = pygame.Color("green")
                 ponto.plotarPonto()
             elif not ponto.response_received:
-                ponto.cor = pygame.Color("red")
-                ponto.tamanhoPonto = 6
+                ponto.cor = pygame.Color("red")                
                 ponto.desenha_quadrado()
 
         for ponto in pontos_ajustados:
@@ -179,3 +185,9 @@ class ResultadoScreening:
                     DadosExame.reset()
 
 
+if __name__ == "__main__":
+    from cordenadas_30 import cordenadas_30
+    pygame.init()
+    pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+    DadosExame.matriz_pontos = [Ponto(x,y,tamanhoPonto = 5,cor = (0,0,0), distancia = 250) for x,y in cordenadas_30]
+    ResultadoScreening.desenha_pontos()
