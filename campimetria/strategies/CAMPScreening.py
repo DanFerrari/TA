@@ -26,6 +26,7 @@ from TelaResultadoScreening import ResultadoScreening
 from fixacao_central import FixacaoCentral
 from MenuPausa import MenuPausa
 from strategy_screen import StrategyScreen
+
 from cordenadas_mcdir import cordenadas_mcdir
 from cordenadas_mcesq import cordenadas_mcesq
 
@@ -125,7 +126,8 @@ class Screening:
         print(f"indice atual: {self.indice_atual}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
-            self.game.change_screen(StrategyScreen(self.game))
+            from select_eye_screen import SelectEyeScreen
+            self.game.change_screen(SelectEyeScreen(self.game))
 
     def verifica_tecla_pressionada_menu(self):
         for event in pygame.event.get():

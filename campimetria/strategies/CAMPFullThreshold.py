@@ -28,6 +28,7 @@ from cordenadas_mcesq import cordenadas_mcesq
 from strategy_screen import StrategyScreen
 
 
+
 class FullThreshold:
 
     def __init__(self,game):
@@ -203,7 +204,8 @@ class FullThreshold:
         print(f"indice atual: {self.indice_atual}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
-            self.game.change_screen(StrategyScreen(self.game))
+            from select_eye_screen import SelectEyeScreen
+            self.game.change_screen(SelectEyeScreen(self.game))
 
         
         
