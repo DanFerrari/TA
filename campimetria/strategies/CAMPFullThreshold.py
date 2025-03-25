@@ -175,8 +175,7 @@ class FullThreshold:
 
         # if resp == 1 and not Dados.DadosExame.LF and not Dados.DadosExame.ThrRel and not Dados.LimQuad:
         #     VerifyFalseNegative()
-        if ponto.status == "=":
-            self.pontos_fechados += 1
+        
         return resp
 
     def testa_mancha_cega(self, ponto):
@@ -201,7 +200,7 @@ class FullThreshold:
 
     def update(self):
         self.menu.fixacao = "diamante" if self.estado == "limiar_foveal"  else "central"
-        print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {self.pontos_fechados}")
+        print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {self.pontos_fechados}, ")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
             from select_eye_screen import SelectEyeScreen
@@ -355,6 +354,8 @@ class FullThreshold:
                         paciente_viu = 1
 
                     self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto)
+                    if ponto.status == "=":
+                        self.pontos_fechados += 1
                     self.tempos.append(ponto.tempo_resposta)
                     self.testemancha += 1
                     self.testenegativo +=1
@@ -407,7 +408,7 @@ class FullThreshold:
                         random.shuffle(self.pontos)
                     DadosExame.total_de_pontos_testados += 1
             
-            else:
+            elif self.total_pontos_exame == self.pontos_fechados: 
                 self.tempo_final_exame = pygame.time.get_ticks()
                 self.tempo_decorrido_exame = self.tempo_final_exame - self.tempo_inicial_exame
                 DadosExame.duracao_do_exame = self.tempo_decorrido_exame
