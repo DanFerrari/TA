@@ -230,7 +230,7 @@ class Screening:
                 
                 if self.pontos[self.indice_atual].response_received:
                     self.pontos_vistos.append(self.pontos[self.indice_atual])
-                self.pontos[self.indice_atual].limiar_encontrado = True
+                    self.pontos[self.indice_atual].limiar_encontrado = True
                 self.tempos.append(self.pontos[self.indice_atual].tempo_resposta)
                 self.testemancha += 1
                 self.testenegativo += 1
@@ -280,7 +280,7 @@ class Screening:
                     self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(
                         self.tempos
                     )
-                self.tempos = []
+                    self.tempos = []
 
                 self.indice_atual += 1
                 DadosExame.total_de_pontos_testados += 1

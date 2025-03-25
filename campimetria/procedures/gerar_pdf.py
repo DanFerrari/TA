@@ -44,12 +44,7 @@ class GerarPdf():
         largura, altura = A4  # Tamanho da página (595x842 pontos)
         faixa_etaria = {1:"0-20", 2:"21-30", 3:"31-40", 4:"41-50", 5:"51-60", 6:"61-70", 7:"71-80"}
         estimulo = {1:"I",2:"II",3:"III",4:"IV",5:"V"}
-        DadosExame.exame_selecionado = Constantes.fullthreshold
-        #DadosExame.exame_selecionado = Constantes.screening
-        DadosExame.faixa_etaria = 1
-        DadosExame.olho = "DIREITO"
-        DadosExame.perda_de_fixacao = 5.0
-        DadosExame.total_testes_mancha = 10
+      
         
         perda_fixacao = 0
 
@@ -70,8 +65,8 @@ class GerarPdf():
         c.drawString(413, altura - 85, f"Tamanho Estímulo:{estimulo.get(DadosExame.tamanho_estimulo)}")
         c.drawString(26, altura - 131, f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)")
         c.drawString(226, altura - 131, f"Duração (min): {int(minutos)}:{int(segundos)}")
-        c.drawString(413, altura -131, f"Falso negativo: {DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)")
-        c.drawString(26, altura - 176, f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao:.2f}%)")
+        c.drawString(413, altura -131, f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)")
+        c.drawString(26, altura - 176, f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({perda_fixacao:.2f}%)")
         c.drawString(226, altura - 176, f"Total de pontos: {DadosExame.total_de_pontos_testados}")
         if DadosExame.exame_selecionado == Constantes.fullthreshold:
             c.drawString(413, altura - 176, f"Limiar Foveal(db):{DadosExame.LimiarFoveal}")  
