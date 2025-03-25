@@ -604,9 +604,10 @@ class ResultadoFullthreshold:
                         ResultadoFullthreshold.salvar_config(config,CONFIG_FILE)
                         pdf = GerarPdf()
                         
-                        caminho_pdf = "/media/orangepi/EXAMES"
-                        pdf.gerar_relatorio(caminho_pdf)
-                        if os.path.exists(caminho_pdf):
+                        caminho_pdf = f"/media/orangepi/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
+                        caminho_pendrive = f"/media/orangepi/EXAMES/"
+                        if os.path.exists(caminho_pendrive):
+                            pdf.gerar_relatorio(caminho_pdf)
                             fonte = pygame.font.Font(None, 68)
                             text_info_pdf = fonte.render("PDF GERADO! RETORNANDO AO MENU...",True,(0,0,0))                          
                             text_info_pdf_pos = text_info_pdf.get_rect()
