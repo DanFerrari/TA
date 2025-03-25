@@ -185,27 +185,24 @@ class ResultadoScreening:
         quadrado_legenda_vermelho.y = 310
         quadrado_legenda_vermelho.desenha_x()
 
-        pontos_ajustados = []
+        
         for ponto in DadosExame.matriz_pontos:                    
-            ponto = Ponto(ponto.xg,ponto.yg,tamanhoPonto = 5, cor = (0,0,0), distancia = 200)
+            ponto_novo = Ponto(ponto.xg,ponto.yg,tamanhoPonto = 5, cor = (0,0,0), distancia = 200)
             ponto.raio_ponto = 6
-            ponto.pontoPix = 4        
-            pontos_ajustados.append(ponto)
-        for ponto in pontos_ajustados:
+            
+            ponto.pontoPix = 4   
+            ponto.x = ponto_novo.x
+            ponto.y = ponto_novo.y
             ponto.x = int(ponto.x * nova_largura / LARGURA)  # Reduzindo a coordenada X
             ponto.y = int(ponto.y * nova_altura / ALTURA)  # Reduzindo a coordenada Y
             
             if ponto.response_received:
+                ponto.atenuacao = DadosExame.atenuacao_screening
                 ponto.cor = pygame.Color("green")
                 ponto.plotarPonto()
             elif not ponto.response_received:
                 ponto.cor = pygame.Color("red")                
                 ponto.desenha_x()
-
-        for ponto in pontos_ajustados:
-            if ponto.response_received:
-                ponto.atenuacao = DadosExame.atenuacao_screening
-            else:
                 ponto.atenuacao = 0
             fonte = pygame.font.Font(None, 20)
             texto = fonte.render(f"{ponto.atenuacao}", True, (0, 0, 0))
@@ -213,8 +210,11 @@ class ResultadoScreening:
             ponto.y += ALTURA // 2
             pygame.display.get_surface().blit(
                 texto, texto.get_rect(center=(ponto.x, ponto.y))
-            )
+            )       
+            
 
+
+          
         ResultadoScreening.desenha_legendas()
         ResultadoScreening.desenha_elementos_botao_pdf()
 
@@ -280,4 +280,11 @@ if __name__ == "__main__":
     pygame.init()
     pygame.display.set_mode((0,0), pygame.FULLSCREEN)
     DadosExame.matriz_pontos = [Ponto(x,y,tamanhoPonto = 5,cor = (0,0,0), distancia = 250) for x,y in cordenadas_30]
+    for i,ponto in enumerate(DadosExame.matriz_pontos):
+        if i % 2 == 0:
+            ponto.response_received = True
+      
+            
+    DadosExame.atenuacao_screening = 25
+        
     ResultadoScreening.desenha_pontos()

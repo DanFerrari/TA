@@ -16,6 +16,7 @@ sys.path.append(
 
 from dados import *
 from Ponto import Ponto
+from gerar_pdf import GerarPdf
 
 
 
@@ -450,8 +451,8 @@ class ResultadoFullthreshold:
         ]
 
         # Posição inicial para desenhar labels (quadrante direito)
-        pos_x = 1920 * 3 // 4  # 75% da largura (centro do quadrante direito)
-        pos_y = 270  # Começa no meio da tela
+        pos_x = 1165  # 75% da largura (centro do quadrante direito)
+        pos_y = 92  # Começa no meio da tela
         espacamento = 100  # Espaço entre as labels
         fonte = pygame.font.Font(None, 30)
         color_label_info = (0, 0, 0)
@@ -473,8 +474,32 @@ class ResultadoFullthreshold:
 
             # Posiciona centralizado no quadrante direito
             pygame.display.get_surface().blit(
-                texto_renderizado, (pos_x - 200, pos_y + i * espacamento)
+                texto_renderizado, (pos_x, pos_y + i * espacamento)
             )
+            
+    @staticmethod
+    def desenha_elementos_botao_pdf():
+        imagem = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","warning_icon.png")))
+        imagem = pygame.transform.scale(imagem, (59, 59))  
+        imagem_pos = (1165,795)
+        
+        fonte = pygame.font.Font(None, 32)
+        texto_info_esc = fonte.render("ESC para voltar ao menu",True,(0,0,0))
+        texto_info_esc_pos = (1256,800)
+        texto_info_entra= fonte.render("ENTRA para gerar o PDF",True,(0,0,0))
+        texto_info_entra_pos = (1256,830)
+        pygame.display.get_surface().blit(texto_info_esc,texto_info_esc_pos)
+        pygame.display.get_surface().blit(texto_info_entra,texto_info_entra_pos)
+        pygame.display.get_surface().blit(imagem,imagem_pos)
+        
+        rect_buton_pdf = pygame.Rect(1165,966,492,81)
+        pygame.draw.rect(pygame.display.get_surface(),(209,41,41),rect_buton_pdf,border_radius=15)
+        pygame.draw.rect(pygame.display.get_surface(),(255,247,28),rect_buton_pdf,5,border_radius=15)
+        button_pdf_text = fonte.render("Gerar PDF",True,(255,255,255))
+        button_pdf_text_pos = button_pdf_text.get_rect()
+        button_pdf_text_pos.center = rect_buton_pdf.center
+        pygame.display.get_surface().blit(button_pdf_text,button_pdf_text_pos)
+         
 
     @staticmethod
     def status_resultado(carregado):
@@ -524,12 +549,10 @@ class ResultadoFullthreshold:
             "tamanho_estimulo":3,
             "exame_id":1
         }
-        config = ResultadoFullthreshold.carregar_config(CONFIG_FILE,DEFAULT_CONFIG)        
-        config["exame_id"] = (DadosExame.exame_id + 1) if DadosExame.exame_id < 999 else 1
-        config["distancia_paciente"] = DadosExame.distancia_paciente
-        config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
-        
-        ResultadoFullthreshold.salvar_config(config,CONFIG_FILE)
+        config = ResultadoFullthreshold.carregar_config(CONFIG_FILE,DEFAULT_CONFIG)      
+
+        DadosExame.exame_id = config["exame_id"]
+
         
         
         
@@ -544,6 +567,7 @@ class ResultadoFullthreshold:
         ResultadoFullthreshold.desenhar_mapa_limiares()
         ResultadoFullthreshold.desenha_legendas_exame()
         print(tempo_final / 1000)
+        ResultadoFullthreshold.desenha_elementos_botao_pdf()
         pygame.display.flip()
         visualizando = True
         while visualizando:
@@ -566,7 +590,39 @@ class ResultadoFullthreshold:
                         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
                         pygame.display.update()
                     elif event.key == pygame.K_j:  # Tecla ESC para sair
-                        visualizando = False    
+                        visualizando = False
+                        DadosExame.reset()
+                        config["exame_id"] = (DadosExame.exame_id + 1) if DadosExame.exame_id < 999 else 1
+                        config["distancia_paciente"] = DadosExame.distancia_paciente
+                        config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
+                        ResultadoFullthreshold.salvar_config(config,CONFIG_FILE)
+                        
+                    elif evento.key == pygame.K_e:
+                        config["exame_id"] = (DadosExame.exame_id + 1) if DadosExame.exame_id < 999 else 1
+                        config["distancia_paciente"] = DadosExame.distancia_paciente
+                        config["tamanho_estimulo"] = DadosExame.tamanho_estimulo                        
+                        ResultadoFullthreshold.salvar_config(config,CONFIG_FILE)
+                        pdf = GerarPdf()
+                        
+                        caminho_pdf = "/media/orangepi/EXAMES"
+                        pdf.gerar_relatorio(caminho_pdf)
+                        if os.path.exists(caminho_pdf):
+                            fonte = pygame.font.Font(None, 68)
+                            text_info_pdf = fonte.render("PDF GERADO! RETORNANDO AO MENU...",True,(0,0,0))                          
+                            text_info_pdf_pos = text_info_pdf.get_rect()
+                            text_info_pdf_pos.center = (1920//2,1080//2)
+                            pygame.display.get_surface().blit(text_info_pdf,text_info_pdf_pos)
+                            pygame.display.update()
+                            visualizando = False
+                            pygame.time.delay(5000)
+                        else:
+                            fonte = pygame.font.Font(None, 68)
+                            text_info_pdf = fonte.render("ERRO AO GERAR PDF, VERIFIQUE SEU PENDRIVE!",True,(0,0,0))                          
+                            text_info_pdf_pos = text_info_pdf.get_rect()
+                            text_info_pdf_pos.center = (1920//2,1080//2)
+                            pygame.display.get_surface().blit(text_info_pdf,text_info_pdf_pos)
+                            pygame.display.update()
+                            pygame.time.delay(5000)
                         
                 
 

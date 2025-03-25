@@ -33,7 +33,7 @@ class GerarPdf():
 
 
 
-    def capturar_parte_tela(self,x, y, largura, altura, nome_arquivo="parte_tela.png"):
+    def capturar_parte_tela(self,x, y, largura, altura, nome_arquivo):
         tela = pygame.display.get_surface()  # Obtém a tela atual
         recorte = pygame.Surface((largura, altura))  # Cria uma superfície do tamanho desejado
         recorte.blit(tela, (0, 0), (x, y, largura, altura))  # Copia a parte da tela desejada
