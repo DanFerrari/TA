@@ -138,6 +138,20 @@ class Ponto:
         quadrado = pygame.Rect(0, 0, *tamanho)
         quadrado.center = (self.x, self.y)
         pygame.draw.rect(pygame.display.get_surface(), self.cor, quadrado)
+    def desenha_x(self):
+        tamanho = self.raio_ponto  # Define o tamanho do "X"
+        superficie = pygame.display.get_surface()
+
+        # Coordenadas das linhas do "X"
+        x1, y1 = self.x - tamanho // 2, self.y - tamanho // 2  # Canto superior esquerdo
+        x2, y2 = self.x + tamanho // 2, self.y + tamanho // 2  # Canto inferior direito
+        x3, y3 = self.x - tamanho // 2, self.y + tamanho // 2  # Canto inferior esquerdo
+        x4, y4 = self.x + tamanho // 2, self.y - tamanho // 2  # Canto superior direito
+
+        # Desenha as duas diagonais formando um "X"
+        pygame.draw.line(superficie, self.cor, (x1, y1), (x2, y2), 2)  # Linha \
+        pygame.draw.line(superficie, self.cor, (x3, y3), (x4, y4), 2)  # Linha /
+        
 
     def testaPonto(
         self, tempo_exposicao, tempo_resposta_paciente, menu_pressionado=False
@@ -173,13 +187,13 @@ class Ponto:
                         self.response_received = True
                         print("Respondi o estimulo")
 
-            # if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-            #     self.tempo_resposta = (
-            #         pygame.time.get_ticks() - trial_start_time
-            #     ) / 1000
-            #     print("tempo_resposta_no_ponto: ", self.tempo_resposta)
-            #     self.response_received = True
-            #     print("Respondi o estimulo")
+            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+                self.tempo_resposta = (
+                    pygame.time.get_ticks() - trial_start_time
+                ) / 1000
+                print("tempo_resposta_no_ponto: ", self.tempo_resposta)
+                self.response_received = True
+                print("Respondi o estimulo")
 
             if not self.response_received:
                 self.tempo_resposta = 2.0

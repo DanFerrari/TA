@@ -14,6 +14,7 @@ sys.path.append(
 
 from dados import *
 from Ponto import Ponto
+from gerar_pdf import GerarPdf
 
 
 class ResultadoScreening:
@@ -57,8 +58,8 @@ class ResultadoScreening:
         ]
 
         # Posição inicial para desenhar labels (quadrante direito)
-        pos_x = 1920 * 3 // 4  # 75% da largura (centro do quadrante direito)
-        pos_y = 270  # Começa no meio da tela
+        pos_x = 1165  # 75% da largura (centro do quadrante direito)
+        pos_y = 92  # Começa no meio da tela
         espacamento = 100  # Espaço entre as labels
         fonte = pygame.font.Font(None, 30)
         color_label_info = (0, 0, 0)
@@ -80,11 +81,37 @@ class ResultadoScreening:
 
             # Posiciona centralizado no quadrante direito
             pygame.display.get_surface().blit(
-                texto_renderizado, (pos_x - 200, pos_y + i * espacamento)
+                texto_renderizado, (pos_x, pos_y + i * espacamento)
             )
             
             
             
+    @staticmethod
+    def desenha_elementos_botao_pdf():
+        imagem = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","warning_icon.png")))
+        imagem = pygame.transform.scale(imagem, (59, 59))  
+        imagem_pos = (1165,795)
+        
+        fonte = pygame.font.Font(None, 32)
+        texto_info_esc = fonte.render("ESC para voltar ao menu",True,(0,0,0))
+        texto_info_esc_pos = (1256,800)
+        texto_info_entra= fonte.render("ENTRA para gerar o PDF",True,(0,0,0))
+        texto_info_entra_pos = (1256,830)
+        pygame.display.get_surface().blit(texto_info_esc,texto_info_esc_pos)
+        pygame.display.get_surface().blit(texto_info_entra,texto_info_entra_pos)
+        pygame.display.get_surface().blit(imagem,imagem_pos)
+        
+        rect_buton_pdf = pygame.Rect(1165,966,492,81)
+        pygame.draw.rect(pygame.display.get_surface(),(209,41,41),rect_buton_pdf,border_radius=15)
+        pygame.draw.rect(pygame.display.get_surface(),(255,247,28),rect_buton_pdf,5,border_radius=15)
+        button_pdf_text = fonte.render("Gerar PDF",True,(255,255,255))
+        button_pdf_text_pos = button_pdf_text.get_rect()
+        button_pdf_text_pos.center = rect_buton_pdf.center
+        pygame.display.get_surface().blit(button_pdf_text,button_pdf_text_pos)
+         
+        
+        
+        
     @staticmethod
     def carregar_config(CONFIG_FILE,DEFAULT_CONFIG):
         """Lê as variáveis do arquivo JSON ou usa valores padrão."""
@@ -101,19 +128,7 @@ class ResultadoScreening:
 
     @staticmethod
     def desenha_pontos():
-        CONFIG_FILE = "config.json"
 
-        DEFAULT_CONFIG ={
-            "distancia_paciente":200,
-            "tamanho_estimulo":3,
-            "exame_id":1
-        }
-        config = ResultadoScreening.carregar_config(CONFIG_FILE,DEFAULT_CONFIG)        
-        config["exame_id"] = (DadosExame.exame_id + 1) if DadosExame.exame_id < 999 else 1
-        config["distancia_paciente"] = DadosExame.distancia_paciente
-        config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
-        
-        ResultadoScreening.salvar_config(config,CONFIG_FILE)
         
         
         pygame.display.get_surface().fill(pygame.Color("white"))
@@ -151,14 +166,14 @@ class ResultadoScreening:
         ponto_legenda_green.y = 270
         ponto_legenda_green.plotarPonto()
         label_legenda_green = fonte.render(
-            "Acima do limiar de referência", True, (0, 0, 0)
+            "Acima do limiar", True, (0, 0, 0)
         )
         pygame.display.get_surface().blit(
             label_legenda_green, label_legenda_green.get_rect(center=(900, 270))
         )
 
         label_legenda_red = fonte.render(
-            "Abaixo do limiar de referência", True, (0, 0, 0)
+            "Abaixo do limiar", True, (0, 0, 0)
         )
 
         pygame.display.get_surface().blit(
@@ -168,7 +183,7 @@ class ResultadoScreening:
         quadrado_legenda_vermelho.raio_ponto = 10
         quadrado_legenda_vermelho.x = 800
         quadrado_legenda_vermelho.y = 310
-        quadrado_legenda_vermelho.desenha_quadrado()
+        quadrado_legenda_vermelho.desenha_x()
 
         pontos_ajustados = []
         for ponto in DadosExame.matriz_pontos:                    
@@ -185,7 +200,7 @@ class ResultadoScreening:
                 ponto.plotarPonto()
             elif not ponto.response_received:
                 ponto.cor = pygame.Color("red")                
-                ponto.desenha_quadrado()
+                ponto.desenha_x()
 
         for ponto in pontos_ajustados:
             if ponto.response_received:
@@ -201,19 +216,63 @@ class ResultadoScreening:
             )
 
         ResultadoScreening.desenha_legendas()
+        ResultadoScreening.desenha_elementos_botao_pdf()
 
         pygame.display.flip()
         visualizando = True
 
         while visualizando:
+            CONFIG_FILE = "config.json"
+
+            DEFAULT_CONFIG ={
+                "distancia_paciente":200,
+                "tamanho_estimulo":3,
+                "exame_id":1
+            }
+            config = ResultadoScreening.carregar_config(CONFIG_FILE,DEFAULT_CONFIG) 
+            DadosExame.exame_id = config["exame_id"]       
+          
             for evento in pygame.event.get():
-                if (
-                    evento.type == pygame.QUIT
-                    or evento.type == pygame.KEYDOWN
-                    and evento.key == pygame.K_j
-                ):
-                    visualizando = False
-                    DadosExame.reset()
+                if evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_j:
+                        visualizando = False
+                        DadosExame.reset()
+                        config["exame_id"] = (DadosExame.exame_id + 1) if DadosExame.exame_id < 999 else 1
+                        config["distancia_paciente"] = DadosExame.distancia_paciente
+                        config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
+                        ResultadoScreening.salvar_config(config,CONFIG_FILE)
+                        
+                    if evento.key == pygame.K_e:
+                        config["exame_id"] = (DadosExame.exame_id + 1) if DadosExame.exame_id < 999 else 1
+                        config["distancia_paciente"] = DadosExame.distancia_paciente
+                        config["tamanho_estimulo"] = DadosExame.tamanho_estimulo                        
+                        ResultadoScreening.salvar_config(config,CONFIG_FILE)
+                        pdf = GerarPdf()
+                        
+                        caminho_pdf = "/media/orangepi/EXAMES"
+                        pdf.gerar_relatorio(caminho_pdf)
+                        if os.path.exists(caminho_pdf):
+                            fonte = pygame.font.Font(None, 68)
+                            text_info_pdf = fonte.render("PDF GERADO! RETORNANDO AO MENU...",True,(0,0,0))                          
+                            text_info_pdf_pos = text_info_pdf.get_rect()
+                            text_info_pdf_pos.center = (1920//2,1080//2)
+                            pygame.display.get_surface().blit(text_info_pdf,text_info_pdf_pos)
+                            pygame.display.update()
+                            visualizando = False
+                            pygame.time.delay(5000)
+                        else:
+                            fonte = pygame.font.Font(None, 68)
+                            text_info_pdf = fonte.render("ERRO AO GERAR PDF, VERIFIQUE SEU PENDRIVE!",True,(0,0,0))                          
+                            text_info_pdf_pos = text_info_pdf.get_rect()
+                            text_info_pdf_pos.center = (1920//2,1080//2)
+                            pygame.display.get_surface().blit(text_info_pdf,text_info_pdf_pos)
+                            pygame.display.update()
+                            pygame.time.delay(5000)
+                            
+                            
+                        
+                        
+                    
 
 
 if __name__ == "__main__":
