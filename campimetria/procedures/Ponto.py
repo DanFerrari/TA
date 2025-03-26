@@ -87,8 +87,8 @@ class Ponto:
 
         print(f"grau: {grau}")
 
-        #raio_ponto = (2 * self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
-        raio_ponto = ( self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
+        raio_ponto = ((2 * self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2)/2
+        #raio_ponto = ( self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
         print(f"raio: {raio_ponto}")
 
         
