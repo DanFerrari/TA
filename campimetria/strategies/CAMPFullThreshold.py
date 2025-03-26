@@ -91,7 +91,7 @@ class FullThreshold:
         self.pontos_fechados = 0
         self.perda_de_fixacao = 0
         self.tempo_pausado = 0        
-        self.testes_realizados = 0
+
         
         
         self.tecla_menu_pressionada = False
@@ -200,7 +200,7 @@ class FullThreshold:
 
     def update(self):
         self.menu.fixacao = "diamante" if self.estado == "limiar_foveal"  else "central"
-        print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {self.pontos_fechados}, ")
+        print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {self.pontos_fechados},  total de pontos: {self.total_pontos_exame}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
             from select_eye_screen import SelectEyeScreen
@@ -340,8 +340,53 @@ class FullThreshold:
                 
                 
         elif self.estado == "exame":
+          
+            self.indice_atual += 1
+            self.testemancha += 1
+            self.testenegativo +=1
+            self.testepositivo += 1
+
+            if self.testemancha == 50 and self.teste_fixacao:
+                print("testando mancha cega...")
+                self.perda_de_fixacao += self.testa_mancha_cega(
+                    DadosExame.posicao_mancha_cega
+                )
+                self.testemancha = 0
+                DadosExame.total_testes_mancha += 1
+      
+            if len(self.tempos) == 5:
+                self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(
+                    self.tempos
+                )
+                self.tempos = []
+                
             
-            if self.total_pontos_exame > self.pontos_fechados:                  # Embaralha a lista antes de testar
+            if self.testepositivo == 80 and len(self.pontos_vistos) > 0:
+                print("testando falso positivo...")
+                self.pontos_vistos[-1].cor = Colors.BACKGROUND
+                continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                if not continua:
+                    return          
+                DadosExame.total_testes_falsos_positivo += 1
+                if self.pontos_vistos[-1].response_received:
+                    DadosExame.falso_positivo_respondidos += 1
+                self.testepositivo = 0
+            
+            
+            if self.testenegativo == 70 and len(self.pontos_vistos) > 0:
+                print("testando falso negativo...")
+                self.pontos_vistos[-1].cor = Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0)
+                continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                if not continua:
+                    return  
+                DadosExame.total_testes_falsos_negativo += 1
+                if not self.pontos_vistos[-1].response_received:
+                    DadosExame.falso_negativo_respondidos += 1
+                self.testenegativo = 0
+            if self.indice_atual == 76:
+                self.indice_atual = 0
+            random.shuffle(self.pontos)
+            if self.pontos_fechados  <  self.total_pontos_exame:
                 ponto = self.pontos[self.indice_atual]
                 if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
                     ponto.cor = Ponto.db_para_intensidade(ponto.atenuacao)
@@ -349,51 +394,16 @@ class FullThreshold:
                     if not continua:
                         return            
                     if ponto.response_received:
+                        self.pontos_vistos.append(ponto)
                         paciente_viu = 2
                     else:
                         paciente_viu = 1
 
-                    self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto)
-                    if ponto.status == "=":
-                        self.pontos_fechados += 1
-                    self.tempos.append(ponto.tempo_resposta)
-                    self.testemancha += 1
-                    self.testenegativo +=1
-                    self.testepositivo += 1
-
-                    if self.testemancha == 100 and self.teste_fixacao:
-                        self.perda_de_fixacao += self.testa_mancha_cega(
-                            DadosExame.posicao_mancha_cega
-                        )
-                        self.testemancha = 0
-                        self.testes_realizados += 1
-                    if len(self.tempos) == 5:
-                        self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(
-                            self.tempos
-                        )
-                        self.tempos = []
+                    self.pontos_fechados += self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto)
+                    
                         
-                    
-                    if self.testepositivo == 50 and len(self.pontos_vistos) > 1:
-                        self.pontos_vistos[-1].cor = Colors.BACKGROUND
-                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
-                        if not continua:
-                            return          
-                        DadosExame.total_testes_falsos_positivo += 1
-                        if self.pontos_vistos[-1].response_received:
-                            DadosExame.falso_positivo_respondidos += 1
-                        self.testepositivo = 0
-                    
-                    
-                    if self.testenegativo == 60 and len(self.pontos_vistos) > 1:
-                        self.pontos_vistos[-1].cor = Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0)
-                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
-                        if not continua:
-                            return  
-                        DadosExame.total_testes_falsos_negativo += 1
-                        if not self.pontos_vistos[-1].response_received:
-                            DadosExame.falso_negativo_respondidos += 1
-                        self.testenegativo = 0
+                    self.tempos.append(ponto.tempo_resposta)
+                   
                                  
                     print(
                         f"Ponto: ({ponto.x}, {ponto.y}), Atenuacao: {ponto.atenuacao}, Cor: {ponto.cor}"
@@ -401,23 +411,15 @@ class FullThreshold:
                     print(
                         f"Ponto definidos: {DadosExame.total_pontos_definidos} Mancha: {self.testemancha}"
                     )
-                    if self.indice_atual < 75:
-                        self.indice_atual += 1
-                    else:
-                        self.indice_atual = 0
-                        random.shuffle(self.pontos)
                     DadosExame.total_de_pontos_testados += 1
+
             
-            elif self.total_pontos_exame == self.pontos_fechados: 
+            if self.total_pontos_exame == self.pontos_fechados: 
                 self.tempo_final_exame = pygame.time.get_ticks()
                 self.tempo_decorrido_exame = self.tempo_final_exame - self.tempo_inicial_exame
                 DadosExame.duracao_do_exame = self.tempo_decorrido_exame
-                DadosExame.matriz_pontos = self.pontos            
-                DadosExame.perda_de_fixacao = (
-                    ((self.perda_de_fixacao / self.testes_realizados) * 100)
-                    if self.perda_de_fixacao > 0.0
-                    else 0
-                )
+                DadosExame.matriz_pontos = self.pontos          
+            
                 self.estado = "resultado"
                 
           

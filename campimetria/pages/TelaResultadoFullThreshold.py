@@ -597,7 +597,7 @@ class ResultadoFullthreshold:
                         config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
                         ResultadoFullthreshold.salvar_config(config,CONFIG_FILE)
                         
-                    elif evento.key == pygame.K_e:
+                    elif event.key == pygame.K_e:
                         config["exame_id"] = (DadosExame.exame_id + 1) if DadosExame.exame_id < 999 else 1
                         config["distancia_paciente"] = DadosExame.distancia_paciente
                         config["tamanho_estimulo"] = DadosExame.tamanho_estimulo                        
