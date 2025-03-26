@@ -344,7 +344,7 @@ class FullThreshold:
             self.indice_atual += 1
             if self.indice_atual == 76:
                 self.indice_atual = 0
-                random.shuffle(self.pontos)
+                
 
             
             if self.pontos_fechados  <  self.total_pontos_exame:
@@ -537,4 +537,8 @@ class FullThreshold:
             DadosExame.LimiarFoveal = self.limiar
             print(f"Limiar Foveal: {self.limiar} dB")
             self.limiarok = True  
-                             
+            for ponto in self.pontos:
+                if self.limiar >= 3:
+                    ponto.atenuacao = self.limiar - Constantes.smalldelta
+                else:
+                    ponto.atenuacao = 20
