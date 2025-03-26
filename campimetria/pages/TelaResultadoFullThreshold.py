@@ -391,7 +391,7 @@ class ResultadoFullthreshold:
         # Desenhar pontos e labels
         for ponto in ResultadoFullthreshold.matriz_pontos_mapa_limiar:            
             ponto.plotarPonto()
-            label = fonte.render(f"{ponto.atenuacao}", True, (0, 0, 0))
+            label = fonte.render(f"{int(ponto.atenuacao)}", True, (0, 0, 0))
             label_rect = label.get_rect(center=(ponto.x - 0.505, ponto.y + 12))
             pygame.display.get_surface().blit(label, label_rect)
         
@@ -446,9 +446,9 @@ class ResultadoFullthreshold:
             f"Duração (min): {int(minutos)}:{int(segundos)}",
             f"Total de pontos: {DadosExame.total_de_pontos_testados}",
             f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
-            f"Falso negativo: {DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
-            f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao:.2f}%)",
-            f"Limiar Foveal:{DadosExame.LimiarFoveal}",
+            f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
+            f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({perda_fixacao:.2f}%)",
+            f"Limiar Foveal:{int(DadosExame.LimiarFoveal)}",
             
         ]
 
