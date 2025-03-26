@@ -434,7 +434,7 @@ class FullThreshold:
             
         
                         
-    def db_para_intensidade(self,db, db_min=40, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
+    def db_para_intensidade(self,db, db_min=35, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
         """Converte dB para intensidade de cor (escala logarítmica)."""
         norm_db = (db - db_min) / (db_max - db_min)  # Normaliza dB entre 0 e 1
 
