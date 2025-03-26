@@ -9,7 +9,7 @@ import pygame
 class Constantes:
     dbMin = 0
     dbMax = 40
-    bigdelta = 4
+    bigdelta = 3
     smalldelta = 2
     screening = "screening"
     fullthreshold = "fullthreshold"
