@@ -8,9 +8,9 @@ import pygame
 
 class Constantes:
     dbMin = 0
-    dbMax = 35
-    bigdelta = 3
-    smalldelta = 2
+    dbMax = 40
+    bigdelta = 6
+    smalldelta = 3
     screening = "screening"
     fullthreshold = "fullthreshold"
     olho_direito = "OD"
