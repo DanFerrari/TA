@@ -342,7 +342,9 @@ class FullThreshold:
         elif self.estado == "exame":
           
             self.indice_atual += 1
-
+            if self.indice_atual == 76:
+                self.indice_atual = 0
+                random.shuffle(self.pontos)
 
             
             if self.pontos_fechados  <  self.total_pontos_exame:
@@ -402,9 +404,8 @@ class FullThreshold:
                         if not self.pontos_vistos[-1].response_received:
                             DadosExame.falso_negativo_respondidos += 1
                         self.testenegativo = 0
-                    if self.indice_atual == 76:
-                        self.indice_atual = 0
-                        random.shuffle(self.pontos)
+                    
+                        
                     
                    
                                  
