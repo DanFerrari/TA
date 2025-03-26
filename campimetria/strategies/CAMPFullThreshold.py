@@ -107,6 +107,7 @@ class FullThreshold:
                 ponto.atenuacao = -1
                 ponto.status = "="
                 resp = 1
+                return resp
             else:
                 ponto.ultima_atenuacao_nao_vista = ponto.atenuacao
                 if ponto.primeira_visualizacao:
@@ -128,6 +129,7 @@ class FullThreshold:
                             + ponto.ultima_atenuacao_vista
                         ) / 2
                         resp = 1
+                        return resp
                     else:
                         ponto.atenuacao -= ponto.delta
                         if ponto.atenuacao <= 0:
@@ -159,6 +161,7 @@ class FullThreshold:
                         ponto.ultima_atenuacao_nao_vista + ponto.ultima_atenuacao_vista
                     ) / 2
                     resp = 1
+                    return resp
                 else:
                     ponto.atenuacao += ponto.delta
                     if ponto.atenuacao >= 40:
