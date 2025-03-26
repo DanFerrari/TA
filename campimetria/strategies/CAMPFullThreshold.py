@@ -342,11 +342,9 @@ class FullThreshold:
         elif self.estado == "exame":
           
             self.indice_atual += 1
-            self.testemancha += 1
-            self.testenegativo +=1
-            self.testepositivo += 1
 
-            if self.testemancha == 50 and self.teste_fixacao:
+
+            if self.testemancha == 70 and self.teste_fixacao:
                 print("testando mancha cega...")
                 self.perda_de_fixacao += self.testa_mancha_cega(
                     DadosExame.posicao_mancha_cega
@@ -373,7 +371,7 @@ class FullThreshold:
                 self.testepositivo = 0
             
             
-            if self.testenegativo == 70 and len(self.pontos_vistos) > 0:
+            if self.testenegativo == 90 and len(self.pontos_vistos) > 0:
                 print("testando falso negativo...")
                 self.pontos_vistos[-1].cor = Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0)
                 continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
@@ -389,6 +387,9 @@ class FullThreshold:
             if self.pontos_fechados  <  self.total_pontos_exame:
                 ponto = self.pontos[self.indice_atual]
                 if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
+                    self.testemancha += 1
+                    self.testenegativo +=1
+                    self.testepositivo += 1
                     ponto.cor = Ponto.db_para_intensidade(ponto.atenuacao)
                     continua = self.verifica_testa_ponto(ponto.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                     if not continua:

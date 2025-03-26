@@ -55,6 +55,7 @@ class ResultadoScreening:
             f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
             f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
             f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao:.2f}%)",
+            f"Atenuacao: {DadosExame.atenuacao_screening}",
         ]
 
         # Posição inicial para desenhar labels (quadrante direito)

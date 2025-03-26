@@ -448,6 +448,8 @@ class ResultadoFullthreshold:
             f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
             f"Falso negativo: {DadosExame.falso_negativo_respondidos} / {DadosExame.total_testes_falsos_negativo} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
             f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {DadosExame.total_testes_mancha} ({perda_fixacao:.2f}%)",
+            f"Limiar Foveal:{DadosExame.LimiarFoveal}",
+            
         ]
 
         # Posição inicial para desenhar labels (quadrante direito)
@@ -608,7 +610,7 @@ class ResultadoFullthreshold:
                         caminho_pendrive = f"/media/orangepi/EXAMES/"
                         if os.path.exists(caminho_pendrive):
                             pdf.gerar_relatorio(caminho_pdf)
-                            fonte = pygame.font.Font(None, 68)
+                            fonte = pygame.font.Font(None, 45)
                             text_info_pdf = fonte.render("PDF GERADO! RETORNANDO AO MENU...",True,(0,0,0))                          
                             text_info_pdf_pos = text_info_pdf.get_rect()
                             text_info_pdf_pos.center = (1920//2,1080//2)
@@ -617,13 +619,17 @@ class ResultadoFullthreshold:
                             visualizando = False
                             pygame.time.delay(5000)
                         else:
-                            fonte = pygame.font.Font(None, 68)
+                            fonte = pygame.font.Font(None, 45)
                             text_info_pdf = fonte.render("ERRO AO GERAR PDF, VERIFIQUE SEU PENDRIVE!",True,(0,0,0))                          
                             text_info_pdf_pos = text_info_pdf.get_rect()
                             text_info_pdf_pos.center = (1920//2,1080//2)
                             pygame.display.get_surface().blit(text_info_pdf,text_info_pdf_pos)
                             pygame.display.update()
                             pygame.time.delay(5000)
+                            rect_dash = text_info_pdf.get_rect()
+                            rect_dash.center = text_info_pdf_pos.center
+                            pygame.draw.rect(pygame.display.get_surface(),pygame.Color("white"),rect_dash)
+                            pygame.display.update()
                         
                 
 
