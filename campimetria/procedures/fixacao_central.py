@@ -18,4 +18,4 @@ from dados import *
 class FixacaoCentral:
     @staticmethod   
     def plotar_fixacao_central():
-        Ponto(0, 0, 3, pygame.Color("yellow"),DadosExame.distancia_paciente).plotarPonto()
+        Ponto(0, 0, 3, (255,247,28),DadosExame.distancia_paciente).plotarPonto()

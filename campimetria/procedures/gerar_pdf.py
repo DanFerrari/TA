@@ -69,10 +69,10 @@ class GerarPdf():
         c.drawString(26, altura - 176, f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({perda_fixacao:.2f}%)")
         c.drawString(226, altura - 176, f"Total de pontos: {DadosExame.total_de_pontos_testados}")
         if DadosExame.exame_selecionado == Constantes.fullthreshold:
-            c.drawString(413, altura - 176, f"Limiar Foveal(db):{DadosExame.LimiarFoveal}")  
+            c.drawString(413, altura - 176, f"Limiar Foveal(dB):{DadosExame.LimiarFoveal}")  
             c.drawString(413, altura - 38, f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}")  
         elif DadosExame.exame_selecionado == Constantes.screening:
-            c.drawString(413, altura - 38, f"Atenuação:{DadosExame.atenuacao_screening}")  
+            c.drawString(413, altura - 38, f"Atenuação (dB):{DadosExame.atenuacao_screening}")  
 
         
         nova_largura = 400  

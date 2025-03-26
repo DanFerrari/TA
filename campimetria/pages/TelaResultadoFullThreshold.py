@@ -132,7 +132,7 @@ class ResultadoFullthreshold:
             (centro_x + 280, centro_y - 60, largura, altura),
             (centro_x + 280, centro_y - 90, largura, altura),
             (centro_x + 280, centro_y - 120, largura, altura),
-            (centro_x + 280, centro_y - 150, largura, altura),
+            # (centro_x + 280, centro_y - 150, largura, altura),
         ]
         
         texto_medidas = [
@@ -145,7 +145,7 @@ class ResultadoFullthreshold:
                     "26 - 30",
                     "31 - 35",
                     "36 - 40",
-                    "41 - 50"
+                    # "41 - 50"
                     ]
 
         if ResultadoFullthreshold.mapa_cor:
@@ -167,7 +167,7 @@ class ResultadoFullthreshold:
     @staticmethod
     def gerar_legenda_pontos():
         texturas = []
-        for i in range(1, 11):
+        for i in range(1, 10):
             caminho = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils', 'images', 'bitmaps',f"{i}.bmp"))
             if os.path.exists(caminho):
                 texturas.append(pygame.image.load(caminho).convert())
@@ -189,7 +189,7 @@ class ResultadoFullthreshold:
                     (149, 201, 28),
                     (252, 219, 0),
                     (232, 129, 26),
-                    (255, 0, 0)
+                    # (255, 0, 0)
                     ]
 
         ResultadoFullthreshold.estrutura_legenda(texturas)
@@ -207,7 +207,7 @@ class ResultadoFullthreshold:
             (150,150,150),
             (170,170,170),
             (210,210,210),        
-            (225,225,225)
+            # (225,225,225)
         ]
         
         
@@ -238,8 +238,8 @@ class ResultadoFullthreshold:
             cor = (252, 219, 0)
         elif atenuacao < 41:
             cor = (232, 129, 26)
-        else:
-            cor = (255, 0, 0)
+        # else:
+        #     cor = (255, 0, 0)
 
         # Armazena no cache e retorna
         ResultadoFullthreshold.cache_texturas_cor[atenuacao] = cor
@@ -268,8 +268,8 @@ class ResultadoFullthreshold:
             cor = ResultadoFullthreshold.textura_cache[7]
         elif atenuacao < 41:
             cor = ResultadoFullthreshold.textura_cache[8]
-        else:
-            cor = ResultadoFullthreshold.textura_cache[9]
+        # else:
+        #     cor = ResultadoFullthreshold.textura_cache[9]
         return cor
 
     @staticmethod
@@ -298,8 +298,8 @@ class ResultadoFullthreshold:
             cor = (170,170,170)
         elif atenuacao < 41:
             cor = (210,210,210)
-        else:
-            cor = (225,225,225)
+        # else:
+        #     cor = (225,225,225)
 
         # Armazena no cache e retorna
         ResultadoFullthreshold.cache_texturas_cinza[atenuacao] = cor
@@ -448,7 +448,7 @@ class ResultadoFullthreshold:
             f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
             f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
             f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({perda_fixacao:.2f}%)",
-            f"Limiar Foveal:{int(DadosExame.LimiarFoveal)}",
+            f"Limiar Foveal:{int(DadosExame.LimiarFoveal)}(dB)",
             
         ]
 

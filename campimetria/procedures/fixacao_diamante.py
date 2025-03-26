@@ -18,7 +18,10 @@ from dados import *
 class FixacaoDiamante:
     @staticmethod
     def plotar_fixacao_diamante():
-        Ponto(0, 6, 3, pygame.Color("yellow"), distancia=DadosExame.distancia_paciente).plotarPonto()
-        Ponto(0, -6, 3, pygame.Color("yellow"),distancia=DadosExame.distancia_paciente).plotarPonto()
-        Ponto(6, 0, 3, pygame.Color("yellow"),distancia=DadosExame.distancia_paciente).plotarPonto()
-        Ponto(-6, 0, 3, pygame.Color("yellow"),distancia=DadosExame.distancia_paciente).plotarPonto()
+        Ponto(0, 6, 3, (255,247,28), distancia=DadosExame.distancia_paciente).plotarPonto()
+        Ponto(0, -6, 3, (255,247,28),distancia=DadosExame.distancia_paciente).plotarPonto()
+        Ponto(6, 0, 3, (255,247,28),distancia=DadosExame.distancia_paciente).plotarPonto()
+        Ponto(-6, 0, 3, (255,247,28),distancia=DadosExame.distancia_paciente).plotarPonto()
+        
+        
+        
