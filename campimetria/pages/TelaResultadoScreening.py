@@ -221,7 +221,7 @@ class ResultadoScreening:
 
         pygame.display.flip()
         visualizando = True
-
+            
         while visualizando:
             CONFIG_FILE = "config.json"
 
@@ -284,6 +284,7 @@ if __name__ == "__main__":
     for i,ponto in enumerate(DadosExame.matriz_pontos):
         if i % 2 == 0:
             ponto.response_received = True
+        
       
             
     DadosExame.atenuacao_screening = 25
