@@ -19,7 +19,7 @@ class Constantes:
 
 class Colors:
 
-    BACKGROUND = (155, 155, 155)
+    BACKGROUND = (120, 120, 120)
     ERASE_INTENSITY = 155
     DEFAULT = (53, 43, 54)
     WHITE = (255,255,255)

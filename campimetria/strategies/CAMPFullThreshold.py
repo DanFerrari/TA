@@ -344,46 +344,7 @@ class FullThreshold:
             self.indice_atual += 1
 
 
-            if self.testemancha == 70 and self.teste_fixacao:
-                print("testando mancha cega...")
-                self.perda_de_fixacao += self.testa_mancha_cega(
-                    DadosExame.posicao_mancha_cega
-                )
-                self.testemancha = 0
-                DadosExame.total_testes_mancha += 1
-      
-            if len(self.tempos) == 5:
-                self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(
-                    self.tempos
-                )
-                self.tempos = []
-                
             
-            if self.testepositivo == 80 and len(self.pontos_vistos) > 0:
-                print("testando falso positivo...")
-                self.pontos_vistos[-1].cor = Colors.BACKGROUND
-                continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
-                if not continua:
-                    return          
-                DadosExame.total_testes_falsos_positivo += 1
-                if self.pontos_vistos[-1].response_received:
-                    DadosExame.falso_positivo_respondidos += 1
-                self.testepositivo = 0
-            
-            
-            if self.testenegativo == 90 and len(self.pontos_vistos) > 0:
-                print("testando falso negativo...")
-                self.pontos_vistos[-1].cor = Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0)
-                continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
-                if not continua:
-                    return  
-                DadosExame.total_testes_falsos_negativo += 1
-                if not self.pontos_vistos[-1].response_received:
-                    DadosExame.falso_negativo_respondidos += 1
-                self.testenegativo = 0
-            if self.indice_atual == 76:
-                self.indice_atual = 0
-            random.shuffle(self.pontos)
             if self.pontos_fechados  <  self.total_pontos_exame:
                 ponto = self.pontos[self.indice_atual]
                 if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
@@ -404,6 +365,47 @@ class FullThreshold:
                     
                         
                     self.tempos.append(ponto.tempo_resposta)
+                    if self.testemancha == 70 and self.teste_fixacao:
+                        print("testando mancha cega...")
+                        self.perda_de_fixacao += self.testa_mancha_cega(
+                            DadosExame.posicao_mancha_cega
+                        )
+                        self.testemancha = 0
+                        DadosExame.total_testes_mancha += 1
+            
+                    if len(self.tempos) == 5:
+                        self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(
+                            self.tempos
+                        )
+                        self.tempos = []
+                        
+                    
+                    if self.testepositivo == 80 and len(self.pontos_vistos) > 0:
+                        print("testando falso positivo...")
+                        self.pontos_vistos[-1].cor = Colors.BACKGROUND
+                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        if not continua:
+                            return          
+                        DadosExame.total_testes_falsos_positivo += 1
+                        if self.pontos_vistos[-1].response_received:
+                            DadosExame.falso_positivo_respondidos += 1
+                        self.testepositivo = 0
+                    
+                    
+                    if self.testenegativo == 90 and len(self.pontos_vistos) > 0:
+                        print("testando falso negativo...")
+                        self.pontos_vistos[-1].cor = Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0)
+                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        if not continua:
+                            return  
+                        DadosExame.total_testes_falsos_negativo += 1
+                        if not self.pontos_vistos[-1].response_received:
+                            DadosExame.falso_negativo_respondidos += 1
+                        self.testenegativo = 0
+                    if self.indice_atual == 76:
+                        self.indice_atual = 0
+                        random.shuffle(self.pontos)
+                    
                    
                                  
                     print(
@@ -531,7 +533,7 @@ class FullThreshold:
                 self.AT = 35
         else:
             self.limiar = self.AT
-            DadosExame.limiar_foveal = self.limiar
+            DadosExame.LimiarFoveal = self.limiar
             print(f"Limiar Foveal: {self.limiar} dB")
             self.limiarok = True  
                              
