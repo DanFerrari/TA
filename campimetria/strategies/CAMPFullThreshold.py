@@ -361,10 +361,13 @@ class FullThreshold:
                     self.teste_fixacao = True
                 elif self.mancha_cega.encontrou_mancha == False:
                     self.teste_fixacao = False
-                self.estado = "exame"
-          
-                
-                
+                self.estado = "quadrante"
+        
+        
+        elif self.estado == "quadrante":
+            self.testa_quadrante()        
+            if len(self.pontos) > 0:
+                self.estado == "exame"    
                 
                 
                 
@@ -574,7 +577,6 @@ class FullThreshold:
             self.viu = 0
             self.Dbig = 3
             self.Dsmall = 2
-            self.limiarok = False
             self.limiar_status = ""
             self.limiar = 0
             self.primeiro = True
