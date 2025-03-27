@@ -80,7 +80,7 @@ class FullThreshold:
 
         
         
-        self.tempo_resposta = 2.0
+        self.tempo_resposta = 1.5
         self.tempos = []
         self.pontos_vistos = []
         self.testemancha = 0
@@ -326,7 +326,7 @@ class FullThreshold:
                 x, y = ponto
                 cor_ponto = Ponto.db_para_intensidade(0)
                 teste = Ponto(x, y, tamanhoPonto = DadosExame.tamanho_estimulo, cor = cor_ponto, distancia = DadosExame.distancia_paciente)
-                continua = self.verifica_testa_ponto(teste.testaPonto(0.2, 2, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                continua = self.verifica_testa_ponto(teste.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                 if not continua:
                     return
                 if not teste.response_received:
@@ -404,7 +404,7 @@ class FullThreshold:
                         self.testemancha = 0
                         DadosExame.total_testes_mancha += 1
             
-                    if len(self.tempos) == 5:
+                    if len(self.tempos) == 2:
                         self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(
                             self.tempos
                         )
@@ -589,7 +589,7 @@ class FullThreshold:
                 self.db_para_intensidade(self.AT),
             )
 
-            continua = self.verifica_testa_ponto(self.ponto_quad[self.indice_atual].testaPonto(0.2, 2, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+            continua = self.verifica_testa_ponto(self.ponto_quad[self.indice_atual].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
             if not continua:
                 return
             

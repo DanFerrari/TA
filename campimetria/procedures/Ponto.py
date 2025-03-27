@@ -184,22 +184,21 @@ class Ponto:
                     if event.key == pygame.K_e:
                         self.tempo_resposta = (
                             pygame.time.get_ticks() - trial_start_time
-                        ) / 1000
-                        print("tempo_resposta_no_ponto: ", self.tempo_resposta)
-                        self.response_received = True
-                        print("Respondi o estimulo com o controle!")
+                        ) / 1000                 
+                        self.response_received = True                       
+                        return menu_pressionado
 
             if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
                 self.tempo_resposta = (
                     pygame.time.get_ticks() - trial_start_time
-                ) / 1000
-                print("tempo_resposta_no_ponto: ", self.tempo_resposta)
-                self.response_received = True
-                print("Respondi o estimulo com o joystick")
+                ) / 1000  
+                self.response_received = True 
+                return menu_pressionado
 
             if not self.response_received:
-                self.tempo_resposta = 2.0
+                self.tempo_resposta = 1.5
                 self.response_received = False
+                
             self.clock.tick(60)
 
         return menu_pressionado
