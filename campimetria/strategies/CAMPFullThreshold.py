@@ -107,7 +107,7 @@ class FullThreshold:
         for x,y in cordenadas_30:
             ponto = Ponto(x, y,tamanhoPonto = DadosExame.tamanho_estimulo, cor = (255, 255, 255), distancia = DadosExame.distancia_paciente)
             if x < 0 and y > 0:
-                ponto.atenuacao = self.ponto_NO.atenuacao
+                ponto.atenuacao = self.ponto_NO.atenuacao               
         
             elif x > 0 and y > 0:
                 ponto.atenuacao = self.ponto_NE.atenuacao
@@ -117,6 +117,14 @@ class FullThreshold:
         
             else:
                 ponto.atenuacao = self.ponto_SE.atenuacao
+            
+            if abs(ponto.xg) == 3 and  abs(ponto.yg) == 3:
+                ponto.atenuacao -= 2
+            elif (abs(ponto.xg) == 9 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 3  or abs(ponto.xg) == 3 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 9  or abs(ponto.xg) == 3 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 3 and  abs(ponto.yg) == 21 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 21) :
+                ponto.atenuacao -= 4
+            elif (abs(ponto.xg) == 27 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 27 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 21 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 27 or abs(ponto.xg) == 3 and  abs(ponto.yg) == 27):
+                ponto.atenuacao -= 6
+            
             self.pontos.append(ponto)
         self.total_pontos_exame = len(self.pontos)
         random.shuffle(self.pontos)
@@ -233,13 +241,7 @@ class FullThreshold:
         if self.voltar_ao_menu_inicial:
             from select_eye_screen import SelectEyeScreen
             self.game.change_screen(SelectEyeScreen(self.game))
-
-        
-        
-    
-    
-
-
+            
     def handle_events(self, events):
         self.menu.fixacao = "diamante" if self.estado == "limiar_foveal" else "central"
         for event in events:
@@ -261,15 +263,7 @@ class FullThreshold:
                     self.tempo_pausado += tempo_decorrido
                     if self.menu.sair:
                         self.voltar_ao_menu_inicial = True
-          
                         
-
-
-
-
-
-
-
     def verifica_tecla_pressionada_menu(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -292,13 +286,6 @@ class FullThreshold:
             return True
         
         
-
-        
-        
-
-
-
-
     def draw(self, surface):
         if self.menu.sair:
             return
@@ -457,9 +444,6 @@ class FullThreshold:
                 DadosExame.matriz_pontos = self.pontos          
             
                 self.estado = "resultado"
-                
-          
-            
            
         elif self.estado == "resultado":
             ResultadoFullthreshold.exibir_resultados()
@@ -686,6 +670,7 @@ class FullThreshold:
             if self.indice_atual == 4:
                 self.criar_pontos()
                 self.indice_atual = 0
-                self.estado = "exame"
+                DadosExame.matriz_pontos = self.pontos
+                self.estado = "resultado"
             
                 
