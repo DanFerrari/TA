@@ -33,7 +33,7 @@ class FullThreshold:
 
     def __init__(self,game):
         self.game = game
-        self.pontos = self.criar_pontos()
+        self.pontos = []
         self.indice_atual = 0
         self.UV = 0
         self.AT = 20
@@ -90,14 +90,36 @@ class FullThreshold:
         self.total_pontos_exame = len(self.pontos)
         self.pontos_fechados = 0
         self.perda_de_fixacao = 0
-        self.tempo_pausado = 0        
+        self.tempo_pausado = 0     
+        
+        
+        self.ponto_NE = Ponto(-9,9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)        
+        self.ponto_NO = Ponto(9,9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)
+        self.ponto_SE = Ponto(9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)
+        self.ponto_SO = Ponto(-9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)   
 
         
         
         self.tecla_menu_pressionada = False
         self.tecla_pause_pressionada = False
-    def criar_pontos(self):
-        return [Ponto(x, y,tamanhoPonto = DadosExame.tamanho_estimulo, cor = (255, 255, 255), distancia = DadosExame.distancia_paciente) for x, y in cordenadas_30]
+    def criar_pontos(self):        
+        for x,y in cordenadas_30:
+            ponto = Ponto(x, y,tamanhoPonto = DadosExame.tamanho_estimulo, cor = (255, 255, 255), distancia = DadosExame.distancia_paciente)
+            if x < 0 and y > 0:
+                ponto.atenuacao = self.ponto_NO.atenuacao
+        
+            elif x > 0 and y > 0:
+                ponto.atenuacao = self.ponto_NE.atenuacao
+        
+            elif x < 0 and y < 0:
+                ponto.atenuacao = self.ponto_SO.atenuacao
+        
+            else:
+                ponto.atenuacao = self.ponto_SE.atenuacao
+            self.pontos.append(ponto)
+        
+        
+    
 
     def teste_fullthreshold(self, paciente_viu: int, ponto) -> int:
         resp = 0
@@ -267,6 +289,10 @@ class FullThreshold:
             return True
         
         
+
+        
+        
+
 
 
 
@@ -470,7 +496,7 @@ class FullThreshold:
                 self.viu = 2
             else:
                 self.viu = 1
-            pygame.time.delay(500)
+
             match self.viu:
                 case 1:
                     if self.AT <= 0:
@@ -540,8 +566,119 @@ class FullThreshold:
             DadosExame.LimiarFoveal = self.limiar
             print(f"Limiar Foveal: {self.limiar} dB")
             self.limiarok = True  
-            for ponto in self.pontos:
-                if self.limiar >= 3:
-                    ponto.atenuacao = self.limiar - Constantes.bigdelta
-                else:
-                    ponto.atenuacao = 20
+            self.UV = 0
+            self.AT = 20
+            self.UNV = 0
+            self.NC = 0
+            self.Delta = 0
+            self.viu = 0
+            self.Dbig = 3
+            self.Dsmall = 2
+            self.limiarok = False
+            self.limiar_status = ""
+            self.limiar = 0
+            self.primeiro = True
+            
+
+
+
+    def testa_quadrante(self):
+
+        
+        if self.primeiro:
+            self.ponto_atual_quad = self.ponto_NE
+            self.primeiro = False
+        
+        if self.limiar_status != "=":
+            self.ponto_atual_quad.response_received = False
+            self.ponto_atual_quad.cor = (
+                self.db_para_intensidade(self.AT),
+                self.db_para_intensidade(self.AT),
+                self.db_para_intensidade(self.AT),
+            )
+
+            continua = self.verifica_testa_ponto(self.ponto_atual_quad.testaPonto(0.2, 2, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+            if not continua:
+                return
+            
+            if self.ponto_atual_quad.response_received:
+                self.viu = 2
+            else:
+                self.viu = 1
+           
+            match self.viu:
+                case 1:
+                    if self.AT <= 0:
+                        self.AT = -1
+                        self.limiar_status = "="
+                        return
+
+                    self.UNV = self.AT
+                    if self.primeiro == True:
+                        self.primeiro = False
+                        self.NC = 0
+                        self.UV = 0
+                        self.Delta = self.Dbig
+                        self.AT = self.AT - self.Delta
+                        self.limiar_status = "+"
+                        return
+                    if self.limiar_status == "-":
+                        self.NC += 1
+                        self.Delta = self.Dsmall
+                        if self.NC >= 2:
+                            self.limiar_status = "="
+                            self.AT = (self.UV + self.UNV) / 2
+                            return
+                        else:
+                            self.AT = self.AT - self.Delta
+                            self.limiar_status = "+"
+                            return
+                    else:
+                        self.AT = self.AT - self.Delta
+                        self.limiar_status = "+"
+                        return
+
+                case 2:
+                    self.UV = self.AT
+                    if self.primeiro == True:
+                        self.primeiro = False
+                        self.NC = 0
+                        self.UNV = 35
+                        self.Delta = self.Dbig
+                        self.AT = self.AT + self.Delta
+                        self.limiar_status = "-"
+                        return
+
+                    if self.limiar_status == "+":
+                        self.NC = +1
+                        self.Delta = self.Dsmall
+
+                        if self.NC >= 2:
+                            self.limiar_status = "="
+                            self.AT = (self.UV + self.UNV) / 2
+                            return
+
+                        else:
+                            self.AT = self.AT + self.Delta
+                            self.limiar_status = "-"
+                            return
+
+                    else:
+                        self.AT = self.AT + self.Delta
+                        self.limiar_status = "-"
+                        return
+
+            if self.AT > 40:
+                self.AT = 35
+        else:
+            self.ponto_atual_quad.atenuacao = self.AT
+            if self.ponto_atual_quad == self.ponto_NE:
+                self.ponto_atual_quad = self.ponto_NO
+            elif self.ponto_atual_quad == self.ponto_NO:
+                self.ponto_atual_quad = self.ponto_SO                
+            elif self.ponto_atual_quad == self.ponto_SO:
+                self.ponto_atual_quad = self.ponto_SE
+            elif self.ponto_atual_quad == self.ponto_SE:
+                self.pontos = self.criar_pontos()
+            
+                
