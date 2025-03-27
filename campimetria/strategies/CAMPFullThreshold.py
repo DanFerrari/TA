@@ -542,6 +542,6 @@ class FullThreshold:
             self.limiarok = True  
             for ponto in self.pontos:
                 if self.limiar >= 3:
-                    ponto.atenuacao = self.limiar - Constantes.smalldelta
+                    ponto.atenuacao = self.limiar - Constantes.bigdelta
                 else:
                     ponto.atenuacao = 20
