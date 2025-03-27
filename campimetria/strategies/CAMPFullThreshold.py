@@ -669,8 +669,7 @@ class FullThreshold:
             self.indice_atual += 1
             if self.indice_atual == 4:
                 self.criar_pontos()
-                self.indice_atual = 0
-                DadosExame.matriz_pontos = self.pontos
-                self.estado = "resultado"
+                self.indice_atual = 0          
+                self.estado = "exame"
             
                 
