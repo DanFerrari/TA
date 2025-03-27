@@ -141,38 +141,42 @@ class FullThreshold:
                 ponto.status = "="
                 resp = 1
                 return resp
-            else:
-                ponto.ultima_atenuacao_nao_vista = ponto.atenuacao
-                if ponto.primeira_visualizacao:
-                    ponto.primeira_visualizacao = False
-                    ponto.ultima_atenuacao_vista = Constantes.dbMin
-                    ponto.numero_cruzamentos = 0
-                    ponto.delta = Constantes.bigdelta
-                    ponto.atenuacao -= ponto.delta
-                    if ponto.atenuacao <= 0:
-                        ponto.atenuacao = 0
-                    ponto.status = "+"
-                elif ponto.status == "-":
-                    ponto.numero_cruzamentos += 1
-                    ponto.delta = Constantes.smalldelta
-                    if ponto.numero_cruzamentos >= 2:
-                        ponto.status = "="
-                        ponto.atenuacao = (
-                            ponto.ultima_atenuacao_nao_vista
-                            + ponto.ultima_atenuacao_vista
-                        ) / 2
-                        resp = 1
-                        return resp
-                    else:
-                        ponto.atenuacao -= ponto.delta
-                        if ponto.atenuacao <= 0:
-                            ponto.atenuacao = 0
-                        ponto.status = "+"
+            ponto.ultima_atenuacao_nao_vista = ponto.atenuacao        
+            if ponto.primeira_visualizacao:
+                ponto.primeira_visualizacao = False
+                ponto.ultima_atenuacao_vista = Constantes.dbMin
+                ponto.numero_cruzamentos = 0
+                ponto.delta = Constantes.bigdelta
+                ponto.atenuacao -= ponto.delta
+                if ponto.atenuacao <= 0:
+                    ponto.atenuacao = 0
+                ponto.status = "+"
+                resp = 0
+                return resp
+            elif ponto.status == "-":
+                ponto.numero_cruzamentos += 1
+                ponto.delta = Constantes.smalldelta
+                if ponto.numero_cruzamentos >= 2:
+                    ponto.status = "="
+                    ponto.atenuacao = (
+                        ponto.ultima_atenuacao_nao_vista
+                        + ponto.ultima_atenuacao_vista
+                    ) / 2
+                    resp = 1
+                    return resp
                 else:
                     ponto.atenuacao -= ponto.delta
                     if ponto.atenuacao <= 0:
                         ponto.atenuacao = 0
                     ponto.status = "+"
+                    resp = 0 
+                    return resp
+            ponto.atenuacao -= ponto.delta
+            if ponto.atenuacao <= 0:
+                ponto.atenuacao = 0
+            ponto.status = "+"
+            resp = 0
+            return resp    
 
         elif paciente_viu == 2:
             ponto.ultima_atenuacao_vista = ponto.atenuacao
@@ -185,6 +189,8 @@ class FullThreshold:
                 if ponto.atenuacao >= 40:
                     ponto.atenuacao = 40
                 ponto.status = "-"
+                resp = 0
+                return resp
             elif ponto.status == "+":
                 ponto.numero_cruzamentos += 1
                 ponto.delta = Constantes.smalldelta
@@ -200,11 +206,15 @@ class FullThreshold:
                     if ponto.atenuacao >= 40:
                         ponto.atenuacao = 40
                     ponto.status = "-"
-            else:
-                ponto.atenuacao += ponto.delta
-                if ponto.atenuacao >= 40:
-                    ponto.atenuacao = 40
-                ponto.status = "-"
+                    resp = 0
+                    return resp
+            
+            ponto.atenuacao += ponto.delta
+            if ponto.atenuacao >= 40:
+                ponto.atenuacao = 40
+            ponto.status = "-"
+            resp = 0
+            return resp
 
         #     if Dados.gFlutuacao and not Dados.DadosExame.LF and Dados.gExame[idPto].SF and not Dados.LimQuad:
         #         setLimiarFlutuacao(matExame, idPto)
@@ -451,7 +461,7 @@ class FullThreshold:
             
         
                         
-    def db_para_intensidade(self,db, db_min=35, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
+    def db_para_intensidade(self,db, db_min=40, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
         """Converte dB para intensidade de cor (escala logarítmica)."""
         norm_db = (db - db_min) / (db_max - db_min)  # Normaliza dB entre 0 e 1
 

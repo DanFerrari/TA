@@ -31,7 +31,7 @@
                         matExame[idPto].Delta = Constantes.smalldelta;
                         if (matExame[idPto].NCruzou >= 2)
                         {
-                            matExame[idPto].Status = '=';
+                            matExame[idPto].Status = '='; 
                             matExame[idPto].Atenuacao = (matExame[idPto].UltAtenNaoVista + matExame[idPto].UltAtenVista) / 2;
                             resp = 1;
                             break;
