@@ -80,7 +80,7 @@ class FullThreshold:
 
         
         
-        self.tempo_resposta = 1.5
+        self.tempo_resposta = 2
         self.tempos = []
         self.pontos_vistos = []
         self.testemancha = 0

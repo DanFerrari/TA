@@ -196,7 +196,7 @@ class Ponto:
                 return menu_pressionado
 
             if not self.response_received:
-                self.tempo_resposta = 1.5
+                self.tempo_resposta = 2
                 self.response_received = False
                 
             self.clock.tick(60)
