@@ -79,7 +79,7 @@ class FullThreshold:
         
 
         
-        random.shuffle(self.pontos)
+        
         self.tempo_resposta = 2.0
         self.tempos = []
         self.pontos_vistos = []
@@ -87,7 +87,7 @@ class FullThreshold:
         self.testenegativo = 0
         self.testepositivo = 0
 
-        self.total_pontos_exame = len(self.pontos)
+        self.total_pontos_exame = 0
         self.pontos_fechados = 0
         self.perda_de_fixacao = 0
         self.tempo_pausado = 0     
@@ -97,6 +97,7 @@ class FullThreshold:
         self.ponto_NO = Ponto(9,9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)
         self.ponto_SE = Ponto(9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)
         self.ponto_SO = Ponto(-9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)   
+        self.ponto_quad = [self.ponto_NE,self.ponto_NO,self.ponto_SE,self.ponto_SO]
 
         
         
@@ -117,7 +118,9 @@ class FullThreshold:
             else:
                 ponto.atenuacao = self.ponto_SE.atenuacao
             self.pontos.append(ponto)
-        
+        self.total_pontos_exame = len(self.pontos)
+        random.shuffle(self.pontos)
+        print(f"Pontos criados: {len(self.pontos)}")
         
     
 
@@ -362,15 +365,12 @@ class FullThreshold:
                 elif self.mancha_cega.encontrou_mancha == False:
                     self.teste_fixacao = False
                 self.estado = "quadrante"
+                self.indice_atual = 0
         
         
         elif self.estado == "quadrante":
-            self.testa_quadrante()        
-            if len(self.pontos) > 0:
-                self.estado == "exame"    
-                
-                
-                
+            self.testa_quadrante() 
+            
         elif self.estado == "exame":
           
             self.indice_atual += 1
@@ -581,29 +581,25 @@ class FullThreshold:
             self.limiar = 0
             self.primeiro = True
             
+            
 
 
 
     def testa_quadrante(self):
 
-        
-        if self.primeiro:
-            self.ponto_atual_quad = self.ponto_NE
-            self.primeiro = False
-        
         if self.limiar_status != "=":
-            self.ponto_atual_quad.response_received = False
-            self.ponto_atual_quad.cor = (
+            self.ponto_quad[self.indice_atual].response_received = False
+            self.ponto_quad[self.indice_atual].cor = (
                 self.db_para_intensidade(self.AT),
                 self.db_para_intensidade(self.AT),
                 self.db_para_intensidade(self.AT),
             )
 
-            continua = self.verifica_testa_ponto(self.ponto_atual_quad.testaPonto(0.2, 2, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+            continua = self.verifica_testa_ponto(self.ponto_quad[self.indice_atual].testaPonto(0.2, 2, menu_pressionado = self.verifica_tecla_pressionada_menu()))
             if not continua:
                 return
             
-            if self.ponto_atual_quad.response_received:
+            if self.ponto_quad[self.indice_atual].response_received:
                 self.viu = 2
             else:
                 self.viu = 1
@@ -673,14 +669,23 @@ class FullThreshold:
             if self.AT > 40:
                 self.AT = 35
         else:
-            self.ponto_atual_quad.atenuacao = self.AT
-            if self.ponto_atual_quad == self.ponto_NE:
-                self.ponto_atual_quad = self.ponto_NO
-            elif self.ponto_atual_quad == self.ponto_NO:
-                self.ponto_atual_quad = self.ponto_SO                
-            elif self.ponto_atual_quad == self.ponto_SO:
-                self.ponto_atual_quad = self.ponto_SE
-            elif self.ponto_atual_quad == self.ponto_SE:
-                self.pontos = self.criar_pontos()
+            
+            self.ponto_quad[self.indice_atual].atenuacao = self.AT
+            self.UV = 0
+            self.AT = 20
+            self.UNV = 0
+            self.NC = 0
+            self.Delta = 0
+            self.viu = 0
+            self.Dbig = 3
+            self.Dsmall = 2
+            self.limiar_status = ""
+            self.limiar = 0
+            self.primeiro = True
+            self.indice_atual += 1
+            if self.indice_atual == 4:
+                self.criar_pontos()
+                self.indice_atual = 0
+                self.estado = "exame"
             
                 
