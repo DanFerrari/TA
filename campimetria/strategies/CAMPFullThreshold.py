@@ -99,6 +99,7 @@ class FullThreshold:
         self.ponto_SE = Ponto(9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)
         self.ponto_SO = Ponto(-9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)   
         self.ponto_quad = [self.ponto_NE,self.ponto_NO,self.ponto_SE,self.ponto_SO]
+        random.shuffle(self.ponto_quad)
 
         
         
@@ -587,6 +588,8 @@ class FullThreshold:
             self.indice_atual += 1
             if self.indice_atual == 4:
                 self.indice_atual = 0
+            if self.ponto_quad[self.indice_atual].status == "=":
+                return
             self.ponto_quad[self.indice_atual].response_received = False
             self.ponto_quad[self.indice_atual].cor = (
                 self.db_para_intensidade(self.ponto_quad[self.indice_atual].atenuacao),
