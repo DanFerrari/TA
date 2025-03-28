@@ -585,12 +585,15 @@ class FullThreshold:
 
     def testa_quadrante(self):
 
-        if self.limiar_status != "=":
+        if  not all(ponto.status == "=" for ponto in self.ponto_quad):
+            self.indice_atual += 1
+            if self.indice_atual == 4:
+                self.indice_atual = 0
             self.ponto_quad[self.indice_atual].response_received = False
             self.ponto_quad[self.indice_atual].cor = (
-                self.db_para_intensidade(self.AT),
-                self.db_para_intensidade(self.AT),
-                self.db_para_intensidade(self.AT),
+                self.db_para_intensidade(self.self.ponto_quad[self.indice_atual].atenuacao),
+                self.db_para_intensidade(self.ponto_quad[self.indice_atual].atenuacao),
+                self.db_para_intensidade(self.ponto_quad[self.indice_atual].atenuacao),
             )
 
             continua = self.verifica_testa_ponto(self.ponto_quad[self.indice_atual].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
@@ -604,86 +607,72 @@ class FullThreshold:
            
             match self.viu:
                 case 1:
-                    if self.AT <= 0:
-                        self.AT = -1
-                        self.limiar_status = "="
+                    if self.ponto_quad[self.indice_atual].atenuacao <= 0:
+                        self.ponto_quad[self.indice_atual].atenuacao = -1
+                        self.ponto_quad[self.indice_atual].status = "="
                         return
 
-                    self.UNV = self.AT
-                    if self.primeiro == True:
-                        self.primeiro = False
-                        self.NC = 0
-                        self.UV = 0
-                        self.Delta = self.Dbig
-                        self.AT = self.AT - self.Delta
-                        self.limiar_status = "+"
+                    self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista = self.AT
+                    if self.ponto_quad[self.indice_atual].primeira_visualizacao == True:
+                        self.ponto_quad[self.indice_atual].primeira_visualizacao = False
+                        self.ponto_quad[self.indice_atual].numero_cruzamentos = 0
+                        self.ponto_quad[self.indice_atual].ultima_atenuacao_vista = 0
+                        self.ponto_quad[self.indice_atual].delta = self.Dbig
+                        self.ponto_quad[self.indice_atual].atenuacao = self.ponto_quad[self.indice_atual].atenuacao - self.ponto_quad[self.indice_atual].delta
+                        self.ponto_quad[self.indice_atual].status = "+"
                         return
-                    if self.limiar_status == "-":
-                        self.NC += 1
-                        self.Delta = self.Dsmall
-                        if self.NC >= 2:
-                            self.limiar_status = "="
-                            self.AT = (self.UV + self.UNV) / 2
+                    if self.ponto_quad[self.indice_atual].status == "-":
+                        self.ponto_quad[self.indice_atual].numero_cruzamentos += 1
+                        self.ponto_quad[self.indice_atual].delta = self.Dsmall
+                        if self.ponto_quad[self.indice_atual].numero_cruzamentos >= 2:
+                            self.ponto_quad[self.indice_atual].status = "="
+                            self.ponto_quad[self.indice_atual].atenuacao = (self.ponto_quad[self.indice_atual].ultima_atenuacao_vista + self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista) / 2
                             return
                         else:
-                            self.AT = self.AT - self.Delta
-                            self.limiar_status = "+"
+                            self.ponto_quad[self.indice_atual].atenuacao = self.ponto_quad[self.indice_atual].atenuacao - self.ponto_quad[self.indice_atual].delta
+                            self.ponto_quad[self.indice_atual].status = "+"
                             return
                     else:
-                        self.AT = self.AT - self.Delta
-                        self.limiar_status = "+"
+                        self.ponto_quad[self.indice_atual].atenuacao = self.ponto_quad[self.indice_atual].atenuacao - self.ponto_quad[self.indice_atual].delta
+                        self.ponto_quad[self.indice_atual].status = "+"
                         return
 
                 case 2:
-                    self.UV = self.AT
-                    if self.primeiro == True:
-                        self.primeiro = False
-                        self.NC = 0
-                        self.UNV = 35
-                        self.Delta = self.Dbig
-                        self.AT = self.AT + self.Delta
-                        self.limiar_status = "-"
+                    self.ponto_quad[self.indice_atual].ultima_atenuacao_vista = self.ponto_quad[self.indice_atual].atenuacao
+                    if self.ponto_quad[self.indice_atual].primeira_visualizacao == True:
+                        self.ponto_quad[self.indice_atual].primeira_visualizacao = False
+                        self.ponto_quad[self.indice_atual].numero_cruzamentos = 0
+                        self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista = 35
+                        self.ponto_quad[self.indice_atual].delta = self.Dbig
+                        self.ponto_quad[self.indice_atual].atenuacao = self.ponto_quad[self.indice_atual].atenuacao + self.ponto_quad[self.indice_atual].delta
+                        self.ponto_quad[self.indice_atual].status = "-"
                         return
 
-                    if self.limiar_status == "+":
-                        self.NC = +1
-                        self.Delta = self.Dsmall
+                    if self.ponto_quad[self.indice_atual].status == "+":
+                        self.ponto_quad[self.indice_atual].numero_cruzamentos = +1
+                        self.ponto_quad[self.indice_atual].delta = self.Dsmall
 
-                        if self.NC >= 2:
-                            self.limiar_status = "="
-                            self.AT = (self.UV + self.UNV) / 2
+                        if self.ponto_quad[self.indice_atual].numero_cruzamentos >= 2:
+                            self.ponto_quad[self.indice_atual].status = "="
+                            self.ponto_quad[self.indice_atual].atenuacao = (self.ponto_quad[self.indice_atual].ultima_atenuacao_vista + self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista) / 2
                             return
 
                         else:
-                            self.AT = self.AT + self.Delta
-                            self.limiar_status = "-"
+                            self.ponto_quad[self.indice_atual].atenuacao = self.ponto_quad[self.indice_atual].atenuacao + self.ponto_quad[self.indice_atual].delta
+                            self.ponto_quad[self.indice_atual].status = "-"
                             return
 
                     else:
-                        self.AT = self.AT + self.Delta
-                        self.limiar_status = "-"
+                        self.ponto_quad[self.indice_atual].atenuacao = self.ponto_quad[self.indice_atual].atenuacao + self.ponto_quad[self.indice_atual].delta
+                        self.ponto_quad[self.indice_atual].status = "-"
                         return
 
-            if self.AT > 40:
-                self.AT = 35
-        else:
-            
-            self.ponto_quad[self.indice_atual].atenuacao = self.AT
-            self.UV = 0
-            self.AT = 20
-            self.UNV = 0
-            self.NC = 0
-            self.Delta = 0
-            self.viu = 0
-            self.Dbig = 3
-            self.Dsmall = 2
-            self.limiar_status = ""
-            self.limiar = 0
-            self.primeiro = True
-            self.indice_atual += 1
-            if self.indice_atual == 4:
-                self.criar_pontos()
-                self.indice_atual = 0          
-                self.estado = "exame"
+            if self.ponto_quad[self.indice_atual].atenuacao > 40:
+                self.ponto_quad[self.indice_atual].atenuacao = 35
+        else:                      
+            self.criar_pontos()
+            self.indice_atual = 0          
+            self.estado = "exame"
+
             
                 
