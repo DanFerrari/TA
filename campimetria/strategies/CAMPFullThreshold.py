@@ -89,6 +89,7 @@ class FullThreshold:
 
         self.total_pontos_exame = 0
         self.pontos_fechados = []
+        self.total_pontos_fechados = 0
         self.perda_de_fixacao = 0
         self.tempo_pausado = 0     
         
