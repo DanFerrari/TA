@@ -373,7 +373,7 @@ class FullThreshold:
         elif self.estado == "exame":
           
             self.indice_atual += 1
-            if self.indice_atual == len(self.pontos):
+            if self.indice_atual >= len(self.pontos):
                 self.indice_atual = 0
                 
             if self.total_pontos_fechados  <  self.total_pontos_exame:
@@ -450,11 +450,11 @@ class FullThreshold:
                     DadosExame.total_de_pontos_testados += 1
 
             
-            if self.total_pontos_exame == self.pontos_fechados: 
+            if self.total_pontos_exame == len(self.pontos_fechados): 
                 self.tempo_final_exame = pygame.time.get_ticks()
                 self.tempo_decorrido_exame = self.tempo_final_exame - self.tempo_inicial_exame
                 DadosExame.duracao_do_exame = self.tempo_decorrido_exame
-                DadosExame.matriz_pontos = self.pontos          
+                DadosExame.matriz_pontos = self.pontos_fechados          
             
                 self.estado = "resultado"
            
