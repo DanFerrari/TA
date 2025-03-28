@@ -193,8 +193,7 @@ class Ponto:
                     pygame.time.get_ticks() - trial_start_time
                 ) / 1000  
                 self.response_received = True 
-                self.apagarPonto()
-                pygame.time.delay(500)
+                self.apagarPonto()                
                 return menu_pressionado
 
             if not self.response_received:
