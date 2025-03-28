@@ -19,8 +19,8 @@ class Constantes:
 
 class Colors:
 
-    BACKGROUND = (120, 120, 120)
-    ERASE_INTENSITY = 120
+    BACKGROUND = (150, 150, 150)
+    ERASE_INTENSITY = 150
     DEFAULT = (53, 43, 54)
     WHITE = (255,255,255)
     SOFT_GREEN = (0,200,0)
