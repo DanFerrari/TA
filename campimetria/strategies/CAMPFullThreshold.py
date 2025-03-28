@@ -371,7 +371,7 @@ class FullThreshold:
             self.testa_quadrante() 
             
         elif self.estado == "exame":
-          
+            print(f"limiar foveal: {DadosExame.LimiarFoveal}")
             self.indice_atual += 1
             if self.indice_atual >= len(self.pontos):
                 self.indice_atual = 0
