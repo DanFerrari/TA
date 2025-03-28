@@ -89,7 +89,6 @@ class FullThreshold:
 
         self.total_pontos_exame = 0
         self.pontos_fechados = []
-        self.total_pontos_fechados = []
         self.perda_de_fixacao = 0
         self.tempo_pausado = 0     
         
@@ -375,8 +374,6 @@ class FullThreshold:
             if self.indice_atual == len(self.pontos):
                 self.indice_atual = 0
                 
-
-            
             if self.total_pontos_fechados  <  self.total_pontos_exame:
                 ponto = self.pontos[self.indice_atual]
                 if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
