@@ -34,7 +34,7 @@ class Ponto:
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
-        self.atenuacao = 20
+        self.atenuacao = 25
         self.primeira_visualizacao = True
         self.response_received = False
         self.numero_cruzamentos = 0

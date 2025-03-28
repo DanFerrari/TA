@@ -36,13 +36,13 @@ class FullThreshold:
         self.pontos = []
         self.indice_atual = 0
         self.UV = 0
-        self.AT = 20
+        self.AT = 30
         self.UNV = 0
         self.NC = 0
         self.Delta = 0
         self.viu = 0
-        self.Dbig = 3
-        self.Dsmall = 2
+        self.Dbig = 6
+        self.Dsmall = 3
         self.limiarok = False
         self.limiar_status = ""
         self.limiar = 0
@@ -88,7 +88,8 @@ class FullThreshold:
         self.testepositivo = 0
 
         self.total_pontos_exame = 0
-        self.pontos_fechados = 0
+        self.pontos_fechados = []
+        self.total_pontos_fechados = []
         self.perda_de_fixacao = 0
         self.tempo_pausado = 0     
         
@@ -371,12 +372,12 @@ class FullThreshold:
         elif self.estado == "exame":
           
             self.indice_atual += 1
-            if self.indice_atual == 76:
+            if self.indice_atual == len(self.pontos):
                 self.indice_atual = 0
                 
 
             
-            if self.pontos_fechados  <  self.total_pontos_exame:
+            if self.total_pontos_fechados  <  self.total_pontos_exame:
                 ponto = self.pontos[self.indice_atual]
                 if not ponto.status == "=":  # Apenas testa se ainda não foi ativado
                     self.testemancha += 1
@@ -392,7 +393,10 @@ class FullThreshold:
                     else:
                         paciente_viu = 1
 
-                    self.pontos_fechados += self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto)
+                    if self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto) == 1:
+                        self.total_pontos_fechados += 1                        
+                        self.pontos_fechados.append(self.pontos.pop(self.indice_atual))
+                        
                     
                         
                     self.tempos.append(ponto.tempo_resposta)
@@ -564,13 +568,13 @@ class FullThreshold:
             print(f"Limiar Foveal: {self.limiar} dB")
             self.limiarok = True  
             self.UV = 0
-            self.AT = 20
+            self.AT = 30
             self.UNV = 0
             self.NC = 0
             self.Delta = 0
             self.viu = 0
-            self.Dbig = 3
-            self.Dsmall = 2
+            self.Dbig = 6
+            self.Dsmall = 3
             self.limiar_status = ""
             self.limiar = 0
             self.primeiro = True
