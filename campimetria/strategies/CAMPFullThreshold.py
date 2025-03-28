@@ -591,7 +591,7 @@ class FullThreshold:
                 self.indice_atual = 0
             self.ponto_quad[self.indice_atual].response_received = False
             self.ponto_quad[self.indice_atual].cor = (
-                self.db_para_intensidade(self.self.ponto_quad[self.indice_atual].atenuacao),
+                self.db_para_intensidade(self.ponto_quad[self.indice_atual].atenuacao),
                 self.db_para_intensidade(self.ponto_quad[self.indice_atual].atenuacao),
                 self.db_para_intensidade(self.ponto_quad[self.indice_atual].atenuacao),
             )
