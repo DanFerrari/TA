@@ -469,17 +469,25 @@ class FullThreshold:
     def db_para_intensidade(self,db, db_min=Constantes.dbMin, db_max=Constantes.dbMax, 
                         i_min=Colors.ERASE_INTENSITY, i_max=255):
 
-            # Luminância do fundo no Humphrey (31.5 asb ≈ 10 cd/m²)
+        """Converte dB (Humphrey) para intensidade de cor, ajustando toda a escala de forma precisa."""
+
+        # Luminância do fundo no Humphrey (31.5 asb ≈ 10 cd/m²)
         L_fundo = 10  # cd/m²
 
         # Luminância relativa do estímulo
         L_est = L_fundo * 10 ** (-db / 10)
 
-        # Ajuste da normalização para evitar achatamento
+        # Ajuste da normalização para cobrir toda a faixa corretamente
         norm_L = (L_est - 10**-3) / (L_fundo - 10**-3)
 
-        # **NOVO AJUSTE: Reduzi o fator de potência para dar mais peso aos valores altos de dB**
-        gamma = 0.5  # **Antes era 0.6, agora está mais próximo da curva real**
+        # **NOVO AJUSTE: Usando interpolação não-linear para corrigir toda a faixa**
+        if db <= 10:
+            gamma = 0.7  # Para valores baixos de dB, a curva deve ser mais suave
+        elif db <= 30:
+            gamma = 0.5  # Valores médios exigem um equilíbrio maior
+        else:
+            gamma = 0.4  # Para valores altos de dB, a curva deve ser mais agressiva
+        
         intensity = i_min + (i_max - i_min) * (norm_L ** gamma)
 
         # Garante que o valor está dentro do intervalo permitido
