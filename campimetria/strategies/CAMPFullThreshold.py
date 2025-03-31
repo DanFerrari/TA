@@ -98,7 +98,7 @@ class FullThreshold:
         self.ponto_NO = Ponto(9,9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)
         self.ponto_SE = Ponto(9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)
         self.ponto_SO = Ponto(-9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)   
-        self.ponto_quad = [self.ponto_NE,self.ponto_NO,self.ponto_SE,self.ponto_SO]
+        self.ponto_quad = {"NE":self.ponto_NE,"NO":self.ponto_NO,"SE":self.ponto_SE,"SO":self.ponto_SO}
         random.shuffle(self.ponto_quad)
         
         
@@ -109,16 +109,16 @@ class FullThreshold:
         for x,y in cordenadas_30:
             ponto = Ponto(x, y,tamanhoPonto = DadosExame.tamanho_estimulo, cor = (255, 255, 255), distancia = DadosExame.distancia_paciente)
             if x < 0 and y > 0:
-                ponto.atenuacao = self.ponto_NO.atenuacao               
-        
+                ponto.atenuacao = self.ponto_quad.get("NO").atenuacao               
+                                    
             elif x > 0 and y > 0:
-                ponto.atenuacao = self.ponto_NE.atenuacao
+                ponto.atenuacao = self.ponto_quad.get("NE").atenuacao
         
             elif x < 0 and y < 0:
-                ponto.atenuacao = self.ponto_SO.atenuacao
+                ponto.atenuacao = self.ponto_quad.get("SO").atenuacao
         
             else:
-                ponto.atenuacao = self.ponto_SE.atenuacao
+                ponto.atenuacao = self.ponto_quad.get("SE").atenuacao
             
             if abs(ponto.xg) == 3 and  abs(ponto.yg) == 3:
                 ponto.atenuacao -= 2
