@@ -97,24 +97,24 @@ class Ponto:
     @staticmethod
     def db_para_intensidade(db, db_min=Constantes.dbMin, db_max=Constantes.dbMax, 
                         i_min=Colors.ERASE_INTENSITY, i_max=255):
-        """Converte dB para intensidade de cor (escala logarítmica corrigida)."""
-        
-        # Luminância do fundo no Humphrey (31.5 asb ≈ 10 cd/m²)
+
+    # Luminância do fundo no Humphrey (31.5 asb ≈ 10 cd/m²)
         L_fundo = 10  # cd/m²
 
-        # Calcula luminância relativa do estímulo no Humphrey
-        L_est = L_fundo * 10 ** (-db / 10)  # Luminância em cd/m²
+        # Luminância relativa do estímulo
+        L_est = L_fundo * 10 ** (-db / 10)
 
-        # Normaliza entre 0 e 1 para mapeamento ao monitor
-        norm_L = (L_est - 10**-4) / (L_fundo - 10**-4)  
+        # Ajuste da normalização para evitar achatamento
+        norm_L = (L_est - 10**-3) / (L_fundo - 10**-3)
 
-        # Converte para escala de intensidade de monitor (0-255 RGB)
-        intensity = i_min + (i_max - i_min) * norm_L
+        # **NOVO AJUSTE: Reduzi o fator de potência para dar mais peso aos valores altos de dB**
+        gamma = 0.5  # **Antes era 0.6, agora está mais próximo da curva real**
+        intensity = i_min + (i_max - i_min) * (norm_L ** gamma)
 
-        # Garante que o valor está no intervalo correto
+        # Garante que o valor está dentro do intervalo permitido
         intensity = np.clip(intensity, i_min, i_max)
 
-        return (intensity, intensity, intensity)  # Retorna cor em escala de cinza
+        return (intensity, intensity, intensity)  # Retorna escala de cinza
 
 
     def plotarPonto(self):
@@ -198,14 +198,14 @@ class Ponto:
                         pygame.time.delay(400)                       
                         return menu_pressionado
 
-            # if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-            #     self.tempo_resposta = (
-            #         pygame.time.get_ticks() - trial_start_time
-            #     ) / 1000  
-            #     self.response_received = True 
-            #     self.apagarPonto()  
-            #     pygame.time.delay(400)              
-            #     return menu_pressionado
+            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+                self.tempo_resposta = (
+                    pygame.time.get_ticks() - trial_start_time
+                ) / 1000  
+                self.response_received = True 
+                self.apagarPonto()  
+                pygame.time.delay(400)              
+                return menu_pressionado
 
             if not self.response_received:
                 

@@ -1,7 +1,6 @@
 import sys, os, random, pygame
 import OPi.GPIO as GPIO
 import numpy as np
-
 PIN_ENTRADA = 'PD22'
 
 sys.path.append(
@@ -37,7 +36,7 @@ class FullThreshold:
         self.pontos = []
         self.indice_atual = 0
         self.UV = 0
-        self.AT = 30
+        self.AT = 25
         self.UNV = 0
         self.NC = 0
         self.Delta = 0
@@ -469,19 +468,21 @@ class FullThreshold:
                         
     def db_para_intensidade(self,db, db_min=Constantes.dbMin, db_max=Constantes.dbMax, 
                         i_min=Colors.ERASE_INTENSITY, i_max=255):
+
             # Luminância do fundo no Humphrey (31.5 asb ≈ 10 cd/m²)
         L_fundo = 10  # cd/m²
 
-        # Calcula luminância relativa do estímulo no Humphrey
-        L_est = L_fundo * 10 ** (-db / 10)  # Luminância em cd/m²
+        # Luminância relativa do estímulo
+        L_est = L_fundo * 10 ** (-db / 10)
 
-        # Normaliza entre 0 e 1 para mapeamento ao monitor
-        norm_L = (L_est - 10**-4) / (L_fundo - 10**-4)  
+        # Ajuste da normalização para evitar achatamento
+        norm_L = (L_est - 10**-3) / (L_fundo - 10**-3)
 
-        # Converte para escala de intensidade de monitor (0-255 RGB)
-        intensity = i_min + (i_max - i_min) * norm_L
+        # **NOVO AJUSTE: Reduzi o fator de potência para dar mais peso aos valores altos de dB**
+        gamma = 0.5  # **Antes era 0.6, agora está mais próximo da curva real**
+        intensity = i_min + (i_max - i_min) * (norm_L ** gamma)
 
-        # Garante que o valor está no intervalo correto
+        # Garante que o valor está dentro do intervalo permitido
         intensity = np.clip(intensity, i_min, i_max)
 
         return intensity
