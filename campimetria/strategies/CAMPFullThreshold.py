@@ -121,11 +121,11 @@ class FullThreshold:
                 ponto.atenuacao = self.ponto_SE.atenuacao
             
             if abs(ponto.xg) == 3 and  abs(ponto.yg) == 3:
-                ponto.atenuacao -= 1
-            elif (abs(ponto.xg) == 9 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 3  or abs(ponto.xg) == 3 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 9  or abs(ponto.xg) == 3 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 3 and  abs(ponto.yg) == 21 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 21) :
                 ponto.atenuacao -= 2
+            elif (abs(ponto.xg) == 9 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 3  or abs(ponto.xg) == 3 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 9  or abs(ponto.xg) == 3 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 3 and  abs(ponto.yg) == 21 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 21) :
+                ponto.atenuacao -= 4
             elif (abs(ponto.xg) == 27 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 27 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 21 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 27 or abs(ponto.xg) == 3 and  abs(ponto.yg) == 27):
-                ponto.atenuacao -= 3
+                ponto.atenuacao -= 6
             
             self.pontos.append(ponto)
         self.total_pontos_exame = len(self.pontos)
@@ -537,7 +537,7 @@ class FullThreshold:
                     if self.primeiro == True:
                         self.primeiro = False
                         self.NC = 0
-                        self.UNV = 35
+                        self.UNV = Constantes.dbMax
                         self.Delta = self.Dbig
                         self.AT = self.AT + self.Delta
                         self.limiar_status = "-"
@@ -563,23 +563,23 @@ class FullThreshold:
                         return
 
             if self.AT > 40:
-                self.AT = 35
+                self.AT = Constantes.dbMax
         else:
             self.limiar = self.AT
             DadosExame.LimiarFoveal = self.limiar
             for ponto in self.ponto_quad:
-                ponto.atenuacao = self.limiar - Constantes.bigdelta
+                ponto.atenuacao = self.limiar
            
             self.limiarok = True  
             self.UV = 0
-            self.AT = 0
+            self.AT = 25
             #self.AT = 30
             self.UNV = 0
             self.NC = 0
             self.Delta = 0
             self.viu = 0
-            self.Dbig = 6
-            self.Dsmall = 3
+            self.Dbig = 3
+            self.Dsmall = 2
             self.limiar_status = ""
             self.limiar = 0
             self.primeiro = True
@@ -619,7 +619,7 @@ class FullThreshold:
                         self.ponto_quad[self.indice_atual].status = "="
                         return
 
-                    self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista = self.AT
+                    self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista = self.ponto_quad[self.indice_atual].atenuacao
                     if self.ponto_quad[self.indice_atual].primeira_visualizacao == True:
                         self.ponto_quad[self.indice_atual].primeira_visualizacao = False
                         self.ponto_quad[self.indice_atual].numero_cruzamentos = 0
@@ -649,7 +649,7 @@ class FullThreshold:
                     if self.ponto_quad[self.indice_atual].primeira_visualizacao == True:
                         self.ponto_quad[self.indice_atual].primeira_visualizacao = False
                         self.ponto_quad[self.indice_atual].numero_cruzamentos = 0
-                        self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista = 35
+                        self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista = Constantes.dbMax
                         self.ponto_quad[self.indice_atual].delta = self.Dbig
                         self.ponto_quad[self.indice_atual].atenuacao = self.ponto_quad[self.indice_atual].atenuacao + self.ponto_quad[self.indice_atual].delta
                         self.ponto_quad[self.indice_atual].status = "-"
@@ -675,7 +675,7 @@ class FullThreshold:
                         return
 
             if self.ponto_quad[self.indice_atual].atenuacao > 40:
-                self.ponto_quad[self.indice_atual].atenuacao = 35
+                self.ponto_quad[self.indice_atual].atenuacao = Constantes.dbMax
         else:       
             for ponto in self.ponto_quad:
                 if ponto == self.ponto_NE:                    
@@ -686,15 +686,17 @@ class FullThreshold:
                     self.ponto_SO.atenuacao = ponto.atenuacao   
                     
                 if ponto == self.ponto_SE:                    
-                    self.ponto_SE.atenuacao = ponto.atenuacao   
+                    self.ponto_SE.atenuacao = ponto.atenuacao    
                     
                 if ponto == self.ponto_NO:                    
                     self.ponto_NO.atenuacao = ponto.atenuacao   
+      
                     
                     
             self.criar_pontos()
-            self.indice_atual = 0          
-            self.estado = "exame"
+            self.indice_atual = 0   
+            DadosExame.matriz_pontos = self.pontos       
+            self.estado = "resultado"
 
             
                 
