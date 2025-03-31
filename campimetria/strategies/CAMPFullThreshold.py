@@ -98,7 +98,7 @@ class FullThreshold:
         self.ponto_NO = Ponto(9,9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)
         self.ponto_SE = Ponto(9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)
         self.ponto_SO = Ponto(-9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)   
-        self.ponto_quad = {"NE":self.ponto_NE,"NO":self.ponto_NO,"SE":self.ponto_SE,"SO":self.ponto_SO}
+        self.ponto_quad = [self.ponto_NE,self.ponto_NO,self.ponto_SE,self.ponto_SO]
         random.shuffle(self.ponto_quad)
         
         
@@ -109,16 +109,16 @@ class FullThreshold:
         for x,y in cordenadas_30:
             ponto = Ponto(x, y,tamanhoPonto = DadosExame.tamanho_estimulo, cor = (255, 255, 255), distancia = DadosExame.distancia_paciente)
             if x < 0 and y > 0:
-                ponto.atenuacao = self.ponto_quad.get("NO").atenuacao               
-                                    
+                ponto.atenuacao = self.ponto_NO.atenuacao               
+        
             elif x > 0 and y > 0:
-                ponto.atenuacao = self.ponto_quad.get("NE").atenuacao
+                ponto.atenuacao = self.ponto_NE.atenuacao
         
             elif x < 0 and y < 0:
-                ponto.atenuacao = self.ponto_quad.get("SO").atenuacao
+                ponto.atenuacao = self.ponto_SO.atenuacao
         
             else:
-                ponto.atenuacao = self.ponto_quad.get("SE").atenuacao
+                ponto.atenuacao = self.ponto_SE.atenuacao
             
             if abs(ponto.xg) == 3 and  abs(ponto.yg) == 3:
                 ponto.atenuacao -= 2
@@ -249,6 +249,7 @@ class FullThreshold:
     def update(self):
         self.menu.fixacao = "diamante" if self.estado == "limiar_foveal"  else "central"
         print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {self.pontos_fechados},  total de pontos: {self.total_pontos_exame}, limiar foveal: {DadosExame.LimiarFoveal}")
+        print(f"pontoNO:{self.ponto_NO.atenuacao}  pontoNE:{self.ponto_NE.atenuacao} pontoSO: {self.ponto_SO.atenuacao} pontoSE:{self.ponto_SE.atenuacao}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
             from select_eye_screen import SelectEyeScreen
@@ -674,7 +675,22 @@ class FullThreshold:
 
             if self.ponto_quad[self.indice_atual].atenuacao > 40:
                 self.ponto_quad[self.indice_atual].atenuacao = 35
-        else:                      
+        else:       
+            for ponto in self.ponto_quad:
+                if ponto == self.ponto_NE:                    
+                    self.ponto_NE.atenuacao = ponto.atenuacao  
+                    print("é o mesmo ponto!!!") 
+                
+                if ponto == self.ponto_SO:                    
+                    self.ponto_SO.atenuacao = ponto.atenuacao   
+                    
+                if ponto == self.ponto_SE:                    
+                    self.ponto_SE.atenuacao = ponto.atenuacao   
+                    
+                if ponto == self.ponto_NO:                    
+                    self.ponto_NO.atenuacao = ponto.atenuacao   
+                    
+                    
             self.criar_pontos()
             self.indice_atual = 0          
             self.estado = "exame"
