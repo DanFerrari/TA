@@ -689,14 +689,12 @@ class FullThreshold:
                     self.ponto_SE.atenuacao = ponto.atenuacao    
                     
                 if ponto == self.ponto_NO:                    
-                    self.ponto_NO.atenuacao = ponto.atenuacao   
-      
+                    self.ponto_NO.atenuacao = ponto.atenuacao       
                     
                     
             self.criar_pontos()
-            self.indice_atual = 0   
-            DadosExame.matriz_pontos = self.pontos       
-            self.estado = "resultado"
+            self.indice_atual = 0         
+            self.estado = "exame"
 
             
                 
