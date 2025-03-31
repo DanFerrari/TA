@@ -18,10 +18,10 @@ from dados import *
 class FixacaoDiamante:
     @staticmethod
     def plotar_fixacao_diamante():
-        Ponto(0, 6, 3,(240,240,174), distancia=DadosExame.distancia_paciente).plotarPonto()
-        Ponto(0, -6, 3, (240,240,174),distancia=DadosExame.distancia_paciente).plotarPonto()
-        Ponto(6, 0, 3, (240,240,174),distancia=DadosExame.distancia_paciente).plotarPonto()
-        Ponto(-6, 0, 3, (240,240,174),distancia=DadosExame.distancia_paciente).plotarPonto()
+        Ponto(0, 6, 3, Colors.YELLOW_SIGHT, distancia=DadosExame.distancia_paciente).plotarPonto()
+        Ponto(0, -6, 3,  Colors.YELLOW_SIGHT,distancia=DadosExame.distancia_paciente).plotarPonto()
+        Ponto(6, 0, 3,  Colors.YELLOW_SIGHT,distancia=DadosExame.distancia_paciente).plotarPonto()
+        Ponto(-6, 0, 3,  Colors.YELLOW_SIGHT,distancia=DadosExame.distancia_paciente).plotarPonto()
         
         
         

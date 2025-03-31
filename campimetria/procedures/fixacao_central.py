@@ -18,4 +18,4 @@ from dados import *
 class FixacaoCentral:
     @staticmethod   
     def plotar_fixacao_central():
-        Ponto(0, 0, 3, (240,240,174),DadosExame.distancia_paciente).plotarPonto()
+        Ponto(0, 0, 3, Colors.YELLOW_SIGHT,DadosExame.distancia_paciente).plotarPonto()

@@ -8,7 +8,7 @@ import pygame
 
 class Constantes:
     dbMin = 0
-    dbMax = 35
+    dbMax = 40
     bigdelta = 6
     smalldelta = 3
     screening = "screening"
@@ -20,6 +20,7 @@ class Constantes:
 class Colors:
 
     ERASE_INTENSITY = 120
+    YELLOW_SIGHT = (251,244,19)
     BACKGROUND = (ERASE_INTENSITY, ERASE_INTENSITY, ERASE_INTENSITY)
     DEFAULT = (53, 43, 54)
     WHITE = (255,255,255)
