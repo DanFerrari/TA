@@ -34,7 +34,7 @@ class Ponto:
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
-        self.atenuacao = 0
+        self.atenuacao = 25
         self.primeira_visualizacao = True
         self.response_received = False
         self.numero_cruzamentos = 0
@@ -95,7 +95,7 @@ class Ponto:
         return raio_ponto
 
     @staticmethod
-    def db_para_intensidade(db, db_min=40, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
+    def db_para_intensidade(db, db_min=Constantes.dbMax, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
         """Converte dB para intensidade de cor (escala logarítmica)."""
         norm_db = (db - db_min) / (db_max - db_min)  # Normaliza dB entre 0 e 1
 
@@ -105,7 +105,8 @@ class Ponto:
             intensity = 255
         elif intensity < i_min:
             intensity = i_min
-        cor = int(round(intensity))
+        #cor = int(round(intensity))
+        cor = intensity
         return (cor, cor, cor)
 
     def plotarPonto(self):
@@ -185,17 +186,18 @@ class Ponto:
                         self.tempo_resposta = (
                             pygame.time.get_ticks() - trial_start_time
                         ) / 1000                 
-                        self.response_received = True                       
+                        self.response_received = True 
+                        pygame.time.delay(400)                       
                         return menu_pressionado
 
-            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-                self.tempo_resposta = (
-                    pygame.time.get_ticks() - trial_start_time
-                ) / 1000  
-                self.response_received = True 
-                self.apagarPonto()  
-                pygame.time.delay(400)              
-                return menu_pressionado
+            # if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+            #     self.tempo_resposta = (
+            #         pygame.time.get_ticks() - trial_start_time
+            #     ) / 1000  
+            #     self.response_received = True 
+            #     self.apagarPonto()  
+            #     pygame.time.delay(400)              
+            #     return menu_pressionado
 
             if not self.response_received:
                 self.tempo_resposta = 2

@@ -41,8 +41,8 @@ class FullThreshold:
         self.NC = 0
         self.Delta = 0
         self.viu = 0
-        self.Dbig = 6
-        self.Dsmall = 3
+        self.Dbig = 3
+        self.Dsmall = 2
         self.limiarok = False
         self.limiar_status = ""
         self.limiar = 0
@@ -233,9 +233,9 @@ class FullThreshold:
         if not continua:
             return
         if teste.response_received:
-            return 1.0
+            return 1
         else:
-            return 0.0
+            return 0
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
         tempo_medio = sum(tempos) / len(tempos)
@@ -248,7 +248,7 @@ class FullThreshold:
 
     def update(self):
         self.menu.fixacao = "diamante" if self.estado == "limiar_foveal"  else "central"
-        print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {self.pontos_fechados},  total de pontos: {self.total_pontos_exame}")
+        print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {self.pontos_fechados},  total de pontos: {self.total_pontos_exame}, limiar foveal: {DadosExame.LimiarFoveal}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
             from select_eye_screen import SelectEyeScreen
@@ -371,7 +371,7 @@ class FullThreshold:
             self.testa_quadrante() 
             
         elif self.estado == "exame":
-            print(f"limiar foveal: {DadosExame.LimiarFoveal}")
+            
             self.indice_atual += 1
             if self.indice_atual >= len(self.pontos):
                 self.indice_atual = 0
@@ -464,7 +464,7 @@ class FullThreshold:
             
         
                         
-    def db_para_intensidade(self,db, db_min=40, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
+    def db_para_intensidade(self,db, db_min=Constantes.dbMax, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
         """Converte dB para intensidade de cor (escala logarítmica)."""
         norm_db = (db - db_min) / (db_max - db_min)  # Normaliza dB entre 0 e 1
 
@@ -475,8 +475,8 @@ class FullThreshold:
         elif intensity < i_min:
             intensity = i_min
 
-        return int(round(intensity))
-        # return 110 + (255 - 110) * ((10**(db / 40) - 1) / (10**(1) - 1))
+        #return int(round(intensity))
+        return (intensity)
 
     def iniciar_teste_limiar_foveal(self):        
         
@@ -564,7 +564,7 @@ class FullThreshold:
         else:
             self.limiar = self.AT
             DadosExame.LimiarFoveal = self.limiar
-            print(f"Limiar Foveal: {self.limiar} dB")
+           
             self.limiarok = True  
             self.UV = 0
             self.AT = 0
