@@ -34,7 +34,7 @@ class Ponto:
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
-        self.atenuacao = 25
+        self.atenuacao = 0
         self.primeira_visualizacao = True
         self.response_received = False
         self.numero_cruzamentos = 0
@@ -95,7 +95,7 @@ class Ponto:
         return raio_ponto
 
     @staticmethod
-    def db_para_intensidade(db, db_min=40, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
+    def db_para_intensidade(db, db_min=38, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
         """Converte dB para intensidade de cor (escala logarítmica)."""
         norm_db = (db - db_min) / (db_max - db_min)  # Normaliza dB entre 0 e 1
 
