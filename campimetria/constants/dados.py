@@ -8,9 +8,9 @@ import pygame
 
 class Constantes:
     dbMin = 0
-    dbMax = 38
-    bigdelta = 6
-    smalldelta = 3
+    dbMax = 35
+    bigdelta = 3
+    smalldelta = 2
     screening = "screening"
     fullthreshold = "fullthreshold"
     olho_direito = "OD"
@@ -19,7 +19,7 @@ class Constantes:
 
 class Colors:
 
-    ERASE_INTENSITY = 120
+    ERASE_INTENSITY = 123
     YELLOW_SIGHT = (251,244,19)
     BACKGROUND = (ERASE_INTENSITY, ERASE_INTENSITY, ERASE_INTENSITY)
     DEFAULT = (53, 43, 54)
