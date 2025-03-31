@@ -98,9 +98,9 @@ class Screening:
         if not continua:
             return
         if teste.response_received:
-            return 1.0
+            return 1
         else:
-            return 0.0
+            return 0
 
     def handle_events(self, events):
         for event in events:
@@ -231,7 +231,7 @@ class Screening:
                 if self.pontos[self.indice_atual].response_received:
                     self.pontos_vistos.append(self.pontos[self.indice_atual])
                     self.pontos[self.indice_atual].limiar_encontrado = True
-                self.tempos.append(self.pontos[self.indice_atual].tempo_resposta)
+                    self.tempos.append(self.pontos[self.indice_atual].tempo_resposta)
                 self.testemancha += 1
                 self.testenegativo += 1
                 self.testepositivo += 1

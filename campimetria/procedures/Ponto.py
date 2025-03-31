@@ -34,7 +34,7 @@ class Ponto:
         # self.resolucaoX = 0.246875
         # self.resolucaoY = 0.250
         self.limiar_encontrado = False
-        self.atenuacao = 25
+        self.atenuacao = 28
         self.primeira_visualizacao = True
         self.response_received = False
         self.numero_cruzamentos = 0
@@ -190,17 +190,17 @@ class Ponto:
                         pygame.time.delay(400)                       
                         return menu_pressionado
 
-            # if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-            #     self.tempo_resposta = (
-            #         pygame.time.get_ticks() - trial_start_time
-            #     ) / 1000  
-            #     self.response_received = True 
-            #     self.apagarPonto()  
-            #     pygame.time.delay(400)              
-            #     return menu_pressionado
+            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+                self.tempo_resposta = (
+                    pygame.time.get_ticks() - trial_start_time
+                ) / 1000  
+                self.response_received = True 
+                self.apagarPonto()  
+                pygame.time.delay(400)              
+                return menu_pressionado
 
             if not self.response_received:
-                self.tempo_resposta = 2
+                
                 self.response_received = False
                 
             self.clock.tick(60)

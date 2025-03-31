@@ -8,7 +8,7 @@ import pygame
 
 class Constantes:
     dbMin = 0
-    dbMax = 38
+    dbMax = 35
     bigdelta = 6
     smalldelta = 3
     screening = "screening"

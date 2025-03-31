@@ -100,7 +100,7 @@ class FullThreshold:
         self.ponto_SO = Ponto(-9,-9,DadosExame.tamanho_estimulo,(0,0,0),DadosExame.distancia_paciente)   
         self.ponto_quad = [self.ponto_NE,self.ponto_NO,self.ponto_SE,self.ponto_SO]
         random.shuffle(self.ponto_quad)
-
+        
         
         
         self.tecla_menu_pressionada = False
@@ -388,6 +388,8 @@ class FullThreshold:
                         return            
                     if ponto.response_received:
                         self.pontos_vistos.append(ponto)
+                        self.tempos.append(ponto.tempo_resposta)
+
                         paciente_viu = 2
                     else:
                         paciente_viu = 1
@@ -398,7 +400,6 @@ class FullThreshold:
                         
                     
                         
-                    self.tempos.append(ponto.tempo_resposta)
                     if self.testemancha == 70 and self.teste_fixacao:
                         print("testando mancha cega...")
                         self.perda_de_fixacao += self.testa_mancha_cega(
@@ -564,6 +565,8 @@ class FullThreshold:
         else:
             self.limiar = self.AT
             DadosExame.LimiarFoveal = self.limiar
+            for ponto in self.ponto_quad:
+                ponto.atenuacao = self.limiar - Constantes.bigdelta
            
             self.limiarok = True  
             self.UV = 0
