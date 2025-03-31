@@ -123,9 +123,9 @@ class FullThreshold:
             if abs(ponto.xg) == 3 and  abs(ponto.yg) == 3:
                 ponto.atenuacao -= 2
             elif (abs(ponto.xg) == 9 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 3  or abs(ponto.xg) == 3 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 9  or abs(ponto.xg) == 3 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 3 and  abs(ponto.yg) == 21 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 21) :
-                ponto.atenuacao -= 4
+                ponto.atenuacao -= 3
             elif (abs(ponto.xg) == 27 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 27 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 21 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 27 or abs(ponto.xg) == 3 and  abs(ponto.yg) == 27):
-                ponto.atenuacao -= 6
+                ponto.atenuacao -= 4
             
             self.pontos.append(ponto)
         self.total_pontos_exame = len(self.pontos)
