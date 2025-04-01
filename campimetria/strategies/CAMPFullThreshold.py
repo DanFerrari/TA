@@ -477,14 +477,14 @@ class FullThreshold:
         L_est = L_fundo * 10 ** (-db / 10)
 
         # Normalização para a escala do monitor
-        L_min = L_fundo * 10 ** (-db_max / 12)  # Luminância para 40 dB (ponto mais fraco)
+        L_min = L_fundo * 10 ** (-db_max / 10)  # Luminância para 40 dB (ponto mais fraco)
         L_max = L_fundo * 10 ** (-db_min / 10)  # Luminância para 0 dB (ponto mais forte)
 
         # Normaliza para um valor entre 0 e 1
         norm_L = (L_est - L_min) / (L_max - L_min)
 
         # Ajuste da curva para respeitar a percepção humana
-        gamma = 0.38  # Ajuste baseado na curva de resposta do olho humano
+        gamma = 0.62  # Ajuste baseado na curva de resposta do olho humano
 
         # Calcula a intensidade final
         intensity = i_min + (i_max - i_min) * (norm_L ** gamma)
