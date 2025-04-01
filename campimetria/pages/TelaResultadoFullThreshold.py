@@ -464,11 +464,11 @@ class ResultadoFullthreshold:
             # Renderiza a label
             color_label_info = (0, 0, 0)
             if (
-                i == 3
+                i == 4
                 and DadosExame.falso_positivo_respondidos_percentual > 33
-                or i == 4
-                and DadosExame.falso_negativo_respondidos_percentual > 33
                 or i == 5
+                and DadosExame.falso_negativo_respondidos_percentual > 33
+                or i == 6
                 and perda_fixacao > 33
             ):
                 color_label_info = pygame.Color("red")

@@ -50,6 +50,7 @@ class ResultadoScreening:
 
         labels = [
             f"Exame: {DadosExame.exame_selecionado.upper()}",
+            f"Olho: {DadosExame.olho}",
             f"Duração (min): {int(minutos)}:{int(segundos)}",
             f"Total de pontos: {DadosExame.total_de_pontos_testados}",
             f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
@@ -69,11 +70,11 @@ class ResultadoScreening:
             # Renderiza a label
             color_label_info = (0, 0, 0)
             if (
-                i == 3
+                i == 4
                 and DadosExame.falso_positivo_respondidos_percentual > 33
-                or i == 4
-                and DadosExame.falso_negativo_respondidos_percentual > 33
                 or i == 5
+                and DadosExame.falso_negativo_respondidos_percentual > 33
+                or i == 6
                 and perda_fixacao > 33
             ):
                 color_label_info = pygame.Color("red")
