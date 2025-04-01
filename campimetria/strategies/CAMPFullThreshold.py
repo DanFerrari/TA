@@ -466,20 +466,22 @@ class FullThreshold:
             
         
                         
-    def db_para_intensidade(self,db, db_min=Constantes.dbMin, db_max=Constantes.dbMax, 
-                        i_min=Colors.ERASE_INTENSITY, i_max=255):
-        """Converte dB para intensidade de cor (escala logarítmica corrigida)."""
-        
-        # Normaliza dB corretamente (invertendo a escala)
-        norm_db = (db_max - db) / (db_max - db_min)  # Agora 40dB → intensidade mínima e 0dB → máxima
-        
-        # Conversão logarítmica ajustada
-        intensity = i_min + (i_max - i_min) * (10 ** (norm_db * (-1)) - 1) / (10 ** (-1) - 1)
+    def db_para_intensidade(self,db, db_min=Constantes.dbMax, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
+        """Converte dB para intensidade de cor (escala logarítmica)."""
+        norm_db = (db - db_min) / (db_max - db_min)  # Normaliza dB entre 0 e 1
 
-        # Garante que intensidade fique no intervalo correto
-        intensity = max(i_min, min(255, intensity))
+        intensity = i_min + (i_max - i_min) * ((10 ** (norm_db) - 1) / (10**1 - 1))
+
+        if intensity > 255:
+            intensity = 255
+        elif intensity < i_min:
+            intensity = i_min
+
+        #return int(round(intensity))
+        return (intensity)
+
         
-        return intensity
+        
     def iniciar_teste_limiar_foveal(self):        
         
         if self.limiar_status != "=":
