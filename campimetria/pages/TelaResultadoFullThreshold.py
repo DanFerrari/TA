@@ -456,7 +456,7 @@ class ResultadoFullthreshold:
         # Posição inicial para desenhar labels (quadrante direito)
         pos_x = 1165  # 75% da largura (centro do quadrante direito)
         pos_y = 92  # Começa no meio da tela
-        espacamento = 50  # Espaço entre as labels
+        espacamento = 80  # Espaço entre as labels
         fonte = pygame.font.Font(None, 30)
         color_label_info = (0, 0, 0)
 
