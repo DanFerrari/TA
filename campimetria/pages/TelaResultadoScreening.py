@@ -249,9 +249,10 @@ class ResultadoScreening:
                         config["distancia_paciente"] = DadosExame.distancia_paciente
                         config["tamanho_estimulo"] = DadosExame.tamanho_estimulo                        
                         ResultadoScreening.salvar_config(config,CONFIG_FILE)
-                        pdf = GerarPdf()      
-                        caminho_pdf = f"/media/orangepi/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
-                        caminho_pendrive = f"/media/orangepi/EXAMES/"
+                        pdf = GerarPdf()  
+                        pdf.verifica_e_monta_pendrive()    
+                        caminho_pdf = f"/media/eyetec/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
+                        caminho_pendrive = f"/media/eyetec/EXAMES/"
                         if os.path.exists(caminho_pendrive):
                             pdf.gerar_relatorio(caminho_pdf)
                             fonte = pygame.font.Font(None, 68)
@@ -263,7 +264,7 @@ class ResultadoScreening:
                             visualizando = False
                             pygame.time.delay(5000)
                         else:
-                            fonte = pygame.font.Font(None, 68)
+                            fonte = pygame.font.Font(None, 68)                            
                             text_info_pdf = fonte.render("ERRO AO GERAR PDF, VERIFIQUE SEU PENDRIVE!",True,(0,0,0))                          
                             text_info_pdf_pos = text_info_pdf.get_rect()
                             text_info_pdf_pos.center = (1920//2,1080//2)

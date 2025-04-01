@@ -2,6 +2,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors  # Importa cores
 import pygame, os, sys, math
+import subprocess
 
 
 
@@ -32,7 +33,12 @@ class GerarPdf():
         pygame.image.save(surface, arquivo_saida)  # Salva o novo ícone
 
 
-
+ 
+    def verifica_e_monta_pendrive(self):
+        caminho_verifica = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "procedures","monta_pendrive.sh")
+    )
+        subprocess.run(['bash',caminho_verifica])
     def capturar_parte_tela(self,x, y, largura, altura, nome_arquivo):
         tela = pygame.display.get_surface()  # Obtém a tela atual
         recorte = pygame.Surface((largura, altura))  # Cria uma superfície do tamanho desejado

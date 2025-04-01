@@ -1,5 +1,6 @@
 import pygame, random, time, os, sys, math,json
 import numpy as np
+
 from scipy.spatial import KDTree
 
 
@@ -541,6 +542,9 @@ class ResultadoFullthreshold:
             json.dump(config, f, indent=4)
 
 
+   
+
+
 
 
     @staticmethod
@@ -606,9 +610,10 @@ class ResultadoFullthreshold:
                         config["tamanho_estimulo"] = DadosExame.tamanho_estimulo                        
                         ResultadoFullthreshold.salvar_config(config,CONFIG_FILE)
                         pdf = GerarPdf()
+                        pdf.verifica_e_monta_pendrive()
                         
-                        caminho_pdf = f"/media/orangepi/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
-                        caminho_pendrive = f"/media/orangepi/EXAMES/"
+                        caminho_pdf = f"/media/eyetec/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
+                        caminho_pendrive = f"/media/eyetec/EXAMES/"
                         if os.path.exists(caminho_pendrive):
                             pdf.gerar_relatorio(caminho_pdf)
                             fonte = pygame.font.Font(None, 45)
