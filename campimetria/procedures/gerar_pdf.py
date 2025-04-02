@@ -36,7 +36,7 @@ class GerarPdf():
  
     def verifica_e_monta_pendrive(self):
         caminho_verifica = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "procedures","monta_pendrive.sh")
+        os.path.join(os.path.dirname(__file__), "..", "scripts","monta_pendrive.sh")
     )
         subprocess.run(['bash',caminho_verifica])
     def capturar_parte_tela(self,x, y, largura, altura, nome_arquivo):

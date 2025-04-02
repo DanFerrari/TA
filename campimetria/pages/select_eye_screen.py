@@ -43,7 +43,7 @@ class SelectEyeScreen:
         self.numero = 25
         self.NUMERO_MIN = 0
         self.NUMERO_MAX = 40
-        self.faixa_etaria = {1:"0 - 20", 2:"21 - 30", 3:"31 - 40", 4:"41 - 50", 5:"51 - 60", 6:"61 - 70", 7:"71 - 80"}
+        self.faixa_etaria = {1:"0 - 20", 2:"21 - 30", 3:"31 - 40", 4:"41 - 50", 5:"51 - 60", 6:"61 - 70", 7:"71 - 80",8:"81 - 90",9:"ACIMA 90"}
         self.escolha_faixa = 1
         
         #estimulo
