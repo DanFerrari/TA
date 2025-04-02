@@ -569,7 +569,7 @@ class FullThreshold:
             self.limiar = self.AT
             DadosExame.LimiarFoveal = self.limiar
             for ponto in self.ponto_quad:
-                ponto.atenuacao = self.limiar
+                ponto.atenuacao = self.limiar - 10
            
             self.limiarok = True  
             self.UV = 0

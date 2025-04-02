@@ -1,5 +1,8 @@
 import pygame, random, time, os, sys, math,json
 import numpy as np
+import matplotlib.pyplot as plt 
+ 
+
 
 from scipy.spatial import KDTree
 
@@ -14,10 +17,16 @@ sys.path.append(
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "strategies"))
 )
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants","base"))
+)
 
 from dados import *
 from Ponto import Ponto
 from gerar_pdf import GerarPdf
+from atenuacoes_base import atenuacoes_base
+from atenuacao_daniel import atenuacao_daniel
+
 
 
 
@@ -414,6 +423,82 @@ class ResultadoFullthreshold:
             (480, 810 - 230),
             1,
         )
+        
+        
+        
+    @staticmethod
+    def desenha_mapa_base_limiar():
+        DadosExame.matriz_pontos = [Ponto(x,y,tamanhoPonto = 3,cor = (0,0,0), distancia = 100) for x,y in cordenadas_30]
+        lista_base_atenuacao = []    
+        match DadosExame.faixa_etaria:
+            case 1:
+                from idade_0_20 import lista_valores
+                lista_base_atenuacao = lista_valores
+            case 2:
+                from idade_21_30 import lista_valores
+                lista_base_atenuacao = lista_valores
+            case 3:
+                from idade_31_40 import lista_valores
+                lista_base_atenuacao = lista_valores
+            case 4:
+                from idade_41_50 import lista_valores
+                lista_base_atenuacao = lista_valores
+            case 5:
+                from idade_51_60 import lista_valores
+                lista_base_atenuacao = lista_valores
+            case 6:
+                from idade_61_70 import lista_valores
+                lista_base_atenuacao = lista_valores
+            case 7:
+                from idade_71_80 import lista_valores
+                lista_base_atenuacao = lista_valores
+            case 8:
+                from idade_81_90 import lista_valores
+                lista_base_atenuacao = lista_valores
+            case 9:
+                from idade_90 import lista_valores
+                lista_base_atenuacao = lista_valores
+        
+        
+        y = []
+        for i, (posicao, atenuacao) in enumerate(atenuacoes_base.items()):
+            atenuacoes_base[posicao] = int(lista_base_atenuacao[i])
+            xg, yg = posicao
+            for ponto in DadosExame.matriz_pontos:
+                if ponto.xg == xg and ponto.yg == yg:
+                    ponto.atenuacao = atenuacao_daniel[posicao] - atenuacoes_base[posicao]
+                    y.append(ponto.atenuacao)
+                if ponto.xg == 15 and ponto.yg == 3 or ponto.xg == 15 and ponto.yg == -3:
+                    continue
+
+        y.sort(reverse=True)
+        print(len(y))
+
+        # Generate additional data for the new lines
+        y2 = np.sort(np.linspace(-12,-6,76))[::-1]
+        y3 = np.sort(np.linspace(-6,0,76))[::-1]
+        y4 = np.sort(np.linspace(0,6,76))[::-1]
+        
+        plt.style.use('_mpl-gallery')
+        # plot
+        fig, ax = plt.subplots()
+
+        # Define colors for each line
+        colors = ['red', 'blue', 'green', 'black']
+
+        ax.stairs(y, linewidth=2.5, label="Line 1", color=colors[3])
+        ax.stairs(y2, linewidth=2.5, label="Line 2", color=colors[1])
+        ax.stairs(y3, linewidth=2.5, label="Line 3", color=colors[2])
+        ax.stairs(y4, linewidth=2.5, label="Line 4", color=colors[0])
+
+        ax.set(xlim=(1, 76), xticks=np.arange(1, 76),
+               ylim=(-5,25), yticks=np.arange(-5,25))
+
+        ax.legend()  # Add a legend to differentiate the lines
+
+        plt.show()
+
+        
 
     @staticmethod
     def desenha_legendas_exame():
@@ -645,10 +730,19 @@ class ResultadoFullthreshold:
 
 if __name__ == "__main__":
     from cordenadas_30 import cordenadas_30
-    from atenuacoes_personalizadas import atenuacoes_personalizadas
+
     pygame.init()
     pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-    DadosExame.matriz_pontos = [Ponto(x,y,tamanhoPonto = 3,cor = (0,0,0), distancia = 100) for x,y in cordenadas_30]
-    for ponto in DadosExame.matriz_pontos:
-        ponto.atenuacao = atenuacoes_personalizadas.get((ponto.xg,ponto.yg))
-    ResultadoFullthreshold.exibir_resultados()
+    
+    pygame.display.get_surface().fill((255,255,255))
+    pygame.display.update()
+    ResultadoFullthreshold.desenha_mapa_base_limiar()
+    visualizando = True
+    while visualizando:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    visualizando = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_j:  # Mover para cima
+                        pygame.quit()
+    

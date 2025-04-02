@@ -38,9 +38,9 @@ class Fonts:
 
 
 class DadosExame:
-    #  faixa_etaria =>  1:"0 - 20", 2:"21 - 30", 3:"31 - 40", 4:"41 - 50", 5:"51 - 60", 6:"61 - 70", 7:"71 - 80"
+    #  faixa_etaria =>  1:"0 - 20", 2:"21 - 30", 3:"31 - 40", 4:"41 - 50", 5:"51 - 60", 6:"61 - 70", 7:"71 - 80" 8: "81 - 90", 9: " > 90"  
     exame_id = 0
-    faixa_etaria = 0
+    faixa_etaria = 5
     distancia_paciente = 200
     tamanho_estimulo = 3
     olho = ""
@@ -55,7 +55,7 @@ class DadosExame:
     gExame = []
     LimiarFoveal = 0
     total_pontos_definidos = 0
-    matriz_pontos = []
+    matriz_pontos = []    
     total_de_pontos_testados = 0
     posicao_mancha_cega = (0, 0)
     perda_de_fixacao = 0.0

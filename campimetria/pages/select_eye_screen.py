@@ -140,7 +140,7 @@ class SelectEyeScreen:
                             self.escolha_faixa -= 1                        
                     elif event.key == pygame.K_RIGHT and self.numero < self.NUMERO_MAX:
                         self.numero += 1
-                        if self.escolha_faixa < 7:
+                        if self.escolha_faixa < 9:
                             self.escolha_faixa += 1
                 
                 elif self.selecao_atual == "distancia":

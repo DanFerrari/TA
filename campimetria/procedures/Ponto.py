@@ -46,7 +46,7 @@ class Ponto:
         self.tamanhoPonto = tamanhoPonto
         self.raio_ponto = self.calcula_tamanho_do_ponto()
         self.xg = xg
-        self.yg = yg
+        self.yg = yg 
         self.resolucaoX = 0.25
         self.resolucaoY = 0.25
         self.resolucao_video = 0.2599
@@ -62,7 +62,7 @@ class Ponto:
         self.surface = pygame.display.get_surface()
         self.xrad = math.radians(self.xg)
         self.xmm = self.distanciaPacienteTela * math.tan(self.xrad)
-        self.yrad = math.radians(self.yg)
+        self.yrad = math.radians(self.yg * -1)
         self.ymm = self.distanciaPacienteTela * math.tan(self.yrad)
         self.pontoPix = self.raio_ponto / self.resolucao_video
         # Converte para pixels
@@ -70,6 +70,7 @@ class Ponto:
         self.y = self.ymm / self.resolucaoY
         self.x = self.x + (self.screen_width / 2)
         self.y = self.y + (self.screen_height / 2)
+        
 
     def calcula_tamanho_do_ponto(self):
         grau = 0
@@ -112,6 +113,14 @@ class Ponto:
 
     def plotarPonto(self):
         pygame.draw.circle(self.surface, self.cor, (self.x, self.y), self.pontoPix)
+        
+    def plotaString(self,atenuacao):
+        fonte = pygame.font.FontType(None,24)
+        texto = fonte.render(f"{atenuacao}",True,(0,0,0))
+        pos = texto.get_rect()
+        pos.center = (self.x,self.y)
+        pygame.display.get_surface().blit(texto,pos)
+        pygame.display.update()
 
     @staticmethod
     def plotarPontoStatic(xg, yg, tamanhoPonto, cor):
