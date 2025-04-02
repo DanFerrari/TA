@@ -1,22 +1,28 @@
-#!/bin/bash
+#!/usr/bin/bash
+#sudo su
 
-MOUNT_POINT="/media/eyetec"
+
+MOUNT_POINT="/media/eyetec/EXAMES"
 TARGET_LABEL="EXAMES"
 
-# Obtém o nome do dispositivo (e.g., /dev/sdb1)
-DEVICE=$1
+# Procura pelo dispositivo baseado no rótulo
+DEVICE="/dev/disk/by-label/$TARGET_LABEL"
 
-# Obtém o rótulo (label) do sistema de arquivos
-DEVICE_LABEL=$(blkid -o value -s LABEL "$DEVICE")
+# Verifica se o dispositivo existe
+if [ -e "$DEVICE" ]; then
+    echo "Dispositivo encontrado: $DEVICE"
 
-# Verifica se o rótulo corresponde ao desejado
-if [ "$DEVICE_LABEL" == "$TARGET_LABEL" ]; then
     # Cria o ponto de montagem, se não existir
-    [ ! -d "$MOUNT_POINT" ] && mkdir -p "$MOUNT_POINT"
+    [ ! -d "$MOUNT_POINT" ] && sudo mkdir -p "$MOUNT_POINT"
 
     # Monta o dispositivo
-    mount "$DEVICE" "$MOUNT_POINT"
-    echo "Dispositivo montado em $MOUNT_POINT"
+    sudo mount "$DEVICE" "$MOUNT_POINT"
+
+    if [ $? -eq 0 ]; then
+        echo "Dispositivo montado com sucesso em $MOUNT_POINT!"
+    else
+        echo "Erro ao montar o dispositivo."
+    fi
 else
-    echo "O dispositivo não possui o rótulo esperado."
+    echo "Erro: Nenhum dispositivo com o rótulo '$TARGET_LABEL' encontrado."
 fi

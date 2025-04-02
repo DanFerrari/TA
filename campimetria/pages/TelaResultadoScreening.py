@@ -271,6 +271,11 @@ class ResultadoScreening:
                             pygame.display.get_surface().blit(text_info_pdf,text_info_pdf_pos)
                             pygame.display.update()
                             pygame.time.delay(5000)
+                            rect_dash = text_info_pdf.get_rect()
+                            rect_dash.center = text_info_pdf_pos.center
+                            pygame.draw.rect(pygame.display.get_surface(),pygame.Color("white"),rect_dash)
+                            pygame.display.update()
+                            
                             
                             
                         
