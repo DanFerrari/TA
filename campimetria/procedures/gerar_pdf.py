@@ -63,6 +63,7 @@ class GerarPdf():
         
         minutos,segundos = divmod((DadosExame.duracao_do_exame / 1000),60)
         
+        DadosExame.exame_selecionado = Constantes.fullthreshold
         c.setFont("Helvetica-Bold", 10)
         c.drawString(26,altura - 38, f"Central 30°")
         c.drawString(226, altura - 38, f"Exame: {(DadosExame.exame_selecionado).upper()}")  
@@ -92,13 +93,17 @@ class GerarPdf():
         self.capturar_parte_tela(0, 540, 960, 540, caminho_imagem_limiares)
         caminho_imagem_logo = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","logo_branco.png"))
         
-
-
+        caminho_imagem_curva_bebie = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","bebie_curve.png"))
+        caminho_image_desvio_padrao = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","desvio_padrao.png"))
+        caminho_image_desvio_total = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","desvio_total.png"))
         
-        c.drawImage(caminho_imagem_pontos, largura / 2 - nova_altura,379, width=nova_largura, height=nova_altura)
-        c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura,109, width=nova_largura, height=nova_altura)
+        c.drawImage(caminho_imagem_pontos, largura / 2 - nova_altura + 150,390, width=nova_largura, height=nova_altura)
+        c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura -150,390, width=nova_largura, height=nova_altura)
         c.drawImage(caminho_imagem_logo, 0,-26, width=156, height=110)
         
+        c.drawImage(caminho_image_desvio_padrao, 180, altura - 540 - 110, width=100, height=100)
+        c.drawImage(caminho_image_desvio_total,20 , altura - 540 - 110, width=100, height=100)
+        c.drawImage(caminho_imagem_curva_bebie, 300, altura - 540 - 220, width= 320, height=240)
         
         
         
@@ -134,10 +139,10 @@ class GerarPdf():
         
         pasta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp"))
 
-        for arquivo in os.listdir(pasta):
-            caminho_arquivo = os.path.join(pasta, arquivo)
-            if os.path.isfile(caminho_arquivo):
-                os.remove(caminho_arquivo)  
+        # for arquivo in os.listdir(pasta):
+        #     caminho_arquivo = os.path.join(pasta, arquivo)
+        #     if os.path.isfile(caminho_arquivo):
+        #         os.remove(caminho_arquivo)  
 
 
 
@@ -146,13 +151,14 @@ if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
     screen.fill((255,255,255))
-    from atenuacoes_personalizadas import atenuacoes_personalizadas
+    from atenuacao_daniel import atenuacao_daniel
     from cordenadas_30 import cordenadas_30
     from Ponto import Ponto
+    DadosExame.exame_selecionado = Constantes.fullthreshold
     DadosExame.atenuacao_screening = 25
     DadosExame.matriz_pontos = [Ponto(x,y,tamanhoPonto = 3,cor = (0,0,0), distancia = 100) for x,y in cordenadas_30]
     for i,ponto in enumerate(DadosExame.matriz_pontos):
-        ponto.atenuacao = atenuacoes_personalizadas.get((ponto.xg,ponto.yg))
+        ponto.atenuacao = atenuacao_daniel.get((ponto.xg,ponto.yg))
         if i > 30:
             ponto.response_received = True
     from TelaResultadoFullThreshold import ResultadoFullthreshold
