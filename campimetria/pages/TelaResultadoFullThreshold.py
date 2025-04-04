@@ -1,4 +1,4 @@
-import pygame, random, time, os, sys, math, json
+import pygame, random, time, os, sys, math, json,copy
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -447,107 +447,224 @@ class ResultadoFullthreshold:
         )
 
     @staticmethod
-    def desenha_mapa_desvio_e_curva_de_bebie():
-    
-        lista_base_atenuacao = []
-        match DadosExame.faixa_etaria:
-            case 1:
-                from idade_0_20 import lista_valores
+    def gerar_mapa_desvios_e_curva_de_bebie():
+        
+        def verifica_faixa_etaria(faixa_etaria):
+            match DadosExame.faixa_etaria:
+                case 1:
+                    from idade_0_20 import lista_valores
 
-                lista_base_atenuacao = lista_valores
-            case 2:
-                from idade_21_30 import lista_valores
+                    lista_base_atenuacao = lista_valores
+                case 2:
+                    from idade_21_30 import lista_valores
 
-                lista_base_atenuacao = lista_valores
-            case 3:
-                from idade_31_40 import lista_valores
+                    lista_base_atenuacao = lista_valores
+                case 3:
+                    from idade_31_40 import lista_valores
 
-                lista_base_atenuacao = lista_valores
-            case 4:
-                from idade_41_50 import lista_valores
+                    lista_base_atenuacao = lista_valores
+                case 4:
+                    from idade_41_50 import lista_valores
 
-                lista_base_atenuacao = lista_valores
-            case 5:
-                from idade_51_60 import lista_valores
+                    lista_base_atenuacao = lista_valores
+                case 5:
+                    from idade_51_60 import lista_valores
 
-                lista_base_atenuacao = lista_valores
-            case 6:
-                from idade_61_70 import lista_valores
+                    lista_base_atenuacao = lista_valores
+                case 6:
+                    from idade_61_70 import lista_valores
 
-                lista_base_atenuacao = lista_valores
-            case 7:
-                from idade_71_80 import lista_valores
+                    lista_base_atenuacao = lista_valores
+                case 7:
+                    from idade_71_80 import lista_valores
 
-                lista_base_atenuacao = lista_valores
-            case 8:
-                from idade_81_90 import lista_valores
+                    lista_base_atenuacao = lista_valores
+                case 8:
+                    from idade_81_90 import lista_valores
 
-                lista_base_atenuacao = lista_valores
-            case 9:
-                from idade_90 import lista_valores
-                lista_base_atenuacao = lista_valores
+                    lista_base_atenuacao = lista_valores
+                case 9:
+                    from idade_90 import lista_valores
 
+            return lista_valores
+        def desenha_curva_bebie(desvio_total,desvio_paciente):
+            tolerancia_positiva = [valor - 3 for valor in desvio_total]
+            tolerancia_negativa = [valor + 3 for valor in desvio_total]
+            quantidade_pontos = np.arange(1, 77)  # Adjusted to include point 76
+            fig, ax = plt.subplots()
+            ax.step(
+                quantidade_pontos,
+                tolerancia_positiva,
+                where="mid",
+                label="N + 3",
+                color="blue",
+            )
+            ax.step(quantidade_pontos, desvio_total, where="mid", label="N", color="green")
+            ax.step(
+                quantidade_pontos,
+                tolerancia_negativa,
+                where="mid",
+                label="N - 3",
+                color="red",
+            )
+            ax.step(quantidade_pontos, desvio_paciente, where="mid", color="black")
+
+            # Set y-axis limits and steps
+            ax.set_ylim(25, -10)  # Set the y-axis range from 25 to -10
+            ax.set_yticks(np.arange(25, -10, -5))  # Set y-axis ticks with a step of -5
+            ax.set_yticklabels(
+                [str(i) for i in np.arange(25, -10, -5)]
+            )  # Ensure labels are displayed
+            ax.set_xlim(1, 78)
+            ax.set_xticks(np.arange(1, 77, 15))  # Adjusted to include point 76
+            ax.set_xticklabels(
+                [str(i) for i in np.arange(1, 77, 15)]
+            )  # Ensure labels are displayed
+            ax.plot(
+                [quantidade_pontos[-1], quantidade_pontos[-1]],
+                [tolerancia_positiva[-1], 30],
+                color="black",
+                linestyle="-",
+            )
+
+            ax.set_xlabel("[Pontos]")
+            ax.set_ylabel("[dB]")
+            ax.set_title("Curva de Bebie:")
+            ax.legend()
+
+            plt.savefig(
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        "..",
+                        "utils",
+                        "images",
+                        "temp",
+                        "bebie_curve.png",
+                    )
+                )
+            )
+        def desenha_mapa_desvio(nome_imagem, matriz_pontos):
+            ponto_central = Ponto(0, 0, tamanhoPonto=3, cor=(0, 0, 0), distancia=200)
+            ponto_central.x = int(ponto_central.x * 480 / 1920)
+            ponto_central.y = int(ponto_central.y * 270 / 1080)
+            
+            # Define o tamanho da superfície com base no conteúdo
+            largura = 240  # Raio do círculo * 2
+            altura = 240  # Raio do círculo * 2
+            surface = pygame.Surface((largura, altura))
+            surface.fill((255, 255, 255))
+            
+            # Ajusta o ponto central para o novo tamanho da superfície
+            ponto_central.x = largura // 2
+            ponto_central.y = altura // 2
+            
+            # Desenha o círculo e as linhas centrais
+            pygame.draw.circle(
+            surface,
+            (0, 0, 0),
+            (ponto_central.x, ponto_central.y),
+            largura // 2,
+            1,
+            )
+            pygame.draw.line(
+            surface,
+            (0, 0, 0),
+            (ponto_central.x + largura // 2, ponto_central.y),
+            (ponto_central.x - largura // 2, ponto_central.y),
+            1,
+            )
+            pygame.draw.line(
+            surface,
+            (0, 0, 0),
+            (ponto_central.x, ponto_central.y + altura // 2),
+            (ponto_central.x, ponto_central.y - altura // 2),
+            1,
+            )
+            
+            # Plota os pontos na superfície
+            for ponto in matriz_pontos:        
+                ponto.plotaString(ponto.atenuacao, 20, surface=surface)
+            
+            # Salva a imagem
+            pygame.image.save(surface, os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "utils",
+                "images",
+                "temp",
+                f"{nome_imagem}.png",
+            )
+            ))
+
+        lista_base_atenuacao = verifica_faixa_etaria(DadosExame.faixa_etaria)
+        curva_base = [
+            atenuacao for cordenada, atenuacao in lista_base_atenuacao.items()
+        ]
         curva_paciente = []
         desvio_paciente = []
-        desvio_padrao = []
-       
-        for cordenada,atenuacao in lista_base_atenuacao.items():
-            x,y = cordenada
+        desvio_total = []
+        matriz_desvio_padrao = []
+        matriz_desvio_total = []
+
+        for cordenada, atenuacao in lista_base_atenuacao.items():
+            x, y = cordenada
             for ponto in DadosExame.matriz_pontos:
-                if (x,y) == (ponto.xg,ponto.yg):
+                if (x, y) == (ponto.xg, ponto.yg):
                     curva_paciente.append(ponto.atenuacao)
-       
-       
+
+                    if (
+                        ponto.xg == 15
+                        and ponto.yg == 3
+                        or ponto.xg == 15
+                        and ponto.yg == -3
+                    ):
+                        continue
+
+                    ponto_desvio = Ponto(
+                        ponto.xg, ponto.yg, tamanhoPonto=3, cor=(0, 0, 0), distancia=200
+                    )                    
+
+                    ponto_desvio.x = int(ponto_desvio.x * 480 / 1920)
+                    ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
+                    ponto_desvio.atenuacao = ponto.atenuacao - atenuacao
+                    matriz_desvio_total.append(ponto_desvio)
+      
+        
+        for paciente_atenuacao, base_atenuacao in zip(curva_paciente, curva_base):
+            desvio_paciente.append(-1 * (paciente_atenuacao - base_atenuacao))
+            desvio_total.append(np.mean(curva_base) - base_atenuacao)
+        
+        desvios_por_ponto = [abs(p - b) for p, b in zip(curva_paciente, curva_base)]
+        desvio_padrao_global = int(np.std(desvios_por_ponto))
+        
+        for ponto in matriz_desvio_total:
+            ponto.x -= 120
+            ponto.y -= 15
+        desenha_mapa_desvio("desvio_total",matriz_desvio_total)
+        matriz_desvio_padrao = matriz_desvio_total.copy()
+        for ponto in matriz_desvio_padrao:
+            ponto.atenuacao -= desvio_padrao_global
+        desenha_mapa_desvio("desvio_padrao",matriz_desvio_padrao)
 
 
-        
-
-
-        
-        curva_base = [atenuacao for cordenada,atenuacao in lista_base_atenuacao.items()]
-        
- 
-        for paciente_atenuacao,base_atenuacao in zip(curva_paciente,curva_base):
-            desvio_paciente.append(paciente_atenuacao - base_atenuacao)
-            desvio_padrao.append(np.mean(curva_base) - base_atenuacao)
-        
-        
-        
-        desvio_padrao.sort(reverse=False)
+        desvio_total.sort(reverse=False)
         desvio_paciente.sort(reverse=False)
-        
-        
-        # desvio_paciente[-3:] = [0] * len(desvio_paciente[-3:])
-        # desvio_padrao[-3:] = [0] * len(desvio_padrao[-3:])
-        tolerancia_positiva = [valor + 3 for valor in desvio_padrao]
-        tolerancia_negativa = [valor - 3 for valor in desvio_padrao]
-           
-        quantidade_pontos = np.arange(76)
-        fig, ax = plt.subplots()
-        ax.step(quantidade_pontos, tolerancia_positiva, where="mid", label="N + 3", color="blue")
-        ax.step(quantidade_pontos, desvio_padrao, where="mid", label="N", color="green")
-        ax.step(quantidade_pontos, tolerancia_negativa, where="mid", label="N - 3", color="red")
-        ax.step(quantidade_pontos, desvio_paciente, where="mid", color="black")
+        desvio_total[-2:] = desvio_total[-4:-2]
+        desvio_paciente[:1] = desvio_paciente[1:2]
+        desenha_curva_bebie(desvio_total, desvio_paciente)
 
-        # Set y-axis limits and steps
-        ax.set_ylim(25, -10)  # Set the y-axis range from 25 to -5
-        ax.set_yticks(np.arange(25, -10, -5))  # Set y-axis ticks with a step of -5
-        ax.set_yticklabels([str(i) for i in np.arange(25, -10, -5)])  # Ensure labels are displayed
 
-        ax.set_xticks(np.arange(1, 77, 75))
-          
-        ax.set_xlabel("[Pontos]")
-        ax.set_ylabel("[dB]")
-        ax.set_title("Curva de Bebie:")
-        ax.legend()
-        
-        plt.savefig(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images", "temp", "bebie_curve.png")))
-        plt.show()
+
 
     @staticmethod
     def desenha_legendas_exame():
 
         perda_fixacao = 0
+        faixa_etaria = {1:"0 - 20", 2:"21 - 30", 3:"31 - 40", 4:"41 - 50", 5:"51 - 60", 6:"61 - 70", 7:"71 - 80",8:"81 - 90",9:"ACIMA 90"}        
+        
+        estimulo = {1:"I",2:"II",3:"III",4:"IV",5:"V"}
 
         perda_fixacao = (
             ((DadosExame.perda_de_fixacao / DadosExame.total_testes_mancha) * 100)
@@ -572,6 +689,7 @@ class ResultadoFullthreshold:
 
         minutos, segundos = divmod((DadosExame.duracao_do_exame / 1000), 60)
         labels = [
+            f"Central 30°",
             f"Exame: {DadosExame.exame_selecionado.upper()}",
             f"Olho: {DadosExame.olho}",
             f"Duração (min): {int(minutos)}:{int(segundos)}",
@@ -579,38 +697,50 @@ class ResultadoFullthreshold:
             f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
             f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
             f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({perda_fixacao:.2f}%)",
-            f"Limiar Foveal:{int(DadosExame.LimiarFoveal)}(dB)",
+            f"Limiar Foveal: {int(DadosExame.LimiarFoveal)} (dB)",
+            f"ID exame: {DadosExame.exame_id}",
+            f"Tamanho do estimulo: {estimulo.get(DadosExame.tamanho_estimulo)}",
+            f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}",
         ]
 
-        # Posição inicial para desenhar labels (quadrante direito)
-        pos_x = 1165  # 75% da largura (centro do quadrante direito)
-        pos_y = 92  # Começa no meio da tela
-        espacamento = 80  # Espaço entre as labels
-        fonte = pygame.font.Font(None, 30)
-        color_label_info = (0, 0, 0)
+        # Configuração para desenhar labels em colunas de 3 com 4 linhas
+        colunas = 3
+        linhas = 4
+        espacamento_x = 300  # Espaço entre colunas
+        espacamento_y = 100   # Espaço entre linhas
+        pos_x_inicial = 1000  # Posição inicial da primeira coluna
+        pos_y_inicial = 92    # Posição inicial da primeira linha
+        fonte = pygame.font.Font(None, 23)
 
         for i, texto in enumerate(labels):
-            # Renderiza a label
+            # Calcula a posição da coluna e linha
+            coluna = i % colunas
+            linha = i // colunas
+
+            # Define a cor do texto
             color_label_info = (0, 0, 0)
             if (
-                i == 4
-                and DadosExame.falso_positivo_respondidos_percentual > 33
-                or i == 5
-                and DadosExame.falso_negativo_respondidos_percentual > 33
-                or i == 6
-                and perda_fixacao > 33
+            i == 5
+            and DadosExame.falso_positivo_respondidos_percentual > 33
+            or i == 6
+            and DadosExame.falso_negativo_respondidos_percentual > 33
+            or i == 7
+            and perda_fixacao > 33
             ):
                 color_label_info = pygame.Color("red")
 
+            # Renderiza a label
             texto_renderizado = fonte.render(texto, True, color_label_info)
 
-            # Posiciona centralizado no quadrante direito
-            pygame.display.get_surface().blit(
-                texto_renderizado, (pos_x, pos_y + i * espacamento)
-            )
+            # Calcula a posição para desenhar
+            pos_x = pos_x_inicial + coluna * espacamento_x
+            pos_y = pos_y_inicial + linha * espacamento_y
+
+            # Desenha a label na tela
+            pygame.display.get_surface().blit(texto_renderizado, (pos_x, pos_y))
 
     @staticmethod
-    def desenha_elementos_botao_pdf():
+    def desenha_aviso_pdf():
         imagem = pygame.image.load(
             os.path.abspath(
                 os.path.join(
@@ -623,35 +753,19 @@ class ResultadoFullthreshold:
             )
         )
         imagem = pygame.transform.scale(imagem, (59, 59))
-        imagem_pos = (1165, 795)
-
+   
+        imagem_pos = (1350, 450)
         fonte = pygame.font.Font(None, 32)
         texto_info_esc = fonte.render("ESC para voltar ao menu", True, (0, 0, 0))
-        texto_info_esc_pos = (1256, 800)
+        texto_info_esc_pos = (1461, 455)
         texto_info_entra = fonte.render("ENTRA para gerar o PDF", True, (0, 0, 0))
-        texto_info_entra_pos = (1256, 830)
+        texto_info_entra_pos = (1461, 485)
         pygame.display.get_surface().blit(texto_info_esc, texto_info_esc_pos)
         pygame.display.get_surface().blit(texto_info_entra, texto_info_entra_pos)
         pygame.display.get_surface().blit(imagem, imagem_pos)
 
-        rect_buton_pdf = pygame.Rect(1165, 966, 492, 81)
-        pygame.draw.rect(
-            pygame.display.get_surface(),
-            (209, 41, 41),
-            rect_buton_pdf,
-            border_radius=15,
-        )
-        pygame.draw.rect(
-            pygame.display.get_surface(),
-            (255, 247, 28),
-            rect_buton_pdf,
-            5,
-            border_radius=15,
-        )
-        button_pdf_text = fonte.render("Gerar PDF", True, (255, 255, 255))
-        button_pdf_text_pos = button_pdf_text.get_rect()
-        button_pdf_text_pos.center = rect_buton_pdf.center
-        pygame.display.get_surface().blit(button_pdf_text, button_pdf_text_pos)
+        
+       
 
     @staticmethod
     def status_resultado(carregado):
@@ -697,9 +811,45 @@ class ResultadoFullthreshold:
             "w",
         ) as f:
             json.dump(config, f, indent=4)
+            
+            
+    @staticmethod
+    def desenha_mapas_bebie_desvio():
+        
+        
+        rect_mapas = pygame.Rect(0, 0, 912,492)
+        rect_mapas.center = (1920 - 480, 810)
+        
+        image_desvio_padrao = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__),"..","utils","images","temp","desvio_padrao.png")))
+        image_desvio_total = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__),"..","utils","images","temp","desvio_total.png")))
+        image_bebie = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__),"..","utils","images","temp","bebie_curve.png")))
+        x,y = rect_mapas.center
+        
+        
+        
+        rect_desvio_padrao = image_desvio_padrao.get_rect(center=(x - 300,y -150))
+        rect_desvio_total = image_desvio_total.get_rect(center=(x - 300,y +125))
+        rect_bebie = image_bebie.get_rect(center=(1258 + 350 ,y))
+        
+        fonte_legenda = pygame.font.Font(None, 30)
+        legenda_desvio_padrao = fonte_legenda.render("Desvio padrão", True, (0, 0, 0))
+        legenda_desvio_total = fonte_legenda.render("Desvio total", True, (0, 0, 0))
+        
+        
+        
+        legenda_desvio_padrao_pos = legenda_desvio_padrao.get_rect(center=(x - 300, y - 150 -130))
+        legenda_desvio_total_pos = legenda_desvio_total.get_rect(center=(x - 300, y + 125 - 130))
+        
+        pygame.display.get_surface().blit(image_desvio_padrao, rect_desvio_padrao)
+        pygame.display.get_surface().blit(image_desvio_total, rect_desvio_total)
+        pygame.display.get_surface().blit(image_bebie, rect_bebie)
+
+        pygame.display.get_surface().blit(legenda_desvio_total, legenda_desvio_total_pos)
+        pygame.display.get_surface().blit(legenda_desvio_padrao, legenda_desvio_padrao_pos)
 
     @staticmethod
     def exibir_resultados():
+        ResultadoFullthreshold.gerar_mapa_desvios_e_curva_de_bebie()
         CONFIG_FILE = "config.json"
 
         DEFAULT_CONFIG = {
@@ -719,8 +869,9 @@ class ResultadoFullthreshold:
         tempo_final = pygame.time.get_ticks() - tempo_inicial
         ResultadoFullthreshold.desenhar_mapa_limiares()
         ResultadoFullthreshold.desenha_legendas_exame()
-        print(tempo_final / 1000)
-        ResultadoFullthreshold.desenha_elementos_botao_pdf()
+      
+        ResultadoFullthreshold.desenha_aviso_pdf()
+        ResultadoFullthreshold.desenha_mapas_bebie_desvio()
         pygame.display.flip()
         visualizando = True
         while visualizando:
@@ -816,18 +967,14 @@ if __name__ == "__main__":
 
     pygame.display.get_surface().fill((255, 255, 255))
     pygame.display.update()
-    
-    DadosExame.matriz_pontos = [Ponto(x,y,3,(0,0,0),200) for x,y in cordenadas_30]
-    for (cordenada,atenuacao),ponto in zip(atenuacao_daniel,DadosExame.matriz_pontos):
+
+    DadosExame.matriz_pontos = [
+        Ponto(x, y, 3, (0, 0, 0), 200) for x, y in cordenadas_30
+    ]
+    for (cordenada, atenuacao), ponto in zip(
+        atenuacao_daniel.items(), DadosExame.matriz_pontos
+    ):
         ponto.atenuacao = atenuacao
-        
-    
-    ResultadoFullthreshold.desenha_mapa_desvio_e_curva_de_bebie()
-    visualizando = True
-    while visualizando:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                visualizando = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_j:  # Mover para cima
-                    pygame.quit()
+
+    ResultadoFullthreshold.exibir_resultados()
+

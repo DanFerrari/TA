@@ -111,15 +111,19 @@ class Ponto:
         return (intensity,intensity,intensity)
 
 
-    def plotarPonto(self):
-        pygame.draw.circle(self.surface, self.cor, (self.x, self.y), self.pontoPix)
+    def plotarPonto(self,surface = "padrao"):
+        if surface == "padrao":
+            surface = pygame.display.get_surface()
+        pygame.draw.circle(surface, self.cor, (self.x, self.y), self.pontoPix)
         
-    def plotaString(self,atenuacao):
-        fonte = pygame.font.FontType(None,24)
+    def plotaString(self,atenuacao,fonte_size=24, surface = "padrao"):
+        if surface == "padrao":
+            surface = pygame.display.get_surface()
+        fonte = pygame.font.FontType(None,fonte_size)
         texto = fonte.render(f"{atenuacao}",True,(0,0,0))
         pos = texto.get_rect()
         pos.center = (self.x,self.y)
-        pygame.display.get_surface().blit(texto,pos)
+        surface.blit(texto,pos)
         pygame.display.update()
 
     @staticmethod
