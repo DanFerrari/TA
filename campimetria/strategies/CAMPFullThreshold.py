@@ -41,8 +41,8 @@ class FullThreshold:
         self.NC = 0
         self.Delta = 0
         self.viu = 0
-        self.Dbig = 3
-        self.Dsmall = 2
+        self.Dbig = 6
+        self.Dsmall = 3
         self.limiarok = False
         self.limiar_status = ""
         self.limiar = 0
@@ -569,7 +569,7 @@ class FullThreshold:
             self.limiar = self.AT
             DadosExame.LimiarFoveal = self.limiar
             for ponto in self.ponto_quad:
-                ponto.atenuacao = self.limiar - 10
+                ponto.atenuacao = self.limiar - 12
            
             self.limiarok = True  
             self.UV = 0
@@ -579,8 +579,8 @@ class FullThreshold:
             self.NC = 0
             self.Delta = 0
             self.viu = 0
-            self.Dbig = 3
-            self.Dsmall = 2
+            self.Dbig = 6
+            self.Dsmall = 3
             self.limiar_status = ""
             self.limiar = 0
             self.primeiro = True
@@ -632,7 +632,7 @@ class FullThreshold:
                     if self.ponto_quad[self.indice_atual].status == "-":
                         self.ponto_quad[self.indice_atual].numero_cruzamentos += 1
                         self.ponto_quad[self.indice_atual].delta = self.Dsmall
-                        if self.ponto_quad[self.indice_atual].numero_cruzamentos >= 2:
+                        if self.ponto_quad[self.indice_atual].numero_cruzamentos >= 1:
                             self.ponto_quad[self.indice_atual].status = "="
                             self.ponto_quad[self.indice_atual].atenuacao = (self.ponto_quad[self.indice_atual].ultima_atenuacao_vista + self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista) / 2
                             return
@@ -660,7 +660,7 @@ class FullThreshold:
                         self.ponto_quad[self.indice_atual].numero_cruzamentos = +1
                         self.ponto_quad[self.indice_atual].delta = self.Dsmall
 
-                        if self.ponto_quad[self.indice_atual].numero_cruzamentos >= 2:
+                        if self.ponto_quad[self.indice_atual].numero_cruzamentos >= 1:
                             self.ponto_quad[self.indice_atual].status = "="
                             self.ponto_quad[self.indice_atual].atenuacao = (self.ponto_quad[self.indice_atual].ultima_atenuacao_vista + self.ponto_quad[self.indice_atual].ultima_atenuacao_nao_vista) / 2
                             return

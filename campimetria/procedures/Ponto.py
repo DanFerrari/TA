@@ -120,7 +120,7 @@ class Ponto:
         if surface == "padrao":
             surface = pygame.display.get_surface()
         fonte = pygame.font.FontType(None,fonte_size)
-        texto = fonte.render(f"{atenuacao}",True,(0,0,0))
+        texto = fonte.render(f"{int(atenuacao)}",True,(0,0,0))
         pos = texto.get_rect()
         pos.center = (self.x,self.y)
         surface.blit(texto,pos)
@@ -205,14 +205,14 @@ class Ponto:
                         pygame.time.delay(400)                       
                         return menu_pressionado
 
-            if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-                self.tempo_resposta = (
-                    pygame.time.get_ticks() - trial_start_time
-                ) / 1000  
-                self.response_received = True 
-                self.apagarPonto()  
-                pygame.time.delay(400)              
-                return menu_pressionado
+            # if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+            #     self.tempo_resposta = (
+            #         pygame.time.get_ticks() - trial_start_time
+            #     ) / 1000  
+            #     self.response_received = True 
+            #     self.apagarPonto()  
+            #     pygame.time.delay(400)              
+            #     return menu_pressionado
 
             if not self.response_received:
                 
