@@ -68,6 +68,16 @@ class Campimetria:
         self.set_brightness(self.config["brightness"])
         self.set_contrast(self.config["contrast"])
 
+
+
+
+    def carregar_config(self):
+        """Lê as variáveis do arquivo JSON ou usa valores padrão."""
+        if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE))):
+            with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE)), "r") as f:
+                return json.load(f)
+        else:
+            return self.DEFAULT_CONFIG
     def get_screen_settings(self):
         """Obtém as configurações atuais de tempo de espera da tela"""
         try:
