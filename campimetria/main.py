@@ -4,14 +4,14 @@ import sys
 import OPi.GPIO as GPIO
 import time
 import subprocess
-
+import json
 
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)
 
 PIN_ENTRADA = "PD22"
-# GPIO.setup(PIN_ENTRADA, GPIO.IN)
+GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
@@ -29,6 +29,7 @@ sys.path.append(
 
 from constants.dados import *
 from pages.strategy_screen import StrategyScreen
+
 
 
 class Campimetria:
@@ -50,10 +51,22 @@ class Campimetria:
         self.font_main = pygame.font.Font(None, int(self.height * 0.07))
 
         # Estado inicial: tela de seleção de estratégia
-        self.current_screen = StrategyScreen(self)    
+        self.current_screen = StrategyScreen(self)
+        self.CONFIG_FILE = "config.json"
 
-        
-
+        self.DEFAULT_CONFIG ={
+            "distancia_paciente": 200,
+            "tamanho_estimulo": 3,
+            "exame_id": 1,
+            "background":120,
+            "brightness":90,
+            "contrast":50,
+            "resolution-w":1920,
+            "resolution-h":1080
+        }
+        self.config = self.carregar_config()
+        self.set_brightness(self.config["brightness"])
+        self.set_contrast(self.config["contrast"])
 
     def get_screen_settings(self):
         """Obtém as configurações atuais de tempo de espera da tela"""
@@ -73,11 +86,8 @@ class Campimetria:
 
     def enable_screen_sleep(self):
         """Ativa o descanso de tela e modo de espera"""
-        os.system("xset s on")   # Ativa proteção de tela
+        os.system("xset s on")  # Ativa proteção de tela
         os.system("xset +dpms")  # Ativa gerenciamento de energia
-
-
-      
 
     def run(self):
         while self.running:
@@ -95,26 +105,25 @@ class Campimetria:
 
     def change_screen(self, new_screen):
         self.current_screen = new_screen
-        
-  
+
 
 if __name__ == "__main__":
 
     game = Campimetria()
-        # Obtém as configurações atuais antes de desativar
+    # Obtém as configurações atuais antes de desativar
     original_settings = game.get_screen_settings()
     # Desativa o stand-by e descanso de tela
     game.disable_screen_sleep()
     print("Stand-by e descanso de tela desativados!")
-   
+
     game.run()
     caminho = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "..", "lib", "mainTA.py")
     )
-        # Após o app fechar, restaura a configuração anterior
+    # Após o app fechar, restaura a configuração anterior
     if original_settings and "timeout: 0" not in original_settings:
         game.enable_screen_sleep()
         print("Configurações restauradas!")
     else:
-        print("Stand-by já estava desativado, mantendo assim.") 
+        print("Stand-by já estava desativado, mantendo assim.")
     os.execvp("python", ["python", caminho])

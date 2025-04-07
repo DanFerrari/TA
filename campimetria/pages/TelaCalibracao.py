@@ -38,8 +38,8 @@ class Config:
         self.config = self.carregar_config()
         self.set_brightness(self.config["brightness"])
         self.set_contrast(self.config["contrast"])
-        self.brightness = self.get_brightness()
-        self.contrast = self.get_contrast()
+        self.brightness = (self.config["brightness"])
+        self.contrast = (self.config["contrast"])
         
 
     def carregar_config(self):
@@ -55,9 +55,9 @@ class Config:
             json.dump(config, f, indent=4)
         
         
-    def handle_events(self):
+    def handle_events(self,events):
         
-        for event in pygame.event.get():
+        for event in events:
             if event.type == pygame.QUIT:
                 self.game.running = False
             elif event.type == pygame.KEYDOWN:
@@ -74,10 +74,12 @@ class Config:
                     self.game.change_screen(StrategyScreen(self.game))
                 if event.key == pygame.K_RIGHT:
                     self.background += 1   
-                    Colors.BACKGROUND = self.background                 
+                    Colors.ERASE_INTENSITY = self.background
+                    Colors.BACKGROUND = (self.background,self.background,self.background)          
                 if event.key == pygame.K_LEFT:
                     self.background -= 1                
-                    Colors.BACKGROUND = self.background    
+                    Colors.ERASE_INTENSITY = self.background
+                    Colors.BACKGROUND = (self.background,self.background,self.background)
                 if event.key == pygame.K_l:
                     self.contrast += 1
                     self.set_contrast(self.contrast)
@@ -108,8 +110,8 @@ class Config:
         font = pygame.font.SysFont(None, 36)
         self.ponto_calibracao.plotarPonto()
         fundo = font.render(f"Fundo: {self.background}", True, (26, 45, 254))
-        brilho = font.render(f"Brilho: {self.get_brightness()}", True, (26, 45, 254))
-        contraste = font.render(f"Contraste: {self.get_contrast()}", True, (26, 45, 254))
+        brilho = font.render(f"Brilho: {self.brightness}", True, (26, 45, 254))
+        contraste = font.render(f"Contraste: {self.contrast}", True, (26, 45, 254))
         estimulo = font.render(f"Estimulo: {self.estimulo}", True, (26, 45, 254))
         resolution = font.render(f"Resolucao:{self.config["resolution-w"]} x {self.config["resolution-h"]}",True,(26, 45, 254))
         atenuacao_estimulo = font.render(f"Atenuacao do estimulo:{self.atenuacao}",True,(26, 45, 254))
