@@ -67,7 +67,8 @@ class Config:
                     self.config["contrast"] = self.contrast
                     Colors.ERASE_INTENSITY = self.background
                     Colors.BACKGROUND = (self.background,self.background,self.background)
-                    self.salvar_config(self.config)                    
+                    self.salvar_config(self.config)   
+                    from strategy_screen import StrategyScreen                 
                     self.game.change_screen(StrategyScreen(self.game))
                 if event.key == pygame.K_j: 
                     from strategy_screen import StrategyScreen
