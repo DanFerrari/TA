@@ -78,6 +78,28 @@ class Campimetria:
                 return json.load(f)
         else:
             return self.DEFAULT_CONFIG
+    def get_brightness(self): return self.get_vcp_value("10")
+    def set_brightness(self,val): self.set_vcp_value("10", val)
+
+    def get_contrast(self): return self.get_vcp_value("12")
+    def set_contrast(self,val): self.set_vcp_value("12", val)
+    
+    def get_vcp_value(self,code):
+        try:
+            output = subprocess.check_output(["ddcutil", "getvcp", code], text=True)
+            match = re.search(r'current value = (\d+)', output)
+            if match:
+                return int(match.group(1))
+        except Exception as e:
+            print(f"Erro ao obter VCP {code}:", e)
+        return 50
+
+    def set_vcp_value(self,code, value):
+        value = max(0, min(value, 100))  # clampa entre 0 e 100
+        try:
+            subprocess.run(["ddcutil", "setvcp", code, str(value)])
+        except Exception as e:
+            print(f"Erro ao definir VCP {code}:", e)
     def get_screen_settings(self):
         """Obtém as configurações atuais de tempo de espera da tela"""
         try:
