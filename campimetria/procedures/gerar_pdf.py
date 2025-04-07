@@ -63,7 +63,7 @@ class GerarPdf():
         
         minutos,segundos = divmod((DadosExame.duracao_do_exame / 1000),60)
         
-        DadosExame.exame_selecionado = Constantes.fullthreshold
+        DadosExame.exame_selecionado = Constantes.screening
         c.setFont("Helvetica-Bold", 10)
         c.drawString(26,altura - 38, f"Central 30°")
         c.drawString(226, altura - 38, f"Exame: {(DadosExame.exame_selecionado).upper()}")  
@@ -77,33 +77,54 @@ class GerarPdf():
         c.drawString(226, altura - 176, f"Total de pontos: {DadosExame.total_de_pontos_testados}")
         if DadosExame.exame_selecionado == Constantes.fullthreshold:
             c.drawString(413, altura - 176, f"Limiar Foveal(dB):{DadosExame.LimiarFoveal}")  
-            c.drawString(413, altura - 38, f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}")  
+            c.drawString(413, altura - 38, f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}") 
+            nova_largura = 400  
+            nova_altura = int(nova_largura * (540 / 960))
+            x_pos = 220 
+            y_pos = 100  
+                # Caminho para salvar a imagem
+            caminho_imagem_pontos = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_pontos.png"))
+            self.capturar_parte_tela(0, 0, 960, 540, caminho_imagem_pontos)
+            caminho_imagem_limiares = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_limiares.png"))
+            self.capturar_parte_tela(0, 540, 960, 540, caminho_imagem_limiares)
+            caminho_imagem_logo = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","logo_branco.png"))
+            
+            caminho_imagem_curva_bebie = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","bebie_curve.png"))
+            caminho_image_desvio_padrao = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","desvio_padrao.png"))
+            caminho_image_desvio_total = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","desvio_total.png"))
+            
+            c.drawImage(caminho_imagem_pontos, largura / 2 - nova_altura + 150,390, width=nova_largura, height=nova_altura)
+            c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura -150,390, width=nova_largura, height=nova_altura)
+            c.drawImage(caminho_imagem_logo, 0,-26, width=156, height=110)
+            
+            c.drawImage(caminho_image_desvio_padrao, 180, altura - 540 - 110, width=100, height=100)
+            c.drawImage(caminho_image_desvio_total,20 , altura - 540 - 110, width=100, height=100)
+            c.drawImage(caminho_imagem_curva_bebie, 300, altura - 540 - 220, width= 320, height=240)
+            
+            c.drawString(38, altura - 540, "Desvio Total")
+            c.drawString(195, altura -540, "Desvio Padrão")
+         
         elif DadosExame.exame_selecionado == Constantes.screening:
-            c.drawString(413, altura - 38, f"Atenuação (dB):{DadosExame.atenuacao_screening}")  
+            c.drawString(413, altura - 38, f"Atenuação (dB):{DadosExame.atenuacao_screening}")
+            nova_largura = 400  
+            nova_altura = int(nova_largura * (540 / 960))
+            x_pos = 220 
+            y_pos = 100  
+                # Caminho para salvar a imagem
+            caminho_imagem_pontos = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_pontos.png"))
+            self.capturar_parte_tela(0, 0, 960, 540, caminho_imagem_pontos)
+            caminho_imagem_limiares = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_limiares.png"))
+            self.capturar_parte_tela(0, 540, 960, 540, caminho_imagem_limiares)
+            caminho_imagem_logo = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","logo_branco.png"))
+            
+            c.drawImage(caminho_imagem_logo, 0,-26, width=156, height=110)
+            c.drawImage(caminho_imagem_pontos, largura / 2 - nova_altura,379, width=nova_largura, height=nova_altura)
+            c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura,109, width=nova_largura, height=nova_altura)  
 
         
-        nova_largura = 400  
-        nova_altura = int(nova_largura * (540 / 960))
-        x_pos = 220 
-        y_pos = 100  
-            # Caminho para salvar a imagem
-        caminho_imagem_pontos = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_pontos.png"))
-        self.capturar_parte_tela(0, 0, 960, 540, caminho_imagem_pontos)
-        caminho_imagem_limiares = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_limiares.png"))
-        self.capturar_parte_tela(0, 540, 960, 540, caminho_imagem_limiares)
-        caminho_imagem_logo = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","logo_branco.png"))
+
         
-        caminho_imagem_curva_bebie = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","bebie_curve.png"))
-        caminho_image_desvio_padrao = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","desvio_padrao.png"))
-        caminho_image_desvio_total = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","desvio_total.png"))
-        
-        c.drawImage(caminho_imagem_pontos, largura / 2 - nova_altura + 150,390, width=nova_largura, height=nova_altura)
-        c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura -150,390, width=nova_largura, height=nova_altura)
-        c.drawImage(caminho_imagem_logo, 0,-26, width=156, height=110)
-        
-        c.drawImage(caminho_image_desvio_padrao, 180, altura - 540 - 110, width=100, height=100)
-        c.drawImage(caminho_image_desvio_total,20 , altura - 540 - 110, width=100, height=100)
-        c.drawImage(caminho_imagem_curva_bebie, 300, altura - 540 - 220, width= 320, height=240)
+       
         
         
         

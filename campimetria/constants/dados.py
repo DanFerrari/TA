@@ -1,4 +1,4 @@
-import pygame
+import pygame,os,sys,json
 
 
 
@@ -18,8 +18,29 @@ class Constantes:
 
 
 class Colors:
+    def carregar_config():
+        CONFIG_FILE = "config.json"
+        """Lê as variáveis do arquivo JSON ou usa valores padrão."""
+        if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",CONFIG_FILE))):
+            with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",CONFIG_FILE)), "r") as f:
+                return json.load(f)
+        else:
+            return DEFAULT_CONFIG
 
-    ERASE_INTENSITY = 120
+    DEFAULT_CONFIG ={
+        "distancia_paciente": 200,
+        "tamanho_estimulo": 3,
+        "exame_id": 1,
+        "background":120,
+        "brightness":90,
+        "contrast":50,
+        "resolution-w":1920,
+        "resolution-h":1080
+    }
+
+    
+    config = carregar_config()
+    ERASE_INTENSITY = config["background"]
     YELLOW_SIGHT = (251,244,19)
     BACKGROUND = (ERASE_INTENSITY, ERASE_INTENSITY, ERASE_INTENSITY)
     DEFAULT = (53, 43, 54)

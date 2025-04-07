@@ -81,7 +81,7 @@ class SelectEyeScreen:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_j:  # Volta para o menu ou sai
                     self.game.change_screen(StrategyScreen(self.game))
-                elif event.key == pygame.K_x:
+                elif event.key == pygame.K_r:
                     if self.selecao_atual == "numero":
                         self.selecao_atual = "distancia"
                     elif self.selecao_atual == "botao":                       

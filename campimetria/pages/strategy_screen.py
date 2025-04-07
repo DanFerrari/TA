@@ -29,9 +29,14 @@ class StrategyScreen:
         self.CONFIG_FILE = "config.json"
 
         self.DEFAULT_CONFIG ={
-            "distancia_paciente":200,
-            "tamanho_estimulo":3,
-            "exame_id":1
+            "distancia_paciente": 200,
+            "tamanho_estimulo": 3,
+            "exame_id": 1,
+            "background":120,
+            "brightness":90,
+            "contrast":50,
+            "resolution-w":1920,
+            "resolution-h":1080
         }
         self.config = self.carregar_config()
         DadosExame.tamanho_estimulo = self.config["tamanho_estimulo"]
@@ -51,6 +56,9 @@ class StrategyScreen:
     def handle_events(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    from TelaCalibracao import Config
+                    self.game.change_screen(Config(self.game))
                 if event.key == pygame.K_LEFT:
                     self.botao_selecionado = 0
                 elif event.key == pygame.K_RIGHT:
