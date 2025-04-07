@@ -919,11 +919,12 @@ class ResultadoFullthreshold:
 
                         caminho_pdf = f"/media/eyetec/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
                         caminho_pendrive = f"/media/eyetec/EXAMES/"
+                        
                         if os.path.exists(caminho_pendrive):
                             pdf.gerar_relatorio(caminho_pdf)
                             fonte = pygame.font.Font(None, 45)
                             text_info_pdf = fonte.render(
-                                "PDF GERADO! RETORNANDO AO MENU...", True, (0, 0, 0)
+                                "GERANDO PDF...", True, (0, 0, 0)
                             )
                             text_info_pdf_pos = text_info_pdf.get_rect()
                             text_info_pdf_pos.center = (1920 // 2, 1080 // 2)
@@ -931,12 +932,42 @@ class ResultadoFullthreshold:
                                 text_info_pdf, text_info_pdf_pos
                             )
                             pygame.display.update()
-                            visualizando = False
-                            pygame.time.delay(5000)
+                            pygame.time.delay(7000)
+                            if os.path.exists(caminho_pdf):
+                                rect_dash = text_info_pdf.get_rect()
+                                rect_dash.center = text_info_pdf_pos.center
+                                pygame.draw.rect(pygame.display.get_surface(),pygame.Color("white"),rect_dash)
+                                pygame.display.update()  
+                                text_info_pdf = fonte.render(
+                                "PDF GERADO!", True, (0, 0, 0)
+                                )                              
+                                visualizando = False
+                            else:
+                                fonte = pygame.font.Font(None, 45)
+                                text_info_pdf = fonte.render(
+                                    "ERRO AO GERAR PDF,TENTE NOVAMENTE!",
+                                    True,
+                                    (0, 0, 0),
+                                )
+                                text_info_pdf_pos = text_info_pdf.get_rect()
+                                text_info_pdf_pos.center = (1920 // 2, 1080 // 2)
+                                pygame.display.get_surface().blit(
+                                    text_info_pdf, text_info_pdf_pos
+                                )
+                                pygame.display.update()
+                                pygame.time.delay(5000)
+                                rect_dash = text_info_pdf.get_rect()
+                                rect_dash.center = text_info_pdf_pos.center
+                                pygame.draw.rect(
+                                    pygame.display.get_surface(),
+                                    pygame.Color("white"),
+                                    rect_dash,
+                                )
+                                pygame.display.update()
                         else:
                             fonte = pygame.font.Font(None, 45)
                             text_info_pdf = fonte.render(
-                                "ERRO AO GERAR PDF, VERIFIQUE SEU PENDRIVE!",
+                                "ERRO AO GERAR PDF, PENDRIVE NAO RECONHECIDO!",
                                 True,
                                 (0, 0, 0),
                             )
@@ -961,6 +992,7 @@ class ResultadoFullthreshold:
 
 if __name__ == "__main__":
     from cordenadas_30 import cordenadas_30
+    DadosExame.exame_selecionado = Constantes.fullthreshold
 
     pygame.init()
     pygame.display.set_mode((0, 0), pygame.FULLSCREEN)

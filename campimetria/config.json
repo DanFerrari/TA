@@ -1,9 +1,9 @@
 {
     "distancia_paciente": 200,
     "tamanho_estimulo": 3,
-    "exame_id": 182,
-    "background": 126,
-    "brightness": 50,
+    "exame_id": 3,
+    "background": 120,
+    "brightness": 90,
     "contrast": 50,
     "resolution-w": 1920,
     "resolution-h": 1080
