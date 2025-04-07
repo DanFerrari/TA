@@ -113,7 +113,9 @@ class Config:
         brilho = font.render(f"Brilho: {self.brightness}", True, (26, 45, 254))
         contraste = font.render(f"Contraste: {self.contrast}", True, (26, 45, 254))
         estimulo = font.render(f"Estimulo: {self.estimulo}", True, (26, 45, 254))
-        resolution = font.render(f"Resolucao:{self.config["resolution-w"]} x {self.config["resolution-h"]}",True,(26, 45, 254))
+        resolutionW = self.config["resolution-w"]
+        resolutionH = self.config["resolution-h"]
+        resolution = font.render(f"Resolucao:{resolutionW} x {resolutionH}",True,(26, 45, 254))
         atenuacao_estimulo = font.render(f"Atenuacao do estimulo:{self.atenuacao}",True,(26, 45, 254))
         surface.blit(fundo, (80, 100))
         surface.blit(brilho, (80, 150))
@@ -153,6 +155,6 @@ if __name__ == "__main__":
 
     config = Config()
     while visualizando:
-        config.handle_events()
+        config.handle_events(pygame.event.get())
         config.update()
         config.draw(pygame.display.get_surface())
