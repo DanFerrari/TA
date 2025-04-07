@@ -73,13 +73,15 @@ class Config:
                     from strategy_screen import StrategyScreen
                     self.game.change_screen(StrategyScreen(self.game))
                 if event.key == pygame.K_RIGHT:
-                    self.background += 1   
-                    Colors.ERASE_INTENSITY = self.background
-                    Colors.BACKGROUND = (self.background,self.background,self.background)          
+                    if self.background < 255:
+                        self.background += 1   
+                        Colors.ERASE_INTENSITY = self.background
+                        Colors.BACKGROUND = (self.background,self.background,self.background)          
                 if event.key == pygame.K_LEFT:
-                    self.background -= 1                
-                    Colors.ERASE_INTENSITY = self.background
-                    Colors.BACKGROUND = (self.background,self.background,self.background)
+                    if self.background > 0:
+                        self.background -= 1                
+                        Colors.ERASE_INTENSITY = self.background
+                        Colors.BACKGROUND = (self.background,self.background,self.background)
                 if event.key == pygame.K_l:
                     self.contrast += 1
                     self.set_contrast(self.contrast)
