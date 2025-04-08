@@ -202,7 +202,7 @@ class Ponto:
                         ) / 1000                 
                         self.response_received = True 
                         self.apagarPonto() 
-                        pygame.time.delay(600)                       
+                        pygame.time.delay(400)                       
                         return menu_pressionado
 
             if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
@@ -211,7 +211,7 @@ class Ponto:
                 ) / 1000  
                 self.response_received = True 
                 self.apagarPonto()  
-                pygame.time.delay(600)              
+                pygame.time.delay(400)              
                 return menu_pressionado
 
             if not self.response_received:
