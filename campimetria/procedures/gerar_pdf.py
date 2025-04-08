@@ -63,7 +63,7 @@ class GerarPdf():
         
         minutos,segundos = divmod((DadosExame.duracao_do_exame / 1000),60)
         
-        DadosExame.exame_selecionado = Constantes.screening
+      
         c.setFont("Helvetica-Bold", 10)
         c.drawString(26,altura - 38, f"Central 30°")
         c.drawString(226, altura - 38, f"Exame: {(DadosExame.exame_selecionado).upper()}")  
