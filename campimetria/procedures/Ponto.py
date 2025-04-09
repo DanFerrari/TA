@@ -46,7 +46,7 @@ class Ponto:
         self.tamanhoPonto = tamanhoPonto
         self.raio_ponto = self.calcula_tamanho_do_ponto()
         self.xg = xg
-        self.yg = yg 
+        self.yg = yg
         self.resolucaoX = 0.25
         self.resolucaoY = 0.25
         self.resolucao_video = 0.2599
@@ -70,7 +70,6 @@ class Ponto:
         self.y = self.ymm / self.resolucaoY
         self.x = self.x + (self.screen_width / 2)
         self.y = self.y + (self.screen_height / 2)
-        
 
     def calcula_tamanho_do_ponto(self):
         grau = 0
@@ -86,17 +85,17 @@ class Ponto:
             case 5:
                 grau = 2.08
 
-        print(f"grau: {grau}")
+        raio_ponto = (
+            (2 * self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
+        ) / 2
+        # raio_ponto = ( self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
 
-        raio_ponto = ((2 * self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2)/2
-        #raio_ponto = ( self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
-        print(f"raio: {raio_ponto}")
-
-        
         return raio_ponto
 
     @staticmethod
-    def db_para_intensidade(db, db_min=Constantes.dbMax, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255):
+    def db_para_intensidade(
+        db, db_min=Constantes.dbMax, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255
+    ):
         """Converte dB para intensidade de cor (escala logarítmica)."""
         norm_db = (db - db_min) / (db_max - db_min)  # Normaliza dB entre 0 e 1
 
@@ -107,23 +106,22 @@ class Ponto:
         elif intensity < i_min:
             intensity = i_min
 
-        #return int(round(intensity))
-        return (intensity,intensity,intensity)
+        # return int(round(intensity))
+        return (intensity, intensity, intensity)
 
-
-    def plotarPonto(self,surface = "padrao"):
+    def plotarPonto(self, surface="padrao"):
         if surface == "padrao":
             surface = pygame.display.get_surface()
         pygame.draw.circle(surface, self.cor, (self.x, self.y), self.pontoPix)
-        
-    def plotaString(self,atenuacao,fonte_size=24, surface = "padrao"):
+
+    def plotaString(self, atenuacao, fonte_size=24, surface="padrao"):
         if surface == "padrao":
             surface = pygame.display.get_surface()
-        fonte = pygame.font.FontType(None,fonte_size)
-        texto = fonte.render(f"{int(atenuacao)}",True,(0,0,0))
+        fonte = pygame.font.FontType(None, fonte_size)
+        texto = fonte.render(f"{int(atenuacao)}", True, (0, 0, 0))
         pos = texto.get_rect()
-        pos.center = (self.x,self.y)
-        surface.blit(texto,pos)
+        pos.center = (self.x, self.y)
+        surface.blit(texto, pos)
         pygame.display.update()
 
     @staticmethod
@@ -156,6 +154,7 @@ class Ponto:
         quadrado = pygame.Rect(0, 0, *tamanho)
         quadrado.center = (self.x, self.y)
         pygame.draw.rect(pygame.display.get_surface(), self.cor, quadrado)
+
     def desenha_x(self):
         tamanho = self.raio_ponto  # Define o tamanho do "X"
         superficie = pygame.display.get_surface()
@@ -169,7 +168,6 @@ class Ponto:
         # Desenha as duas diagonais formando um "X"
         pygame.draw.line(superficie, self.cor, (x1, y1), (x2, y2), 2)  # Linha \
         pygame.draw.line(superficie, self.cor, (x3, y3), (x4, y4), 2)  # Linha /
-        
 
     def testaPonto(
         self, tempo_exposicao, tempo_resposta_paciente, menu_pressionado=False
@@ -199,25 +197,25 @@ class Ponto:
                     if event.key == pygame.K_e:
                         self.tempo_resposta = (
                             pygame.time.get_ticks() - trial_start_time
-                        ) / 1000                 
-                        self.response_received = True 
-                        self.apagarPonto() 
-                        pygame.time.delay(400)                       
+                        ) / 1000
+                        self.response_received = True
+                        self.apagarPonto()
+                        pygame.time.delay(400)
                         return menu_pressionado
 
             if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
                 self.tempo_resposta = (
                     pygame.time.get_ticks() - trial_start_time
-                ) / 1000  
-                self.response_received = True 
-                self.apagarPonto()  
-                pygame.time.delay(400)              
+                ) / 1000
+                self.response_received = True
+                self.apagarPonto()
+                pygame.time.delay(400)
                 return menu_pressionado
 
             if not self.response_received:
-                
+
                 self.response_received = False
-                
+
             self.clock.tick(60)
 
         return menu_pressionado

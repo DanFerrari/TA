@@ -188,5 +188,3 @@ if __name__ == "__main__":
     pygame.display.update()
     
     caminho_pdf = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "pdfs", f"relatorio-id-exame-{DadosExame.exame_id}.pdf"))
-    pdf = GerarPdf()
-    pdf.gerar_relatorio(caminho_pdf)
