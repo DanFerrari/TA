@@ -488,6 +488,22 @@ class ResultadoFullthreshold:
                     from idade_90 import lista_valores
 
             return lista_valores
+        def espelhar_vetor(vetor):
+            lista_atenuacao = []
+            for cordenada,atenuacao in vetor.items():
+                lista_atenuacao.append(atenuacao)
+            print(lista_atenuacao)
+            tamanhos_linhas = [4, 6, 8, 10, 10, 10, 10, 8, 6, 4]
+            espelhado = []
+            inicio = 0
+
+            for tamanho in tamanhos_linhas:
+                linha = lista_atenuacao[inicio:inicio + tamanho]
+                espelhado.extend(linha[::-1])  # faz o espelhamento (slice reverso)
+                inicio += tamanho
+            for (cordenada,atenuacao),atenuacao_espelhada in zip(vetor.items(),espelhado):
+                vetor[cordenada] = atenuacao_espelhada
+            return vetor
 
         def desenha_curva_bebie(desvio_total, desvio_paciente):
             tolerancia_positiva = [valor - 3 for valor in desvio_total]
@@ -666,11 +682,11 @@ class ResultadoFullthreshold:
             DadosExame.psd = psd
             
             
-        def calcula_desvio(matriz_desvio_total,curva_paciente):
+        def calcula_desvio(matriz_desvio_total):
             setimo_valor = 0
             curva_paciente_filtrada = [ ponto.atenuacao for ponto in matriz_desvio_total]
             curva_paciente_filtrada.sort(reverse=True)
-            setimo_valor = curva_paciente_filtrada[6]
+            setimo_valor = curva_paciente_filtrada[9]
             print(curva_paciente_filtrada)
             for ponto in matriz_desvio_total:
                 ponto_desvio_padrao = Ponto(ponto.xg,ponto.yg,3,(0,0,0),200)                              
@@ -683,6 +699,8 @@ class ResultadoFullthreshold:
             
 
         lista_base_atenuacao = verifica_faixa_etaria(DadosExame.faixa_etaria)
+        if DadosExame.olho == Constantes.olho_esquerdo:
+            lista_base_atenuacao = espelhar_vetor(lista_base_atenuacao)
         
         curva_base = [
             atenuacao for cordenada, atenuacao in lista_base_atenuacao.items()
@@ -743,7 +761,7 @@ class ResultadoFullthreshold:
             ponto.x -= 120
             ponto.y -= 15
             
-        calcula_desvio(matriz_desvio_total,curva_paciente)
+        calcula_desvio(matriz_desvio_total)
         calcula_MD()
         calcula_PSD(matriz_desvio_total)
         desenha_mapa_desvio("desvio_total", matriz_desvio_total)        
@@ -753,6 +771,8 @@ class ResultadoFullthreshold:
         desvio_paciente.sort(reverse=False)
         desvio_total[-2:] = desvio_total[-4:-2]
         desvio_paciente[:1] = desvio_paciente[1:2]
+        desvio_paciente[:2] = desvio_paciente[2:4]
+       
         desenha_curva_bebie(desvio_total, desvio_paciente)
         
         
@@ -1215,10 +1235,10 @@ if __name__ == "__main__":
     from cordenadas_30 import cordenadas_30
     from converte_atenuacao_txt import read_file_to_list
     
-    atenuacoes = read_file_to_list(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "atenuacao_teste", "exame.txt")))
+    atenuacoes = read_file_to_list(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "atenuacao_teste", "exame2.txt")),7)
 
     DadosExame.exame_selecionado = Constantes.fullthreshold
-    DadosExame.olho = Constantes.olho_direito
+    DadosExame.olho = Constantes.olho_esquerdo
 
     pygame.init()
     pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
