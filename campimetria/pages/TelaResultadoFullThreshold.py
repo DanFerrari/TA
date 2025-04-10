@@ -837,34 +837,62 @@ class ResultadoFullthreshold:
         cor_legenda_moderado = (179,108,8)
         cor_legenda_severo = (166,6,6)
         
-        def render_texto_colorido(fonte, texto, cor_restante, cor_primeira=(0, 0, 0)):
+        def render_texto_colorido(fonte, texto, cor_restante, cor_primeira=(0, 0, 0), largura_max=850):
             """
             Renderiza um texto com tudo que estiver antes de ':' em preto
             e o restante em uma cor definida.
+            Faz quebra de linha se ultrapassar a largura máxima.
             """
-            
-            
+
             if ':' in texto:
                 parte1, parte2 = texto.split(':', 1)
-                parte1 += ':'  # mantém os dois pontos
+                parte1 += ':'
                 parte2 = parte2.strip()
             else:
                 parte1 = texto
                 parte2 = ""
 
-            # Renderiza as duas partes
-            render1 = fonte.render(parte1, True, cor_primeira)
-            render2 = fonte.render(parte2, True, cor_restante) if parte2 else None
+            linhas = []
+            espaco = fonte.size(" ")[0]
 
-            # Cria uma surface para juntar
-            largura_total = render1.get_width() + (render2.get_width() if render2 else 0) + fonte.size(" ")[0]
-            altura = max(render1.get_height(), render2.get_height() if render2 else 0)
-            surface_final = pygame.Surface((largura_total, altura), pygame.SRCALPHA)
+            # Começa com a parte1
+            rendered = fonte.render(parte1, True, cor_primeira)
+            linha_atual = [rendered]
+            largura_linha = rendered.get_width()
 
-            # Blit das partes
-            surface_final.blit(render1, (0, 0))
-            if render2:
-                surface_final.blit(render2, (render1.get_width() + fonte.size(" ")[0], 0))
+            if parte2:
+                palavras = parte2.split()
+                for palavra in palavras:
+                    word_render = fonte.render(palavra, True, cor_restante)
+                    word_width = word_render.get_width()
+
+                    if largura_linha + espaco + word_width > largura_max:
+                        # Salva a linha atual e começa uma nova
+                        linhas.append(linha_atual)
+                        linha_atual = [word_render]
+                        largura_linha = word_width
+                    else:
+                        linha_atual.append(word_render)
+                        largura_linha += espaco + word_width
+
+            if linha_atual:
+                linhas.append(linha_atual)
+
+            # Calcula tamanho total da surface
+            altura_linha = fonte.get_height()
+            altura_total = altura_linha * len(linhas)
+            largura_surface = largura_max
+
+            surface_final = pygame.Surface((largura_surface, altura_total), pygame.SRCALPHA)
+
+            # Blitando linhas
+            y = 0
+            for linha in linhas:
+                x = 0
+                for palavra in linha:
+                    surface_final.blit(palavra, (x, y))
+                    x += palavra.get_width() + espaco
+                y += altura_linha
 
             return surface_final
 
@@ -913,6 +941,9 @@ class ResultadoFullthreshold:
             faixa_psd_chosen = 2
         if DadosExame.psd > 5.0:
             faixa_psd_chosen = 3
+            
+        DadosExame.resultado_md = faixa_md[faixa_md_chosen]
+        DadosExame.resultado_psd = faixa_psd[faixa_psd_chosen]
 
         def verifica_confiabilidade():
             bom, ruim, muito_ruim = 0, 0, 0
@@ -955,7 +986,7 @@ class ResultadoFullthreshold:
                 DadosExame.confiabilidade = Constantes.ruim
             if muito_ruim == 3:
                 DadosExame.confiabilidade = Constantes.nao_confiavel
-
+            
 
         def gerar_resultado_final(faixa_psd,faixa_md,faixa_md_chosen,faixa_psd_chosen):         
 
@@ -969,8 +1000,9 @@ class ResultadoFullthreshold:
                 elif faixa_md_chosen == 0 and faixa_psd_chosen != 0:
                     interpretacao = f"Presença de defeitos localizados: {faixa_psd[faixa_psd_chosen]}."
                 else:
-                    interpretacao = f"Alterações difusas e localizadas: {faixa_md[faixa_md_chosen]}, {faixa_psd[faixa_psd_chosen]}."
+                    interpretacao = f"Alterações difusas e localizadas, MD: {faixa_md[faixa_md_chosen]}, PSD :{faixa_psd[faixa_psd_chosen]}."
 
+            DadosExame.resultado_exame = interpretacao
             return interpretacao
         
         
@@ -998,20 +1030,20 @@ class ResultadoFullthreshold:
 
         minutos, segundos = divmod((DadosExame.duracao_do_exame / 1000), 60)
         labels = [
+            f"ID exame: {DadosExame.exame_id}",
             f"Central 30°",
-            f"Exame: {DadosExame.exame_selecionado.upper()}",
             f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
             
             f"Olho: {DadosExame.olho}",
-            f"Duração (min): {int(minutos)}:{int(segundos)}",
+            f"Tamanho do estimulo: {estimulo.get(DadosExame.tamanho_estimulo)}",
             f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
             
-            f"Total de pontos: {DadosExame.total_de_pontos_testados}",
-            f"ID exame: {DadosExame.exame_id}",
+            f"Exame: {DadosExame.exame_selecionado.upper()}",
+            f"Duração (min): {int(minutos)}:{int(segundos)}",
             f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({DadosExame.perda_de_fixacao_percentual:.2f}%)",
             
-            f"Tamanho do estimulo: {estimulo.get(DadosExame.tamanho_estimulo)}",
             f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}",           
+            f"Total de pontos: {DadosExame.total_de_pontos_testados}",
             f"Limiar Foveal: {int(DadosExame.LimiarFoveal)} (dB)",
         ]
         labels_valores = [ f"MD:{DadosExame.md:.2f}  ({faixa_md[faixa_md_chosen]})",           
@@ -1022,7 +1054,7 @@ class ResultadoFullthreshold:
         # Configuração para desenhar labels em colunas de 3 com 4 linhas
         colunas = 3
         linhas = 4
-        espacamento_x = 300  # Espaço entre colunas
+        espacamento_x = 280  # Espaço entre colunas
         espacamento_y = 50  # Espaço entre linhas
         pos_x_inicial = 1020  # Posição inicial da primeira coluna
         pos_y_inicial = 50  # Posição inicial da primeira linha
@@ -1062,6 +1094,7 @@ class ResultadoFullthreshold:
                         color_label_info = cor_legenda_moderado
                     case 3:
                         color_label_info = cor_legenda_severo
+                
 
             if i == 1:
                 if DadosExame.confiabilidade == Constantes.confiavel:
@@ -1103,7 +1136,7 @@ class ResultadoFullthreshold:
             color_label_info = (0, 0, 0)
             if i == 2:
                 if DadosExame.falso_positivo_respondidos_percentual <= 15:
-                    color_label_info = cor_legenda_normal
+                    color_label_info = (0, 0, 0)
                 if (
                     DadosExame.falso_positivo_respondidos_percentual > 15
                     and DadosExame.falso_positivo_respondidos_percentual <= 20
@@ -1114,7 +1147,7 @@ class ResultadoFullthreshold:
 
             if i == 5:
                 if DadosExame.falso_negativo_respondidos_percentual <= 15:
-                    color_label_info = cor_legenda_normal
+                    color_label_info = (0, 0, 0)
                 if (
                     DadosExame.falso_negativo_respondidos_percentual > 15
                     and DadosExame.falso_negativo_respondidos_percentual <= 30
@@ -1125,7 +1158,7 @@ class ResultadoFullthreshold:
 
             if i == 8:
                 if DadosExame.perda_de_fixacao_percentual <= 20:
-                    color_label_info = cor_legenda_normal
+                    color_label_info = (0, 0, 0)
                 if (
                     DadosExame.perda_de_fixacao_percentual > 20
                     and DadosExame.perda_de_fixacao_percentual <= 30

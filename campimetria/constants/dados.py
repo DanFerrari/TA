@@ -65,7 +65,6 @@ class Fonts:
 class DadosExame:
     #  faixa_etaria =>  1:"0 - 20", 2:"21 - 30", 3:"31 - 40", 4:"41 - 50", 5:"51 - 60", 6:"61 - 70", 7:"71 - 80" 8: "81 - 90", 9: " > 90"  
     exame_id = 0
-    confiabilidade = ""
     faixa_etaria = 2
     distancia_paciente = 200
     tamanho_estimulo = 3
@@ -95,6 +94,10 @@ class DadosExame:
     falso_positivo_respondidos_percentual = 0.0
     md = 0
     psd = 0
+    resultado_md = ""
+    resultado_psd = ""    
+    resultado_exame = ""
+    confiabilidade = ""
     
     
 

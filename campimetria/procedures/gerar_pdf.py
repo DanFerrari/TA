@@ -58,22 +58,25 @@ class GerarPdf():
 
         
         minutos,segundos = divmod((DadosExame.duracao_do_exame / 1000),60)
+         
+        
+        
         
       
         c.setFont("Helvetica-Bold", 10)
-        c.drawString(26,altura - 38, f"Central 30°")
-        c.drawString(226, altura - 38, f"Exame: {(DadosExame.exame_selecionado).upper()}")  
-        c.drawString(26, altura - 85, f"ID exame:{DadosExame.exame_id}")
-        c.drawString(226, altura - 85, f"Olho:{DadosExame.olho}")  
-        c.drawString(413, altura - 85, f"Tamanho Estímulo:{estimulo.get(DadosExame.tamanho_estimulo)}")
-        c.drawString(26, altura - 131, f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)")
+        c.drawString(26,altura - 38, f"ID exame:{DadosExame.exame_id}")
+        c.drawString(26, altura - 85, f"Olho:{DadosExame.olho}")  
+        c.drawString(26, altura - 131, f"Exame: {(DadosExame.exame_selecionado).upper()}")  
+        c.drawString(226, altura - 38, f"Central 30°")
+        c.drawString(226, altura - 85, f"Tamanho Estímulo:{estimulo.get(DadosExame.tamanho_estimulo)}")
+        c.drawString(413, altura - 38, f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)")
         c.drawString(226, altura - 131, f"Duração (min): {int(minutos)}:{int(segundos)}")
-        c.drawString(413, altura -131, f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)")
-        c.drawString(26, altura - 176, f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({perda_fixacao:.2f}%)")
+        c.drawString(413, altura - 85, f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)")
+        c.drawString(413, altura -131, f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({perda_fixacao:.2f}%)")
         c.drawString(226, altura - 176, f"Total de pontos: {DadosExame.total_de_pontos_testados}")
         if DadosExame.exame_selecionado == Constantes.fullthreshold:
             c.drawString(413, altura - 176, f"Limiar Foveal(dB):{DadosExame.LimiarFoveal}")  
-            c.drawString(413, altura - 38, f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}") 
+            c.drawString(26, altura - 176, f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}") 
             nova_largura = 400  
             nova_altura = int(nova_largura * (540 / 960))
             x_pos = 220 
@@ -99,9 +102,14 @@ class GerarPdf():
             
             c.drawString(38, altura - 540, "Desvio Total")
             c.drawString(195, altura -540, "Desvio Padrão")
+            
+            c.drawString(43,160,(f"MD: {DadosExame.md:.2f} ({DadosExame.resultado_md})").upper())
+            c.drawString(43,145,(f"PSD: {DadosExame.psd:.2f} ({DadosExame.resultado_psd})").upper())
+            c.drawString(43,130,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
+            c.drawString(43,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
          
         elif DadosExame.exame_selecionado == Constantes.screening:
-            c.drawString(413, altura - 38, f"Atenuação (dB):{DadosExame.atenuacao_screening}")
+            c.drawString(26, altura - 176, f"Atenuação (dB):{DadosExame.atenuacao_screening}")
             nova_largura = 400  
             nova_altura = int(nova_largura * (540 / 960))
             x_pos = 220 
