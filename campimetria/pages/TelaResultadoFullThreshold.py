@@ -831,11 +831,19 @@ class ResultadoFullthreshold:
 
     @staticmethod
     def desenha_legendas_exame():
+        
+        cor_legenda_normal = (9,92,12)
+        cor_legenda_leve = (161,156,14)
+        cor_legenda_moderado = (179,108,8)
+        cor_legenda_severo = (166,6,6)
+        
         def render_texto_colorido(fonte, texto, cor_restante, cor_primeira=(0, 0, 0)):
             """
             Renderiza um texto com tudo que estiver antes de ':' em preto
             e o restante em uma cor definida.
             """
+            
+            
             if ':' in texto:
                 parte1, parte2 = texto.split(':', 1)
                 parte1 += ':'  # mantém os dois pontos
@@ -877,7 +885,7 @@ class ResultadoFullthreshold:
             "Normal ou alteração mínima",
             "Perda leve",
             "Perda moderada, ponto de atenção",
-            "Campo severamente comprometido",
+            "Perda severa",
         ]
         faixa_psd_chosen = 0
         faixa_psd = [
@@ -888,16 +896,16 @@ class ResultadoFullthreshold:
         ]
         estimulo = {1: "I", 2: "II", 3: "III", 4: "IV", 5: "V"}
 
-        if DadosExame.md < -2.0:
+        if DadosExame.md >= -2.0:
             faixa_md_chosen = 0
-        if DadosExame.md < -5.0:
+        if DadosExame.md >= -6.0 and DadosExame.md < -2.0:
             faixa_md_chosen = 1
-        if DadosExame.md < -10.0:
+        if DadosExame.md >= -10.0 and DadosExame.md < -6.0:
             faixa_md_chosen = 2
-        if DadosExame.md < -18.0:
+        if DadosExame.md < -10.0:
             faixa_md_chosen = 3
 
-        if DadosExame.psd < 1.5:
+        if DadosExame.psd < 2.0:
             faixa_psd_chosen = 0
         if DadosExame.psd < 3.0:
             faixa_psd_chosen = 1
@@ -913,30 +921,30 @@ class ResultadoFullthreshold:
                 bom += 1
             if (
                 DadosExame.falso_positivo_respondidos_percentual > 15
-                and DadosExame.falso_positivo_respondidos_percentual <= 20
+                and DadosExame.falso_positivo_respondidos_percentual <= 33
             ):
                 ruim += 1
-            elif DadosExame.falso_positivo_respondidos_percentual > 20:
+            elif DadosExame.falso_positivo_respondidos_percentual > 33:
                 muito_ruim += 1
 
             if DadosExame.falso_negativo_respondidos_percentual <= 15:
                 bom += 1
             if (
                 DadosExame.falso_negativo_respondidos_percentual > 15
-                and DadosExame.falso_negativo_respondidos_percentual <= 30
+                and DadosExame.falso_negativo_respondidos_percentual <= 33
             ):
                 ruim += 1
-            elif DadosExame.falso_negativo_respondidos_percentual > 30:
+            elif DadosExame.falso_negativo_respondidos_percentual > 33:
                 muito_ruim += 1
 
-            if DadosExame.perda_de_fixacao_percentual <= 20:
+            if DadosExame.perda_de_fixacao_percentual <= 10:
                 bom += 1
             if (
-                DadosExame.perda_de_fixacao_percentual > 20
-                and DadosExame.perda_de_fixacao_percentual <= 30
+                DadosExame.perda_de_fixacao_percentual > 10
+                and DadosExame.perda_de_fixacao_percentual <= 20
             ):
                 ruim += 1
-            elif DadosExame.perda_de_fixacao_percentual > 30:
+            elif DadosExame.perda_de_fixacao_percentual > 20:
                 muito_ruim += 1
 
             if bom == 3:
@@ -964,6 +972,8 @@ class ResultadoFullthreshold:
                     interpretacao = f"Alterações difusas e localizadas: {faixa_md[faixa_md_chosen]}, {faixa_psd[faixa_psd_chosen]}."
 
             return interpretacao
+        
+        
         DadosExame.perda_de_fixacao_percentual = (
             ((DadosExame.perda_de_fixacao / DadosExame.total_testes_mancha) * 100)
             if DadosExame.perda_de_fixacao > 0.0
@@ -1014,16 +1024,16 @@ class ResultadoFullthreshold:
         linhas = 4
         espacamento_x = 300  # Espaço entre colunas
         espacamento_y = 50  # Espaço entre linhas
-        pos_x_inicial = 1050  # Posição inicial da primeira coluna
+        pos_x_inicial = 1020  # Posição inicial da primeira coluna
         pos_y_inicial = 50  # Posição inicial da primeira linha
         
         cor_resultado = (0,0,0)
         if faixa_md_chosen == 0 and faixa_psd_chosen == 0:
-            cor_resultado = (0, 153, 81)
+            cor_resultado = cor_legenda_normal
         if faixa_md_chosen != 0 or faixa_psd_chosen != 0:
-            cor_resultado = (252, 166, 41)
-        if faixa_md_chosen == 4 and faixa_psd_chosen == 4:
-            cor_resultado = (255, 6, 6)
+            cor_resultado = cor_legenda_moderado
+        if faixa_md_chosen == 3 or faixa_psd_chosen == 3:
+            cor_resultado = cor_legenda_severo
 
         
         
@@ -1034,9 +1044,9 @@ class ResultadoFullthreshold:
         
         espacamento_x_valores = 450
         espacamento_y_valores = 50
-        pos_x_inicial_valores = 1050
+        pos_x_inicial_valores = 1020
         pos_y_inicial_valores = 300
-        fonte = pygame.font.Font(None, 30)
+        fonte = pygame.font.Font(None, 28)
         
         for i,texto in enumerate(labels_valores):
             coluna = i % 1
@@ -1045,33 +1055,33 @@ class ResultadoFullthreshold:
             if i == 0:
                 match faixa_md_chosen:
                     case 0:
-                        color_label_info = (0, 153, 81)
+                        color_label_info = cor_legenda_normal
                     case 1:
-                        color_label_info = (218, 213, 63)
+                        color_label_info = cor_legenda_leve
                     case 2:
-                        color_label_info = (252, 166, 41)
+                        color_label_info = cor_legenda_moderado
                     case 3:
-                        color_label_info = (255, 6, 6)
+                        color_label_info = cor_legenda_severo
 
             if i == 1:
                 if DadosExame.confiabilidade == Constantes.confiavel:
-                    color_label_info = (0, 153, 81)
+                    color_label_info = cor_legenda_normal
                 if DadosExame.confiabilidade == Constantes.questionavel:
-                    color_label_info = (218, 213, 63)
+                    color_label_info = cor_legenda_leve
                 if DadosExame.confiabilidade == Constantes.ruim:
-                    color_label_info = (252, 166, 41)
+                    color_label_info = cor_legenda_moderado
                 if DadosExame.confiabilidade == Constantes.nao_confiavel:
-                    color_label_info = (255, 6, 6)
+                    color_label_info = cor_legenda_severo
             if i == 2:
                 match faixa_psd_chosen:
                     case 0:
-                        color_label_info = (0, 153, 81)
+                        color_label_info = cor_legenda_normal
                     case 1:
-                        color_label_info = (218, 213, 63)
+                        color_label_info = cor_legenda_leve
                     case 2:
-                        color_label_info = (252, 166, 41)
+                        color_label_info = cor_legenda_moderado
                     case 3:
-                        color_label_info = (255, 6, 6)
+                        color_label_info = cor_legenda_severo
             if i == 3:
                 color_label_info = cor_resultado
             
@@ -1080,7 +1090,7 @@ class ResultadoFullthreshold:
 
             # Renderiza a label
 
-            texto_renderizado = render_texto_colorido(fonte,texto,color_label_info)
+            texto_renderizado = render_texto_colorido(fonte,texto.upper(),color_label_info)
             pygame.display.get_surface().blit(texto_renderizado, (pos_x, pos_y))
 
         fonte = pygame.font.Font(None, 26)
@@ -1093,42 +1103,42 @@ class ResultadoFullthreshold:
             color_label_info = (0, 0, 0)
             if i == 2:
                 if DadosExame.falso_positivo_respondidos_percentual <= 15:
-                    color_label_info = (0, 153, 81)
+                    color_label_info = cor_legenda_normal
                 if (
                     DadosExame.falso_positivo_respondidos_percentual > 15
                     and DadosExame.falso_positivo_respondidos_percentual <= 20
                 ):
-                    color_label_info = (252, 166, 41)
+                    color_label_info = cor_legenda_moderado
                 elif DadosExame.falso_positivo_respondidos_percentual > 20:
-                    color_label_info = (255, 6, 6)
+                    color_label_info = cor_legenda_severo
 
             if i == 5:
                 if DadosExame.falso_negativo_respondidos_percentual <= 15:
-                    color_label_info = (0, 153, 81)
+                    color_label_info = cor_legenda_normal
                 if (
                     DadosExame.falso_negativo_respondidos_percentual > 15
                     and DadosExame.falso_negativo_respondidos_percentual <= 30
                 ):
-                    color_label_info = (252, 166, 41)
+                    color_label_info = cor_legenda_moderado
                 elif DadosExame.falso_negativo_respondidos_percentual > 30:
-                    color_label_info = (255, 6, 6)
+                    color_label_info = cor_legenda_severo
 
             if i == 8:
                 if DadosExame.perda_de_fixacao_percentual <= 20:
-                    color_label_info = (0, 153, 81)
+                    color_label_info = cor_legenda_normal
                 if (
                     DadosExame.perda_de_fixacao_percentual > 20
                     and DadosExame.perda_de_fixacao_percentual <= 30
                 ):
-                    color_label_info = (252, 166, 41)
+                    color_label_info = cor_legenda_moderado
                 elif DadosExame.perda_de_fixacao_percentual > 30:
-                    color_label_info = (255, 6, 6)
+                    color_label_info = cor_legenda_severo
 
            
             # Calcula a posição para desenhar
             pos_x = pos_x_inicial + coluna * espacamento_x
             pos_y = pos_y_inicial + linha * espacamento_y
-            texto_renderizado = render_texto_colorido(fonte,texto,color_label_info)
+            texto_renderizado = render_texto_colorido(fonte,texto.upper(),color_label_info)
             # Desenha a label na tela
             pygame.display.get_surface().blit(texto_renderizado, (pos_x, pos_y))
 
@@ -1438,7 +1448,7 @@ if __name__ == "__main__":
     atenuacoes = read_file_to_list(
         os.path.abspath(
             os.path.join(
-                os.path.dirname(__file__), "..", "atenuacao_teste", "exame4.txt"
+                os.path.dirname(__file__), "..", "atenuacao_teste", "exame6.txt"
             )
         ),
         7,
