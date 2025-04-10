@@ -27,8 +27,9 @@ from atenuacoes_base import atenuacoes_base
 from atenuacao_daniel import atenuacao_daniel
 
 
-
 class ResultadoFullthreshold:
+    
+    
 
     @staticmethod
     def gerar_pontos_mapa_textura():
@@ -56,7 +57,6 @@ class ResultadoFullthreshold:
             ponto_novo.pontoPix = 4
             ponto_novo.x = int(ponto_novo.x * 960 / 1920)
             ponto_novo.y = int(ponto_novo.y * 540 / 1080)
-            ponto_novo.y += 540
             ponto_novo.atenuacao = ponto.atenuacao
             matriz.append(ponto_novo)
         return matriz
@@ -136,7 +136,7 @@ class ResultadoFullthreshold:
             pygame.display.update()
 
     @staticmethod
-    def estrutura_legenda(texturas):
+    def estrutura_legenda(texturas, surface):
 
         centro_x, centro_y = 480, 270
         largura, altura = 40, 30
@@ -170,32 +170,28 @@ class ResultadoFullthreshold:
 
         if ResultadoFullthreshold.mapa_cor:
             for i, rect in enumerate(textura_rect):
-                pygame.draw.rect(
-                    pygame.display.get_surface(), texturas[i], textura_rect[i]
-                )
-                pygame.display.get_surface().blit(
+                pygame.draw.rect(surface, texturas[i], textura_rect[i])
+                surface.blit(
                     fonte.render(texto_medidas[i], True, (0, 0, 0)),
                     ((lambda: rect[0])() + 50, (lambda: rect[1])() + 7.5),
                 )
         else:
             for k, rect in enumerate(textura_rect):
-                pygame.display.get_surface().blit(
+                surface.blit(
                     fonte.render(texto_medidas[k], True, (0, 0, 0)),
                     ((lambda: rect[0])() + 50, (lambda: rect[1])() + 7.5),
                 )
                 borda = (rect[0] - 1, rect[1] - 1, rect[2] + 2, rect[3] + 2)
-                pygame.draw.rect(
-                    pygame.display.get_surface(), pygame.Color("black"), borda, 2
-                )
+                pygame.draw.rect(surface, pygame.Color("black"), borda, 2)
 
                 for i in range(0, largura, 5):
                     for j in range(0, altura, 5):
                         pos_x = rect[0] + i
                         pos_y = rect[1] + j
-                        pygame.display.get_surface().blit(texturas[k], (pos_x, pos_y))
+                        surface.blit(texturas[k], (pos_x, pos_y))
 
     @staticmethod
-    def gerar_legenda_pontos():
+    def gerar_legenda_pontos(surface):
         texturas = []
         for i in range(1, 10):
             caminho = os.path.abspath(
@@ -212,10 +208,10 @@ class ResultadoFullthreshold:
                 texturas.append(pygame.image.load(caminho).convert())
             else:
                 print(f"caminho nao existe: {caminho}")
-        ResultadoFullthreshold.estrutura_legenda(texturas)
+        ResultadoFullthreshold.estrutura_legenda(texturas, surface)
 
     @staticmethod
-    def gerar_legenda_cores():
+    def gerar_legenda_cores(surface):
 
         texturas = [
             (0, 0, 156),
@@ -230,9 +226,9 @@ class ResultadoFullthreshold:
             # (255, 0, 0)
         ]
 
-        ResultadoFullthreshold.estrutura_legenda(texturas)
+        ResultadoFullthreshold.estrutura_legenda(texturas, surface)
 
-    def gerar_legenda_tons_cinza():
+    def gerar_legenda_tons_cinza(surface):
 
         texturas = [
             (0, 0, 0),
@@ -246,7 +242,7 @@ class ResultadoFullthreshold:
             (225, 225, 225),
         ]
 
-        ResultadoFullthreshold.estrutura_legenda(texturas)
+        ResultadoFullthreshold.estrutura_legenda(texturas, surface)
 
     @staticmethod
     def gerar_texturas_coloridas(atenuacao):
@@ -399,53 +395,88 @@ class ResultadoFullthreshold:
             (centro_x + raio, centro_y),
             2,
         )
-        pygame.display.get_surface().blit(buffer, (0, 0))
-        ResultadoFullthreshold.gerar_legenda_textura()
+
+        ResultadoFullthreshold.gerar_legenda_textura(buffer)
+
+        pygame.image.save(
+            buffer,
+            os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "..",
+                    "utils",
+                    "images",
+                    "temp",
+                    f"mapa_pontos.png",
+                )
+            ),
+        )
+        pygame.display.get_surface().blit(buffer, (-200, 0))
+
         if not firstload:
             ResultadoFullthreshold.mostrar_label_temporaria(True)
         else:
             ResultadoFullthreshold.status_resultado(carregado=True)
 
     @staticmethod
-    def gerar_legenda_textura():
+    def gerar_legenda_textura(surface):
 
         if ResultadoFullthreshold.mapa_cor:
             if ResultadoFullthreshold.mapa_cinza:
-                ResultadoFullthreshold.gerar_legenda_tons_cinza()
+                ResultadoFullthreshold.gerar_legenda_tons_cinza(surface)
 
             else:
-                ResultadoFullthreshold.gerar_legenda_cores()
+                ResultadoFullthreshold.gerar_legenda_cores(surface)
         else:
-            ResultadoFullthreshold.gerar_legenda_pontos()
+            ResultadoFullthreshold.gerar_legenda_pontos(surface)
 
     @staticmethod
     def desenhar_mapa_limiares():
+        largura = 1920 / 2  # Raio do círculo * 2
+        altura = 1080 / 2  # Raio do círculo * 2
+        surface = pygame.Surface((largura, altura))
+        surface.fill((255, 255, 255))
         fonte = pygame.font.Font(None, 18)
         # Desenhar pontos e labels
         for ponto in ResultadoFullthreshold.matriz_pontos_mapa_limiar:
-            ponto.plotarPonto()
+
+            ponto.plotarPonto(surface=surface)
             label = fonte.render(f"{int(ponto.atenuacao)}", True, (0, 0, 0))
             label_rect = label.get_rect(center=(ponto.x - 0.505, ponto.y + 12))
-            pygame.display.get_surface().blit(label, label_rect)
+            surface.blit(label, label_rect)
 
         # circulo do mapa de limiar
-        pygame.draw.circle(pygame.display.get_surface(), (0, 0, 0), (480, 810), 230, 1)
+        pygame.draw.circle(surface, (0, 0, 0), (480, altura / 2), 230, 1)
 
         # cruz do mapa
         pygame.draw.line(
-            pygame.display.get_surface(),
+            surface,
             (0, 0, 0),
-            (480 + 230, 810),
-            (480 - 230, 810),
+            (480 + 230, altura / 2),
+            (480 - 230, altura / 2),
             1,
         )
         pygame.draw.line(
-            pygame.display.get_surface(),
+            surface,
             (0, 0, 0),
-            (480, 810 + 230),
-            (480, 810 - 230),
+            (480, altura / 2 + 230),
+            (480, altura / 2 - 230),
             1,
         )
+        pygame.image.save(
+            surface,
+            os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "..",
+                    "utils",
+                    "images",
+                    "temp",
+                    f"mapa_limiares.png",
+                )
+            ),
+        )
+        pygame.display.get_surface().blit(surface, (-200, 540))
 
     @staticmethod
     def gerar_mapa_desvios_e_curva_de_bebie():
@@ -488,28 +519,33 @@ class ResultadoFullthreshold:
                     from idade_90 import lista_valores
 
             return lista_valores
+
         def espelhar_vetor(vetor):
             lista_atenuacao = []
-            for cordenada,atenuacao in vetor.items():
+            for cordenada, atenuacao in vetor.items():
                 lista_atenuacao.append(atenuacao)
-            print(lista_atenuacao)
+
             tamanhos_linhas = [4, 6, 8, 10, 10, 10, 10, 8, 6, 4]
             espelhado = []
             inicio = 0
 
             for tamanho in tamanhos_linhas:
-                linha = lista_atenuacao[inicio:inicio + tamanho]
+                linha = lista_atenuacao[inicio : inicio + tamanho]
                 espelhado.extend(linha[::-1])  # faz o espelhamento (slice reverso)
                 inicio += tamanho
-            for (cordenada,atenuacao),atenuacao_espelhada in zip(vetor.items(),espelhado):
+            for (cordenada, atenuacao), atenuacao_espelhada in zip(
+                vetor.items(), espelhado
+            ):
                 vetor[cordenada] = atenuacao_espelhada
             return vetor
 
         def desenha_curva_bebie(desvio_total, desvio_paciente):
             tolerancia_positiva = [valor - 3 for valor in desvio_total]
             tolerancia_negativa = [valor + 3 for valor in desvio_total]
-            
-            quantidade_pontos = np.arange(1, len(desvio_total) + 1)  # Adjusted to include point 76
+
+            quantidade_pontos = np.arange(
+                1, len(desvio_total) + 1
+            )  # Adjusted to include point 76
             fig, ax = plt.subplots()
             ax.step(
                 quantidade_pontos,
@@ -537,7 +573,9 @@ class ResultadoFullthreshold:
                 [str(i) for i in np.arange(25, -10, -5)]
             )  # Ensure labels are displayed
             ax.set_xlim(1, len(desvio_total) + 2)
-            ax.set_xticks(np.arange(1, len(desvio_total) + 1, 15))  # Adjusted to include point 76
+            ax.set_xticks(
+                np.arange(1, len(desvio_total) + 1, 15)
+            )  # Adjusted to include point 76
             ax.set_xticklabels(
                 [str(i) for i in np.arange(1, len(desvio_total) + 1, 15)]
             )  # Ensure labels are displayed
@@ -606,11 +644,15 @@ class ResultadoFullthreshold:
 
             # Plota os pontos na superfície
             for ponto in matriz_pontos:
-                if (DadosExame.olho == Constantes.olho_direito and 
-                        ((ponto.xg == 15 and ponto.yg == 3) or (ponto.xg == 15 and ponto.yg == -3))):                        
+                if DadosExame.olho == Constantes.olho_direito and (
+                    (ponto.xg == 15 and ponto.yg == 3)
+                    or (ponto.xg == 15 and ponto.yg == -3)
+                ):
                     continue
-                if (DadosExame.olho == Constantes.olho_esquerdo and 
-                    ((ponto.xg == -15 and ponto.yg == 3) or (ponto.xg == -15 and ponto.yg == -3))):                       
+                if DadosExame.olho == Constantes.olho_esquerdo and (
+                    (ponto.xg == -15 and ponto.yg == 3)
+                    or (ponto.xg == -15 and ponto.yg == -3)
+                ):
                     continue
                 ponto.plotaString(ponto.atenuacao, 20, surface=surface)
 
@@ -637,27 +679,30 @@ class ResultadoFullthreshold:
                 x, y = cordenada
                 for ponto in DadosExame.matriz_pontos:
                     if (x, y) == (ponto.xg, ponto.yg):
-                        if (DadosExame.olho == Constantes.olho_direito and
-                                ponto.xg == 15
-                                and ponto.yg == 3
-                                or ponto.xg == 15
-                                and ponto.yg == -3
-                                
-                            ):
-                                continue
-                        elif (DadosExame.olho == Constantes.olho_esquerdo and
-                            ponto.xg == -15
+                        if (
+                            DadosExame.olho == Constantes.olho_direito
+                            and ponto.xg == 15
+                            and ponto.yg == 3
+                            or ponto.xg == 15
+                            and ponto.yg == -3
+                        ):
+                            continue
+                        elif (
+                            DadosExame.olho == Constantes.olho_esquerdo
+                            and ponto.xg == -15
                             and ponto.yg == 3
                             or ponto.xg == -15
                             and ponto.yg == -3
                         ):
                             continue
 
-                
-                        somatorio1 = somatorio1 +  (float(ponto.atenuacao) - float(atenuacao))/ (variancia * variancia)
-                        somatorio2 = somatorio2 +  (1.0/(variancia * variancia))
-                
-            DadosExame.md = float(round((somatorio1/somatorio2),3))
+                        somatorio1 = somatorio1 + (
+                            float(ponto.atenuacao) - float(atenuacao)
+                        ) / (variancia * variancia)
+                        somatorio2 = somatorio2 + (1.0 / (variancia * variancia))
+
+            DadosExame.md = float(round((somatorio1 / somatorio2), 3))
+
         def calcula_PSD(matriz_desvio_total):
             tam = len(matriz_desvio_total)
             somatorio1 = 0.0
@@ -665,43 +710,44 @@ class ResultadoFullthreshold:
             variancia = 4.0
             for i in range(tam - 3):
                 somatorio1 = somatorio1 + (variancia * variancia)
-            
+
             for ponto in matriz_desvio_total:
-                if (DadosExame.olho == Constantes.olho_direito and 
-                        ((ponto.xg == 15 and ponto.yg == 3) or (ponto.xg == 15 and ponto.yg == -3))):                        
+                if DadosExame.olho == Constantes.olho_direito and (
+                    (ponto.xg == 15 and ponto.yg == 3)
+                    or (ponto.xg == 15 and ponto.yg == -3)
+                ):
                     continue
-                if (DadosExame.olho == Constantes.olho_esquerdo and 
-                    ((ponto.xg == -15 and ponto.yg == 3) or (ponto.xg == -15 and ponto.yg == -3))):                       
+                if DadosExame.olho == Constantes.olho_esquerdo and (
+                    (ponto.xg == -15 and ponto.yg == 3)
+                    or (ponto.xg == -15 and ponto.yg == -3)
+                ):
                     continue
-                somatorio2 = somatorio2 + float(pow(ponto.atenuacao - DadosExame.md, 2.0)/ pow(variancia,2.0))
-            
+                somatorio2 = somatorio2 + float(
+                    pow(ponto.atenuacao - DadosExame.md, 2.0) / pow(variancia, 2.0)
+                )
+
             somatorio1 = somatorio1 / float(tam - 2)
-            somatorio2 = somatorio2/ float(tam - 3)
+            somatorio2 = somatorio2 / float(tam - 3)
             psd = somatorio1 * somatorio2
             psd = float(math.sqrt(psd))
             DadosExame.psd = psd
-            
-            
+
         def calcula_desvio(matriz_desvio_total):
             setimo_valor = 0
-            curva_paciente_filtrada = [ ponto.atenuacao for ponto in matriz_desvio_total]
+            curva_paciente_filtrada = [ponto.atenuacao for ponto in matriz_desvio_total]
             curva_paciente_filtrada.sort(reverse=True)
             setimo_valor = curva_paciente_filtrada[9]
-            print(curva_paciente_filtrada)
             for ponto in matriz_desvio_total:
-                ponto_desvio_padrao = Ponto(ponto.xg,ponto.yg,3,(0,0,0),200)                              
+                ponto_desvio_padrao = Ponto(ponto.xg, ponto.yg, 3, (0, 0, 0), 200)
                 ponto_desvio_padrao.atenuacao = ponto.atenuacao - setimo_valor
                 ponto_desvio_padrao.x = ponto.x
                 ponto_desvio_padrao.y = ponto.y
                 matriz_desvio_padrao.append(ponto_desvio_padrao)
 
-            
-            
-
         lista_base_atenuacao = verifica_faixa_etaria(DadosExame.faixa_etaria)
         if DadosExame.olho == Constantes.olho_esquerdo:
             lista_base_atenuacao = espelhar_vetor(lista_base_atenuacao)
-        
+
         curva_base = [
             atenuacao for cordenada, atenuacao in lista_base_atenuacao.items()
         ]
@@ -710,27 +756,38 @@ class ResultadoFullthreshold:
         desvio_total = []
         matriz_desvio_padrao = []
         matriz_desvio_total = []
-        
 
         for cordenada, atenuacao in lista_base_atenuacao.items():
             x, y = cordenada
             for ponto in DadosExame.matriz_pontos:
                 if (x, y) == (ponto.xg, ponto.yg):
                     curva_paciente.append(ponto.atenuacao)
-                    if (DadosExame.olho == Constantes.olho_direito and 
-                        ((ponto.xg == 15 and ponto.yg == 3) or (ponto.xg == 15 and ponto.yg == -3))):
+                    if DadosExame.olho == Constantes.olho_direito and (
+                        (ponto.xg == 15 and ponto.yg == 3)
+                        or (ponto.xg == 15 and ponto.yg == -3)
+                    ):
                         ponto_desvio = Ponto(
-                        ponto.xg, ponto.yg, tamanhoPonto=3, cor=(0, 0, 0), distancia=200
+                            ponto.xg,
+                            ponto.yg,
+                            tamanhoPonto=3,
+                            cor=(0, 0, 0),
+                            distancia=200,
                         )
                         ponto_desvio.x = int(ponto_desvio.x * 480 / 1920)
                         ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
                         ponto_desvio.atenuacao = -99
                         matriz_desvio_total.append(ponto_desvio)
                         continue
-                    if (DadosExame.olho == Constantes.olho_esquerdo and 
-                        ((ponto.xg == -15 and ponto.yg == 3) or (ponto.xg == -15 and ponto.yg == -3))):
+                    if DadosExame.olho == Constantes.olho_esquerdo and (
+                        (ponto.xg == -15 and ponto.yg == 3)
+                        or (ponto.xg == -15 and ponto.yg == -3)
+                    ):
                         ponto_desvio = Ponto(
-                        ponto.xg, ponto.yg, tamanhoPonto=3, cor=(0, 0, 0), distancia=200
+                            ponto.xg,
+                            ponto.yg,
+                            tamanhoPonto=3,
+                            cor=(0, 0, 0),
+                            distancia=200,
                         )
                         ponto_desvio.x = int(ponto_desvio.x * 480 / 1920)
                         ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
@@ -746,10 +803,7 @@ class ResultadoFullthreshold:
                     ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
                     ponto_desvio.atenuacao = ponto.atenuacao - atenuacao
                     matriz_desvio_total.append(ponto_desvio)
-        
-        
-        
-        
+
         for paciente_atenuacao, base_atenuacao in zip(curva_paciente, curva_base):
             desvio_paciente.append(-1 * (paciente_atenuacao - base_atenuacao))
             desvio_total.append(np.mean(curva_base) - base_atenuacao)
@@ -760,11 +814,11 @@ class ResultadoFullthreshold:
         for ponto in matriz_desvio_total:
             ponto.x -= 120
             ponto.y -= 15
-            
+
         calcula_desvio(matriz_desvio_total)
         calcula_MD()
         calcula_PSD(matriz_desvio_total)
-        desenha_mapa_desvio("desvio_total", matriz_desvio_total)        
+        desenha_mapa_desvio("desvio_total", matriz_desvio_total)
         desenha_mapa_desvio("desvio_padrao", matriz_desvio_padrao)
 
         desvio_total.sort(reverse=False)
@@ -772,16 +826,41 @@ class ResultadoFullthreshold:
         desvio_total[-2:] = desvio_total[-4:-2]
         desvio_paciente[:1] = desvio_paciente[1:2]
         desvio_paciente[:2] = desvio_paciente[2:4]
-       
+
         desenha_curva_bebie(desvio_total, desvio_paciente)
-        
-        
-    
 
     @staticmethod
     def desenha_legendas_exame():
+        def render_texto_colorido(fonte, texto, cor_restante, cor_primeira=(0, 0, 0)):
+            """
+            Renderiza um texto com tudo que estiver antes de ':' em preto
+            e o restante em uma cor definida.
+            """
+            if ':' in texto:
+                parte1, parte2 = texto.split(':', 1)
+                parte1 += ':'  # mantém os dois pontos
+                parte2 = parte2.strip()
+            else:
+                parte1 = texto
+                parte2 = ""
 
-        perda_fixacao = 0
+            # Renderiza as duas partes
+            render1 = fonte.render(parte1, True, cor_primeira)
+            render2 = fonte.render(parte2, True, cor_restante) if parte2 else None
+
+            # Cria uma surface para juntar
+            largura_total = render1.get_width() + (render2.get_width() if render2 else 0) + fonte.size(" ")[0]
+            altura = max(render1.get_height(), render2.get_height() if render2 else 0)
+            surface_final = pygame.Surface((largura_total, altura), pygame.SRCALPHA)
+
+            # Blit das partes
+            surface_final.blit(render1, (0, 0))
+            if render2:
+                surface_final.blit(render2, (render1.get_width() + fonte.size(" ")[0], 0))
+
+            return surface_final
+
+        DadosExame.perda_de_fixacao_percentual = 0
         faixa_etaria = {
             1: "0 - 20",
             2: "21 - 30",
@@ -809,10 +888,7 @@ class ResultadoFullthreshold:
         ]
         estimulo = {1: "I", 2: "II", 3: "III", 4: "IV", 5: "V"}
 
-
-
-        
-        if DadosExame.md < -1.5:
+        if DadosExame.md < -2.0:
             faixa_md_chosen = 0
         if DadosExame.md < -5.0:
             faixa_md_chosen = 1
@@ -829,8 +905,66 @@ class ResultadoFullthreshold:
             faixa_psd_chosen = 2
         if DadosExame.psd > 5.0:
             faixa_psd_chosen = 3
-      
-        perda_fixacao = (
+
+        def verifica_confiabilidade():
+            bom, ruim, muito_ruim = 0, 0, 0
+
+            if DadosExame.falso_positivo_respondidos_percentual <= 15:
+                bom += 1
+            if (
+                DadosExame.falso_positivo_respondidos_percentual > 15
+                and DadosExame.falso_positivo_respondidos_percentual <= 20
+            ):
+                ruim += 1
+            elif DadosExame.falso_positivo_respondidos_percentual > 20:
+                muito_ruim += 1
+
+            if DadosExame.falso_negativo_respondidos_percentual <= 15:
+                bom += 1
+            if (
+                DadosExame.falso_negativo_respondidos_percentual > 15
+                and DadosExame.falso_negativo_respondidos_percentual <= 30
+            ):
+                ruim += 1
+            elif DadosExame.falso_negativo_respondidos_percentual > 30:
+                muito_ruim += 1
+
+            if DadosExame.perda_de_fixacao_percentual <= 20:
+                bom += 1
+            if (
+                DadosExame.perda_de_fixacao_percentual > 20
+                and DadosExame.perda_de_fixacao_percentual <= 30
+            ):
+                ruim += 1
+            elif DadosExame.perda_de_fixacao_percentual > 30:
+                muito_ruim += 1
+
+            if bom == 3:
+                DadosExame.confiabilidade = Constantes.confiavel
+            if ruim > 0 and muito_ruim < 2:
+                DadosExame.confiabilidade = Constantes.questionavel
+            if muito_ruim == 2 or ruim == 3 or ruim == 2 and muito_ruim == 1:
+                DadosExame.confiabilidade = Constantes.ruim
+            if muito_ruim == 3:
+                DadosExame.confiabilidade = Constantes.nao_confiavel
+
+
+        def gerar_resultado_final(faixa_psd,faixa_md,faixa_md_chosen,faixa_psd_chosen):         
+
+            if DadosExame.confiabilidade == Constantes.nao_confiavel:
+                interpretacao = "Resultado comprometido pela baixa confiabilidade."
+            else:
+                if faixa_md_chosen == 0 and faixa_psd_chosen == 0:
+                    interpretacao = "Campo visual dentro dos padrões de normalidade."
+                elif faixa_md_chosen != 0 and faixa_psd_chosen == 0:
+                    interpretacao = f"Alteração difusa: {faixa_md[faixa_md_chosen]}."
+                elif faixa_md_chosen == 0 and faixa_psd_chosen != 0:
+                    interpretacao = f"Presença de defeitos localizados: {faixa_psd[faixa_psd_chosen]}."
+                else:
+                    interpretacao = f"Alterações difusas e localizadas: {faixa_md[faixa_md_chosen]}, {faixa_psd[faixa_psd_chosen]}."
+
+            return interpretacao
+        DadosExame.perda_de_fixacao_percentual = (
             ((DadosExame.perda_de_fixacao / DadosExame.total_testes_mancha) * 100)
             if DadosExame.perda_de_fixacao > 0.0
             else 0
@@ -850,35 +984,106 @@ class ResultadoFullthreshold:
             if DadosExame.falso_positivo_respondidos > 0
             else 0
         )
+        verifica_confiabilidade()
 
         minutos, segundos = divmod((DadosExame.duracao_do_exame / 1000), 60)
         labels = [
             f"Central 30°",
             f"Exame: {DadosExame.exame_selecionado.upper()}",
+            f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
+            
             f"Olho: {DadosExame.olho}",
             f"Duração (min): {int(minutos)}:{int(segundos)}",
-            f"Total de pontos: {DadosExame.total_de_pontos_testados}",
-            f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
             f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
-            f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({perda_fixacao:.2f}%)",
-            f"Limiar Foveal: {int(DadosExame.LimiarFoveal)} (dB)",
+            
+            f"Total de pontos: {DadosExame.total_de_pontos_testados}",
             f"ID exame: {DadosExame.exame_id}",
+            f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({DadosExame.perda_de_fixacao_percentual:.2f}%)",
+            
             f"Tamanho do estimulo: {estimulo.get(DadosExame.tamanho_estimulo)}",
-            f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}",
-            f"MD:{DadosExame.md:.2f}  ({faixa_md[faixa_md_chosen]})","","",
-            f"Confiabilidade:{"Exame com índices de confiabilidade adequados,permitindo interpretação clínica segura. " if (DadosExame.falso_positivo_respondidos_percentual < 33 and DadosExame.falso_negativo_respondidos_percentual < 33 and perda_fixacao < 33) else f"Exame com confiabilidade questionável, podendo superestimar perdas." }",
-            "","",f"PSD:{DadosExame.psd:.2f}  ({faixa_psd[faixa_psd_chosen]})",
+            f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}",           
+            f"Limiar Foveal: {int(DadosExame.LimiarFoveal)} (dB)",
         ]
+        labels_valores = [ f"MD:{DadosExame.md:.2f}  ({faixa_md[faixa_md_chosen]})",           
+            f"Confiabilidade:{DadosExame.confiabilidade}",        
+            f"PSD:{DadosExame.psd:.2f}  ({faixa_psd[faixa_psd_chosen]})",
+            f"RESULTADO: {(gerar_resultado_final(faixa_psd,faixa_md,faixa_md_chosen,faixa_psd_chosen)).upper()}"]
 
         # Configuração para desenhar labels em colunas de 3 com 4 linhas
         colunas = 3
-        linhas = 7
+        linhas = 4
         espacamento_x = 300  # Espaço entre colunas
-        espacamento_y = 40  # Espaço entre linhas
-        pos_x_inicial = 1000  # Posição inicial da primeira coluna
-        pos_y_inicial = 92  # Posição inicial da primeira linha
-        fonte = pygame.font.Font(None, 23)
+        espacamento_y = 50  # Espaço entre linhas
+        pos_x_inicial = 1050  # Posição inicial da primeira coluna
+        pos_y_inicial = 50  # Posição inicial da primeira linha
         
+        cor_resultado = (0,0,0)
+        if faixa_md_chosen == 0 and faixa_psd_chosen == 0:
+            cor_resultado = (0, 153, 81)
+        if faixa_md_chosen != 0 or faixa_psd_chosen != 0:
+            cor_resultado = (252, 166, 41)
+        if faixa_md_chosen == 4 and faixa_psd_chosen == 4:
+            cor_resultado = (255, 6, 6)
+
+        
+        
+  
+        
+    
+ 
+        
+        espacamento_x_valores = 450
+        espacamento_y_valores = 50
+        pos_x_inicial_valores = 1050
+        pos_y_inicial_valores = 300
+        fonte = pygame.font.Font(None, 30)
+        
+        for i,texto in enumerate(labels_valores):
+            coluna = i % 1
+            linha = i // 1
+            
+            if i == 0:
+                match faixa_md_chosen:
+                    case 0:
+                        color_label_info = (0, 153, 81)
+                    case 1:
+                        color_label_info = (218, 213, 63)
+                    case 2:
+                        color_label_info = (252, 166, 41)
+                    case 3:
+                        color_label_info = (255, 6, 6)
+
+            if i == 1:
+                if DadosExame.confiabilidade == Constantes.confiavel:
+                    color_label_info = (0, 153, 81)
+                if DadosExame.confiabilidade == Constantes.questionavel:
+                    color_label_info = (218, 213, 63)
+                if DadosExame.confiabilidade == Constantes.ruim:
+                    color_label_info = (252, 166, 41)
+                if DadosExame.confiabilidade == Constantes.nao_confiavel:
+                    color_label_info = (255, 6, 6)
+            if i == 2:
+                match faixa_psd_chosen:
+                    case 0:
+                        color_label_info = (0, 153, 81)
+                    case 1:
+                        color_label_info = (218, 213, 63)
+                    case 2:
+                        color_label_info = (252, 166, 41)
+                    case 3:
+                        color_label_info = (255, 6, 6)
+            if i == 3:
+                color_label_info = cor_resultado
+            
+            pos_x = pos_x_inicial_valores + coluna * espacamento_x_valores
+            pos_y = pos_y_inicial_valores + linha * espacamento_y_valores
+
+            # Renderiza a label
+
+            texto_renderizado = render_texto_colorido(fonte,texto,color_label_info)
+            pygame.display.get_surface().blit(texto_renderizado, (pos_x, pos_y))
+
+        fonte = pygame.font.Font(None, 26)
         for i, texto in enumerate(labels):
             # Calcula a posição da coluna e linha
             coluna = i % colunas
@@ -886,49 +1091,44 @@ class ResultadoFullthreshold:
 
             # Define a cor do texto
             color_label_info = (0, 0, 0)
-            if (
-                i == 5
-                and DadosExame.falso_positivo_respondidos_percentual > 33
-                or i == 6
-                and DadosExame.falso_negativo_respondidos_percentual > 33
-                or i == 7
-                and perda_fixacao > 33
-            ):
-                color_label_info = (255,6,6)
-            
-            if i == 12:
-                match faixa_md_chosen:
-                    case 0:
-                        color_label_info = (0,153,81)
-                    case 1:
-                        color_label_info = (218,213,63)
-                    case 2:
-                        color_label_info = (252,166,41)
-                    case 3:
-                        color_label_info = (255,6,6)
-                    
-            if i == 18:
-                match faixa_psd_chosen:
-                    case 0:
-                        color_label_info = (0,153,81)
-                    case 1:
-                        color_label_info = (218,213,63)
-                    case 2:
-                        color_label_info = (252,166,41)
-                    case 3:
-                        color_label_info = (255,6,6)
-            if i == 15:
-                if (DadosExame.falso_positivo_respondidos_percentual < 33 and DadosExame.falso_negativo_respondidos_percentual < 33 and perda_fixacao < 33):
-                    color_label_info = (0,153,81)
-                else:
-                    color_label_info = (255,6,6)
-            # Renderiza a label
-            texto_renderizado = fonte.render(texto, True, color_label_info)
+            if i == 2:
+                if DadosExame.falso_positivo_respondidos_percentual <= 15:
+                    color_label_info = (0, 153, 81)
+                if (
+                    DadosExame.falso_positivo_respondidos_percentual > 15
+                    and DadosExame.falso_positivo_respondidos_percentual <= 20
+                ):
+                    color_label_info = (252, 166, 41)
+                elif DadosExame.falso_positivo_respondidos_percentual > 20:
+                    color_label_info = (255, 6, 6)
 
+            if i == 5:
+                if DadosExame.falso_negativo_respondidos_percentual <= 15:
+                    color_label_info = (0, 153, 81)
+                if (
+                    DadosExame.falso_negativo_respondidos_percentual > 15
+                    and DadosExame.falso_negativo_respondidos_percentual <= 30
+                ):
+                    color_label_info = (252, 166, 41)
+                elif DadosExame.falso_negativo_respondidos_percentual > 30:
+                    color_label_info = (255, 6, 6)
+
+            if i == 8:
+                if DadosExame.perda_de_fixacao_percentual <= 20:
+                    color_label_info = (0, 153, 81)
+                if (
+                    DadosExame.perda_de_fixacao_percentual > 20
+                    and DadosExame.perda_de_fixacao_percentual <= 30
+                ):
+                    color_label_info = (252, 166, 41)
+                elif DadosExame.perda_de_fixacao_percentual > 30:
+                    color_label_info = (255, 6, 6)
+
+           
             # Calcula a posição para desenhar
             pos_x = pos_x_inicial + coluna * espacamento_x
             pos_y = pos_y_inicial + linha * espacamento_y
-
+            texto_renderizado = render_texto_colorido(fonte,texto,color_label_info)
             # Desenha a label na tela
             pygame.display.get_surface().blit(texto_renderizado, (pos_x, pos_y))
 
@@ -947,12 +1147,13 @@ class ResultadoFullthreshold:
         )
         imagem = pygame.transform.scale(imagem, (59, 59))
 
-        imagem_pos = (1350, 450)
-        fonte = pygame.font.Font(None, 32)
+        imagem_pos = (830, 950)
+        x,y = imagem_pos
+        fonte = pygame.font.Font(None, 24)
         texto_info_esc = fonte.render("ESC para voltar ao menu", True, (0, 0, 0))
-        texto_info_esc_pos = (1461, 455)
+        texto_info_esc_pos = (x + 80, y + 5)
         texto_info_entra = fonte.render("ENTRA para gerar o PDF", True, (0, 0, 0))
-        texto_info_entra_pos = (1461, 485)
+        texto_info_entra_pos = (x + 80, y + 35)
         pygame.display.get_surface().blit(texto_info_esc, texto_info_esc_pos)
         pygame.display.get_surface().blit(texto_info_entra, texto_info_entra_pos)
         pygame.display.get_surface().blit(imagem, imagem_pos)
@@ -1003,10 +1204,10 @@ class ResultadoFullthreshold:
             json.dump(config, f, indent=4)
 
     @staticmethod
-    def desenha_mapas_bebie_desvio():
+    def plota_mapas():
 
-        rect_mapas = pygame.Rect(0, 0, 912, 492)
-        rect_mapas.center = (1920 - 480, 810)
+        rect_mapas_desvio = pygame.Rect(0, 0, 912, 492)
+        rect_mapas_desvio.center = (1920 / 2 + 200, 1080 / 2)
 
         image_desvio_padrao = pygame.image.load(
             os.path.abspath(
@@ -1044,21 +1245,21 @@ class ResultadoFullthreshold:
                 )
             )
         )
-        x, y = rect_mapas.center
+        x, y = rect_mapas_desvio.center
 
-        rect_desvio_padrao = image_desvio_padrao.get_rect(center=(x - 300, y - 150))
-        rect_desvio_total = image_desvio_total.get_rect(center=(x - 300, y + 125))
-        rect_bebie = image_bebie.get_rect(center=(1258 + 350, y))
+        rect_desvio_padrao = image_desvio_padrao.get_rect(center=(x - 300, y - 200))
+        rect_desvio_total = image_desvio_total.get_rect(center=(x - 300, y + 200))
+        rect_bebie = image_bebie.get_rect(center=(1450, 1080 / 2 + 250))
 
         fonte_legenda = pygame.font.Font(None, 30)
         legenda_desvio_padrao = fonte_legenda.render("Desvio padrão", True, (0, 0, 0))
         legenda_desvio_total = fonte_legenda.render("Desvio total", True, (0, 0, 0))
 
         legenda_desvio_padrao_pos = legenda_desvio_padrao.get_rect(
-            center=(x - 300, y - 150 - 130)
+            center=(x - 300, y - 200 - 130)
         )
         legenda_desvio_total_pos = legenda_desvio_total.get_rect(
-            center=(x - 300, y + 125 - 130)
+            center=(x - 300, y + 200 - 130)
         )
 
         pygame.display.get_surface().blit(image_desvio_padrao, rect_desvio_padrao)
@@ -1093,10 +1294,9 @@ class ResultadoFullthreshold:
         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=True)
         tempo_final = pygame.time.get_ticks() - tempo_inicial
         ResultadoFullthreshold.desenhar_mapa_limiares()
+        ResultadoFullthreshold.plota_mapas()
         ResultadoFullthreshold.desenha_legendas_exame()
-
         ResultadoFullthreshold.desenha_aviso_pdf()
-        ResultadoFullthreshold.desenha_mapas_bebie_desvio()
         pygame.display.flip()
         visualizando = True
         while visualizando:
@@ -1234,11 +1434,25 @@ class ResultadoFullthreshold:
 if __name__ == "__main__":
     from cordenadas_30 import cordenadas_30
     from converte_atenuacao_txt import read_file_to_list
-    
-    atenuacoes = read_file_to_list(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "atenuacao_teste", "exame2.txt")),7)
+
+    atenuacoes = read_file_to_list(
+        os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__), "..", "atenuacao_teste", "exame4.txt"
+            )
+        ),
+        7,
+    )
+
+    DadosExame.perda_de_fixacao = 5
+    DadosExame.total_testes_mancha = 10
+    DadosExame.falso_positivo_respondidos = 3
+    DadosExame.falso_negativo_respondidos = 3
+    DadosExame.total_testes_falsos_positivo = 10
+    DadosExame.total_testes_falsos_negativo = 10
 
     DadosExame.exame_selecionado = Constantes.fullthreshold
-    DadosExame.olho = Constantes.olho_esquerdo
+    DadosExame.olho = Constantes.olho_direito
 
     pygame.init()
     pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -1247,11 +1461,8 @@ if __name__ == "__main__":
     pygame.display.update()
 
     for (x, y), atenuacao in zip(cordenadas_30, atenuacoes):
-        ponto = Ponto(x, y, 3, (0, 0, 0), 200) 
+        ponto = Ponto(x, y, 3, (0, 0, 0), 200)
         ponto.atenuacao = atenuacao
         DadosExame.matriz_pontos.append(ponto)
-    
-    
-    
 
     ResultadoFullthreshold.exibir_resultados()

@@ -39,11 +39,7 @@ class GerarPdf():
         os.path.join(os.path.dirname(__file__), "..", "scripts","monta_pendrive.sh")
     )
         subprocess.run(['bash',caminho_verifica])
-    def capturar_parte_tela(self,x, y, largura, altura, nome_arquivo):
-        tela = pygame.display.get_surface()  # Obtém a tela atual
-        recorte = pygame.Surface((largura, altura))  # Cria uma superfície do tamanho desejado
-        recorte.blit(tela, (0, 0), (x, y, largura, altura))  # Copia a parte da tela desejada
-        pygame.image.save(recorte, nome_arquivo)  # Salva como imagem
+   
         
     def gerar_relatorio(self,nome_arquivo_pdf):
         c = canvas.Canvas(nome_arquivo_pdf, pagesize=A4)
@@ -84,9 +80,9 @@ class GerarPdf():
             y_pos = 100  
                 # Caminho para salvar a imagem
             caminho_imagem_pontos = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_pontos.png"))
-            self.capturar_parte_tela(0, 0, 960, 540, caminho_imagem_pontos)
+         
             caminho_imagem_limiares = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_limiares.png"))
-            self.capturar_parte_tela(0, 540, 960, 540, caminho_imagem_limiares)
+         
             caminho_imagem_logo = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","logo_branco.png"))
             
             caminho_imagem_curva_bebie = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","bebie_curve.png"))

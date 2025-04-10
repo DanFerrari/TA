@@ -89,7 +89,7 @@ class Ponto:
             (2 * self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
         ) / 2
         # raio_ponto = ( self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
-
+ 
         return raio_ponto
 
     @staticmethod
