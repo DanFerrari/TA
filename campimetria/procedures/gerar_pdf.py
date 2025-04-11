@@ -98,15 +98,15 @@ class GerarPdf():
             
             c.drawImage(caminho_image_desvio_padrao, 180, altura - 540 - 110, width=100, height=100)
             c.drawImage(caminho_image_desvio_total,20 , altura - 540 - 110, width=100, height=100)
-            c.drawImage(caminho_imagem_curva_bebie, 300, altura - 540 - 220, width= 320, height=240)
+            c.drawImage(caminho_imagem_curva_bebie, 300, altura - 540 - 180, width= 320, height=240)
             
             c.drawString(38, altura - 540, "Desvio Total")
             c.drawString(195, altura -540, "Desvio Padrão")
-            c.setFont("Helvetica-Bold", 8)
-            c.drawString(43,160,(f"MD: {DadosExame.md:.2f} ({DadosExame.resultado_md})").upper())
-            c.drawString(43,145,(f"PSD: {DadosExame.psd:.2f} ({DadosExame.resultado_psd})").upper())
-            c.drawString(43,130,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
-            c.drawString(43,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
+            c.setFont("Helvetica-Bold", 7)
+            c.drawString(30,160,(f"MD: {DadosExame.md:.2f} ({DadosExame.resultado_md})").upper())
+            c.drawString(30,145,(f"PSD: {DadosExame.psd:.2f} ({DadosExame.resultado_psd})").upper())
+            c.drawString(30,130,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
+            c.drawString(5,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
          
         elif DadosExame.exame_selecionado == Constantes.screening:
             c.drawString(26, altura - 176, f"Atenuação (dB):{DadosExame.atenuacao_screening}")
@@ -124,9 +124,9 @@ class GerarPdf():
             c.drawImage(caminho_imagem_logo, 0,-26, width=156, height=110)
             c.drawImage(caminho_imagem_pontos, largura / 2 - nova_altura,420, width=nova_largura, height=nova_altura)
             c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura,150, width=nova_largura, height=nova_altura)  
-            c.setFont("Helvetica-Bold", 8)
-            c.drawString(43,90,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
-            c.drawString(43,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
+            c.setFont("Helvetica-Bold", 7)
+            c.drawString(30,90,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
+            c.drawString(5,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
 
         
 
@@ -167,10 +167,10 @@ class GerarPdf():
         
         pasta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp"))
 
-        for arquivo in os.listdir(pasta):
-            caminho_arquivo = os.path.join(pasta, arquivo)
-            if os.path.isfile(caminho_arquivo):
-                os.remove(caminho_arquivo)  
+        # for arquivo in os.listdir(pasta):
+        #     caminho_arquivo = os.path.join(pasta, arquivo)
+        #     if os.path.isfile(caminho_arquivo):
+        #         os.remove(caminho_arquivo)  
 
 
 
@@ -190,8 +190,13 @@ if __name__ == "__main__":
         if i > 30:
             ponto.response_received = True
     from TelaResultadoFullThreshold import ResultadoFullthreshold
-    #ResultadoScreening.desenha_pontos()
-    ResultadoFullthreshold.exibir_resultados()
+
+
     pygame.display.update()
-    
+    DadosExame.resultado_psd ="Campo visual normal ou muito próximo do normal" 
+    DadosExame.resultado_md = 'Perda moderada, ponto de atenção',
+    DadosExame.resultado_exame = f"Alterações difusas e localizadas, MD: {DadosExame.resultado_md},\n PSD :{DadosExame.resultado_psd}."
+    DadosExame.confiabilidade = "Exame não confiavél,totalmente impreciso"
     caminho_pdf = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "pdfs", f"relatorio-id-exame-{DadosExame.exame_id}.pdf"))
+    pdf = GerarPdf()
+    pdf.gerar_relatorio(caminho_pdf)

@@ -13,6 +13,10 @@ class Constantes:
     smalldelta = 3
     screening = "screening"
     fullthreshold = "fullthreshold"
+    esterman= "esterman"
+    central24 = "central 24°"
+    central30 = "central 30°"
+    central10 = "central 10°"
     olho_direito = "OD"
     olho_esquerdo = "OE"
     confiavel = "Exame confiavel"
@@ -70,6 +74,7 @@ class DadosExame:
     tamanho_estimulo = 3
     olho = ""
     exame_selecionado = ""
+    programa_selecionado = ""
     atenuacao_screening = 0
     porcentagem_respondidos_screening = 0
     duracao_do_exame = 0
