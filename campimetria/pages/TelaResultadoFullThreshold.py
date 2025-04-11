@@ -766,6 +766,7 @@ class ResultadoFullthreshold:
                         (ponto.xg == 15 and ponto.yg == 3)
                         or (ponto.xg == 15 and ponto.yg == -3)
                     ):
+                        
                         ponto_desvio = Ponto(
                             ponto.xg,
                             ponto.yg,
@@ -775,7 +776,7 @@ class ResultadoFullthreshold:
                         )
                         ponto_desvio.x = int(ponto_desvio.x * 480 / 1920)
                         ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
-                        ponto_desvio.atenuacao = -99
+                        ponto_desvio.atenuacao = 0
                         matriz_desvio_total.append(ponto_desvio)
                         continue
                     if DadosExame.olho == Constantes.olho_esquerdo and (
@@ -824,8 +825,8 @@ class ResultadoFullthreshold:
         desvio_total.sort(reverse=False)
         desvio_paciente.sort(reverse=False)
         desvio_total[-2:] = desvio_total[-4:-2]
-        desvio_paciente[:1] = desvio_paciente[1:2]
-        desvio_paciente[:2] = desvio_paciente[2:4]
+
+
 
         desenha_curva_bebie(desvio_total, desvio_paciente)
 

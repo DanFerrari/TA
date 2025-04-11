@@ -79,7 +79,7 @@ class Ponto:
             case 2:
                 grau = 0.26
             case 3:
-                grau = 0.76
+                grau = 0.72
             case 4:
                 grau = 1.04
             case 5:

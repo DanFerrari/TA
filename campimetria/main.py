@@ -67,6 +67,9 @@ class Campimetria:
         self.config = self.carregar_config()
         self.set_brightness(self.config["brightness"])
         self.set_contrast(self.config["contrast"])
+        DadosExame.tamanho_estimulo = self.config["tamanho_estimulo"]
+        DadosExame.distancia_paciente = self.config["distancia_paciente"]
+        DadosExame.exame_id = self.config["exame_id"]
 
 
 

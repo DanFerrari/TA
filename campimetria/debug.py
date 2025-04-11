@@ -37,7 +37,8 @@ if __name__ == "__main__":
     from fixacao_central import FixacaoCentral
     FixacaoCentral.plotar_fixacao_central()
     from cordenadas_mcesq import cordenadas_mcesq
-    for x,y in cordenadas_mcesq:
+    from cordenadas_mcdir import cordenadas_mcdir
+    for x,y in cordenadas_mcdir:
         Ponto(x,y,3,(0,0,0),200).plotarPonto()
     pygame.display.update()
     while running:
