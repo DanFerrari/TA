@@ -825,7 +825,7 @@ class ResultadoFullthreshold:
         desvio_total.sort(reverse=False)
         desvio_paciente.sort(reverse=False)
         desvio_total[-2:] = desvio_total[-4:-2]
-
+        desvio_paciente[:3] = desvio_paciente[3:6]
 
 
         desenha_curva_bebie(desvio_total, desvio_paciente)
@@ -1469,7 +1469,7 @@ if __name__ == "__main__":
     atenuacoes = read_file_to_list(
         os.path.abspath(
             os.path.join(
-                os.path.dirname(__file__), "..", "atenuacao_teste", "exame6.txt"
+                os.path.dirname(__file__), "..", "atenuacao_teste", "exame2.txt"
             )
         ),
         7,
