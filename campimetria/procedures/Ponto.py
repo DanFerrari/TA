@@ -119,6 +119,7 @@ class Ponto:
 
         # return int(round(intensity))
         return (intensity, intensity, intensity)
+    
 
     def plotarPonto(self, surface="padrao"):
         if surface == "padrao":
