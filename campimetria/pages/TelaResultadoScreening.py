@@ -471,23 +471,10 @@ class ResultadoScreening:
                         config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
                         ResultadoScreening.salvar_config(config, CONFIG_FILE)
                         pdf = GerarPdf()
-                        # pdf.verifica_e_monta_pendrive()
-                        # caminho_pdf = f"/media/eyetec/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
-                        # caminho_pendrive = f"/media/eyetec/EXAMES/"
-                        caminho_pendrive = os.path.abspath(
-                            os.path.join(
-                                os.path.dirname(__file__), "..", "utils", "pdfs"
-                            )
-                        )
-                        caminho_pdf = os.path.abspath(
-                            os.path.join(
-                                os.path.dirname(__file__),
-                                "..",
-                                "utils",
-                                "pdfs",
-                                f"relatorio-id-exame-{DadosExame.exame_id}.pdf",
-                            )
-                        )
+                        pdf.verifica_e_monta_pendrive()
+                        caminho_pdf = f"/media/eyetec/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
+                        caminho_pendrive = f"/media/eyetec/EXAMES/"
+                        
                         if os.path.exists(caminho_pendrive):
                             pdf.gerar_relatorio(caminho_pdf)
                             fonte = pygame.font.Font(None, 45)
