@@ -79,11 +79,22 @@ class Ponto:
             case 2:
                 grau = 0.26
             case 3:
-                grau = 0.52
+                grau = 0.76
             case 4:
                 grau = 1.04
             case 5:
                 grau = 2.08
+        # match self.tamanhoPonto:
+        #     case 1:
+        #         grau = 0.13
+        #     case 2:
+        #         grau = 0.26
+        #     case 3:
+        #         grau = 0.52
+        #     case 4:
+        #         grau = 1.04
+        #     case 5:
+        #         grau = 2.08
 
         raio_ponto = (
             (2 * self.distanciaPacienteTela * math.tan(math.radians(grau))) / 2
