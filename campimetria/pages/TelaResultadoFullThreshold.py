@@ -933,11 +933,11 @@ class ResultadoFullthreshold:
         if DadosExame.md < -10.0:
             faixa_md_chosen = 3
 
-        if DadosExame.psd < 2.0:
+        if DadosExame.psd <= 2.0:
             faixa_psd_chosen = 0
-        if DadosExame.psd < 3.0:
+        if DadosExame.psd <=3.0 and DadosExame.psd > 2.0:
             faixa_psd_chosen = 1
-        if DadosExame.psd < 5.0:
+        if DadosExame.psd <=5.0 and DadosExame.psd > 3.0:
             faixa_psd_chosen = 2
         if DadosExame.psd > 5.0:
             faixa_psd_chosen = 3
@@ -1190,9 +1190,9 @@ class ResultadoFullthreshold:
         )
         imagem = pygame.transform.scale(imagem, (59, 59))
 
-        imagem_pos = (830, 950)
+        imagem_pos = (730, 950)
         x,y = imagem_pos
-        fonte = pygame.font.Font(None, 24)
+        fonte = pygame.font.Font(None, 38)
         texto_info_esc = fonte.render("ESC para voltar ao menu", True, (0, 0, 0))
         texto_info_esc_pos = (x + 80, y + 5)
         texto_info_entra = fonte.render("ENTRA para gerar o PDF", True, (0, 0, 0))

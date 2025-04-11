@@ -114,16 +114,18 @@ class GerarPdf():
             nova_altura = int(nova_largura * (540 / 960))
             x_pos = 220 
             y_pos = 100  
-                # Caminho para salvar a imagem
+                
+
             caminho_imagem_pontos = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_pontos.png"))
-            self.capturar_parte_tela(0, 0, 960, 540, caminho_imagem_pontos)
             caminho_imagem_limiares = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","mapa_limiares.png"))
-            self.capturar_parte_tela(0, 540, 960, 540, caminho_imagem_limiares)
+
             caminho_imagem_logo = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","logo_branco.png"))
             
             c.drawImage(caminho_imagem_logo, 0,-26, width=156, height=110)
-            c.drawImage(caminho_imagem_pontos, largura / 2 - nova_altura,379, width=nova_largura, height=nova_altura)
-            c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura,109, width=nova_largura, height=nova_altura)  
+            c.drawImage(caminho_imagem_pontos, largura / 2 - nova_altura,420, width=nova_largura, height=nova_altura)
+            c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura,150, width=nova_largura, height=nova_altura)  
+            c.drawString(43,90,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
+            c.drawString(43,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
 
         
 

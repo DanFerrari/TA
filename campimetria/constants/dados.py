@@ -71,6 +71,7 @@ class DadosExame:
     olho = ""
     exame_selecionado = ""
     atenuacao_screening = 0
+    porcentagem_respondidos_screening = 0
     duracao_do_exame = 0
     gContIgual = 0
     gFlutuacao = False  # Ajuste conforme necessário

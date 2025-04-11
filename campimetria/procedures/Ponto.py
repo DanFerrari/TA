@@ -155,9 +155,10 @@ class Ponto:
         quadrado.center = (self.x, self.y)
         pygame.draw.rect(pygame.display.get_surface(), self.cor, quadrado)
 
-    def desenha_x(self):
+    def desenha_x(self,surface = "padrao"):
         tamanho = self.raio_ponto  # Define o tamanho do "X"
-        superficie = pygame.display.get_surface()
+        if surface == "padrao":
+            surface = pygame.display.get_surface()
 
         # Coordenadas das linhas do "X"
         x1, y1 = self.x - tamanho // 2, self.y - tamanho // 2  # Canto superior esquerdo
@@ -166,8 +167,8 @@ class Ponto:
         x4, y4 = self.x + tamanho // 2, self.y - tamanho // 2  # Canto superior direito
 
         # Desenha as duas diagonais formando um "X"
-        pygame.draw.line(superficie, self.cor, (x1, y1), (x2, y2), 2)  # Linha \
-        pygame.draw.line(superficie, self.cor, (x3, y3), (x4, y4), 2)  # Linha /
+        pygame.draw.line(surface, self.cor, (x1, y1), (x2, y2), 2)  # Linha \
+        pygame.draw.line(surface, self.cor, (x3, y3), (x4, y4), 2)  # Linha /
 
     def testaPonto(
         self, tempo_exposicao, tempo_resposta_paciente, menu_pressionado=False
