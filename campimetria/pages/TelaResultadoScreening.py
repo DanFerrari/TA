@@ -177,7 +177,7 @@ class ResultadoScreening:
         minutos, segundos = divmod((DadosExame.duracao_do_exame / 1000), 60)
         labels = [
             f"ID exame: {DadosExame.exame_id}",
-            f"Central 30°",
+            f"Programa:{DadosExame.programa_selecionado}",
             f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)",
             f"Olho: {DadosExame.olho}",
             f"Tamanho do estimulo: {estimulo.get(DadosExame.tamanho_estimulo)}",
@@ -399,7 +399,7 @@ class ResultadoScreening:
         respondidos, nao_respondidos = 0, 0
         for ponto in DadosExame.matriz_pontos:
             
-            if DadosExame.exame_selecionado == Constantes.esterman:
+            if DadosExame.programa_selecionado == Constantes.esterman:
                 ponto.xg = int(ponto.xg * 0.8) 
                 ponto.yg = int(ponto.yg * 0.8)  
             ponto_novo = Ponto(
@@ -594,7 +594,8 @@ if __name__ == "__main__":
         if i % 2 == 0:
             ponto.response_received = True
 
-    DadosExame.exame_selecionado = Constantes.esterman
+
+    DadosExame.programa_selecionado = Constantes.esterman
     DadosExame.atenuacao_screening = 25
     DadosExame.total_de_pontos_testados = 120
 

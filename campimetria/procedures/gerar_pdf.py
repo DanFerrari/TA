@@ -67,7 +67,7 @@ class GerarPdf():
         c.drawString(26,altura - 38, f"ID exame:{DadosExame.exame_id}")
         c.drawString(26, altura - 85, f"Olho:{DadosExame.olho}")  
         c.drawString(26, altura - 131, f"Exame: {(DadosExame.exame_selecionado).upper()}")  
-        c.drawString(226, altura - 38, f"Central 30°")
+        c.drawString(226, altura - 38, f"Programa:{DadosExame.programa_selecionado}")
         c.drawString(226, altura - 85, f"Tamanho Estímulo:{estimulo.get(DadosExame.tamanho_estimulo)}")
         c.drawString(413, altura - 38, f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)")
         c.drawString(226, altura - 131, f"Duração (min): {int(minutos)}:{int(segundos)}")
