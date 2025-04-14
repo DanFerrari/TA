@@ -11,3 +11,5 @@ keys = [
 ]
 
 lista_valores = {key: int(base[i]) for i, key in enumerate(keys)}
+
+print(lista_valores)

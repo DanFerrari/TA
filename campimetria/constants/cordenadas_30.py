@@ -77,4 +77,3 @@ cordenadas_30 = [
 (3,-27),
 (9,-27)
 ]
-print(len(cordenadas_30))

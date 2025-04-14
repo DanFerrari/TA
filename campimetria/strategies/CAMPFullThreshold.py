@@ -121,6 +121,8 @@ class FullThreshold:
         
         self.tecla_menu_pressionada = False
         self.tecla_pause_pressionada = False
+        
+    
     def criar_pontos(self):        
         for x,y in self.cordenadas:
             ponto = Ponto(x, y,tamanhoPonto = DadosExame.tamanho_estimulo, cor = (255, 255, 255), distancia = DadosExame.distancia_paciente)

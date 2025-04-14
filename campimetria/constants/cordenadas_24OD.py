@@ -54,3 +54,10 @@ cordenadas_24OD = [
 (3, -21),
 (9, -21)
 ]
+
+
+from cordenadas_30 import cordenadas_30
+indices_nulos_24OD = [index for index, coord in enumerate(cordenadas_30) if coord not in cordenadas_24OD]
+
+
+

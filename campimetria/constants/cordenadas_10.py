@@ -43,7 +43,7 @@ cordenadas_10 = [
     (5, -1),
     (7, -1),
     (9, -1),
-    (-7, -3),
+    (7, -3),
     (-5, -3),
     (-3, -3),
     (-1, -3),
@@ -68,3 +68,12 @@ cordenadas_10 = [
     (-1, -9),
     (1, -9),
 ]
+
+
+indices_nulos_10 = []
+
+from cordenadas_30 import cordenadas_30
+
+
+
+

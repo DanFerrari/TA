@@ -480,6 +480,16 @@ class ResultadoFullthreshold:
 
     @staticmethod
     def gerar_mapa_desvios_e_curva_de_bebie():
+        indices_nulos = []
+        if DadosExame.programa_selecionado == Constantes.central24 and DadosExame.olho == Constantes.olho_direito:
+            from cordenadas_24OD import indices_nulos_24OD
+            indices_nulos = indices_nulos_24OD
+        elif DadosExame.programa_selecionado == Constantes.central24 and DadosExame.olho == Constantes.olho_esquerdo:
+            from cordenadas_24OE import indices_nulos_24OE
+            indices_nulos = indices_nuindices_nulos_24OE
+       
+     
+    
 
         def verifica_faixa_etaria(faixa_etaria):
             match DadosExame.faixa_etaria:
@@ -542,10 +552,16 @@ class ResultadoFullthreshold:
         def desenha_curva_bebie(desvio_total, desvio_paciente):
             tolerancia_positiva = [valor - 3 for valor in desvio_total]
             tolerancia_negativa = [valor + 3 for valor in desvio_total]
-
+            
+            if DadosExame.programa_selecionado == Constantes.central30:
+                step_labels_x = 15
+            elif DadosExame.programa_selecionado == Constantes.central24:
+                step_labels_x = 13.25
+            
+            
             quantidade_pontos = np.arange(
                 1, len(desvio_total) + 1
-            )  # Adjusted to include point 76
+            )  
             fig, ax = plt.subplots()
             ax.step(
                 quantidade_pontos,
@@ -574,10 +590,10 @@ class ResultadoFullthreshold:
             )  # Ensure labels are displayed
             ax.set_xlim(1, len(desvio_total) + 2)
             ax.set_xticks(
-                np.arange(1, len(desvio_total) + 1, 15)
+                np.arange(1, len(desvio_total) + 1, step_labels_x)
             )  # Adjusted to include point 76
             ax.set_xticklabels(
-                [str(i) for i in np.arange(1, len(desvio_total) + 1, 15)]
+                [str(int(i)) for i in np.arange(1, len(desvio_total) + 1, step_labels_x)]
             )  # Ensure labels are displayed
             ax.plot(
                 [quantidade_pontos[-1], quantidade_pontos[-1]],
@@ -736,6 +752,7 @@ class ResultadoFullthreshold:
             setimo_valor = 0
             curva_paciente_filtrada = [ponto.atenuacao for ponto in matriz_desvio_total]
             curva_paciente_filtrada.sort(reverse=True)
+           
             setimo_valor = curva_paciente_filtrada[9]
             for ponto in matriz_desvio_total:
                 ponto_desvio_padrao = Ponto(ponto.xg, ponto.yg, 3, (0, 0, 0), 200)
@@ -745,6 +762,24 @@ class ResultadoFullthreshold:
                 matriz_desvio_padrao.append(ponto_desvio_padrao)
 
         lista_base_atenuacao = verifica_faixa_etaria(DadosExame.faixa_etaria)
+        lista_temp = {}
+        if DadosExame.programa_selecionado == Constantes.central10:
+            for cordenada in cordenadas_10:
+                
+            
+            
+        
+        
+        keys_to_remove = [list(lista_base_atenuacao.keys())[i] for i in indices_nulos]
+        for key in keys_to_remove:
+            lista_base_atenuacao.pop(key, None)
+    
+
+        
+
+        
+        
+        
         if DadosExame.olho == Constantes.olho_esquerdo:
             lista_base_atenuacao = espelhar_vetor(lista_base_atenuacao)
 
@@ -776,7 +811,7 @@ class ResultadoFullthreshold:
                         )
                         ponto_desvio.x = int(ponto_desvio.x * 480 / 1920)
                         ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
-                        ponto_desvio.atenuacao = 0
+                        ponto_desvio.atenuacao = -99
                         matriz_desvio_total.append(ponto_desvio)
                         continue
                     if DadosExame.olho == Constantes.olho_esquerdo and (
@@ -824,10 +859,12 @@ class ResultadoFullthreshold:
 
         desvio_total.sort(reverse=False)
         desvio_paciente.sort(reverse=False)
-        desvio_total[-2:] = desvio_total[-4:-2]
-        desvio_paciente[:3] = desvio_paciente[3:6]
-
-
+        if DadosExame.programa_selecionado == Constantes.central30:
+            desvio_total[-2:] = desvio_total[-4:-2]
+        
+        elif DadosExame.programa_selecionado == Constantes.central24: 
+            desvio_total[-2:] = desvio_total[-3:-1]
+        # desvio_paciente[:3] = desvio_paciente[3:6]
         desenha_curva_bebie(desvio_total, desvio_paciente)
 
     @staticmethod
@@ -1464,6 +1501,7 @@ class ResultadoFullthreshold:
 
 if __name__ == "__main__":
     from cordenadas_24OD import cordenadas_24OD
+    from cordenadas_10 import cordenadas_10
     from converte_atenuacao_txt import read_file_to_list
 
     atenuacoes = read_file_to_list(
@@ -1483,7 +1521,7 @@ if __name__ == "__main__":
     DadosExame.total_testes_falsos_negativo = 10
 
     DadosExame.exame_selecionado = Constantes.fullthreshold
-    DadosExame.programa_selecionado = Constantes.central24
+    DadosExame.programa_selecionado = Constantes.central10
     DadosExame.olho = Constantes.olho_direito
 
     pygame.init()
@@ -1492,7 +1530,7 @@ if __name__ == "__main__":
     pygame.display.get_surface().fill((255, 255, 255))
     pygame.display.update()
 
-    for (x, y), atenuacao in zip(cordenadas_24OD, atenuacoes):
+    for (x, y), atenuacao in zip(cordenadas_10, atenuacoes):
         ponto = Ponto(x, y, 3, (0, 0, 0), 200)
         ponto.atenuacao = atenuacao
         DadosExame.matriz_pontos.append(ponto)
