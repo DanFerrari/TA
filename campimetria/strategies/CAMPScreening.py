@@ -19,7 +19,8 @@ sys.path.append(
 
 from Ponto import Ponto
 from ManchaCega import TesteLimiarManchaCega
-from cordenadas_30 import cordenadas_30
+
+
 from ContagemRegressiva import ContagemRegressiva
 from dados import *
 from TelaResultadoScreening import ResultadoScreening
@@ -35,6 +36,28 @@ class Screening:
 
     def __init__(self, game):
         self.game = game
+        
+        
+        self.cordenadas = []
+        if DadosExame.programa_selecionado == Constantes.central30:
+            from cordenadas_30 import cordenadas_30
+            self.cordenadas = cordenadas_30
+        elif DadosExame.programa_selecionado == Constantes.central24 and DadosExame.olho == Constantes.olho_direito:
+            from cordenadas_24OD import cordenadas_24OD
+            self.cordenadas = cordenadas_24OD
+        elif DadosExame.programa_selecionado == Constantes.central24 and DadosExame.olho == Constantes.olho_esquerdo:
+            from cordenadas_24OE import cordenadas_24OE
+            self.cordenadas = cordenadas_24OE
+        elif DadosExame.programa_selecionado == Constantes.esterman and DadosExame.olho == Constantes.olho_direito:
+            from cordenadas_ESTOD import cordenadas_ESTOD
+            self.cordenadas = cordenadas_ESTOD
+        elif DadosExame.programa_selecionado == Constantes.esterman and DadosExame.olho == Constantes.olho_esquerdo:
+            from cordenadas_ESTOE import cordenadas_ESTOE
+            self.cordenadas = cordenadas_ESTOE
+        elif DadosExame.programa_selecionado == Constantes.esterman and DadosExame.olho == Constantes.binocular:
+            from cordenadas_ESTBIN import cordenadas_ESTBIN
+            self.cordenadas = cordenadas_ESTBIN
+        
 
         self.pontos = self.criar_pontos()
         self.indice_atual = 0
@@ -85,7 +108,7 @@ class Screening:
         return tempo_medio
 
     def criar_pontos(self):
-        return [Ponto(x, y, tamanhoPonto = DadosExame.tamanho_estimulo, cor =  (255, 255, 255), distancia = DadosExame.distancia_paciente) for x, y in cordenadas_30]
+        return [Ponto(x, y, tamanhoPonto = DadosExame.tamanho_estimulo, cor =  (255, 255, 255), distancia = DadosExame.distancia_paciente) for x, y in self.cordenadas]
 
     def testa_mancha_cega(self, ponto):
         x, y = ponto
@@ -157,7 +180,11 @@ class Screening:
             if self.aviso_inicial_respondido == False:
                 self.voltar_ao_menu_inicial = True
             else:
-                self.estado = "encontrando_mancha"
+                if DadosExame.programa_selecionado == Constantes.esterman and DadosExame.olho == Constantes.binocular:
+                    self.estado = "exame"
+                    self.teste_fixacao = False
+                else: 
+                    self.estado = "encontrando_mancha"
                 self.tempo_inicial_exame = pygame.time.get_ticks()
 
         elif self.estado == "encontrando_mancha":
@@ -298,5 +325,5 @@ class Screening:
                 self.estado = "resultado"
 
         elif self.estado == "resultado":
-            ResultadoScreening.desenha_pontos()
+            ResultadoScreening.exibir_resultados()
             self.game.change_screen(StrategyScreen(self.game))

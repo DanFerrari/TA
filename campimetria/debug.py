@@ -36,10 +36,12 @@ if __name__ == "__main__":
     running = True
     from fixacao_central import FixacaoCentral
     FixacaoCentral.plotar_fixacao_central()
-    from cordenadas_mcesq import cordenadas_mcesq
-    from cordenadas_mcdir import cordenadas_mcdir
-    for x,y in cordenadas_mcdir:
-        Ponto(x,y,3,(0,0,0),200).plotarPonto()
+
+    from cordenadas_10 import cordenadas_10
+    
+    
+    for x,y in cordenadas_10:
+        Ponto(x,y,3,(0,0,0),distancia).plotarPonto()
     pygame.display.update()
     while running:
 
@@ -47,4 +49,19 @@ if __name__ == "__main__":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_j:
                     running = False
-               
+                if event.key == pygame.K_UP:
+                    pygame.display.get_surface().fill((255, 255, 255))
+                    distancia += 10
+                    for x,y in cordenadas_10:
+                        Ponto(x,y,3,(0,0,0),distancia).plotarPonto()
+                    pygame.display.update()
+                if event.key == pygame.K_DOWN:
+                    pygame.display.get_surface().fill((255, 255, 255))
+                    distancia -= 10
+                    for x,y in cordenadas_10:
+                        Ponto(x,y,3,(0,0,0),distancia).plotarPonto()
+                    pygame.display.update()
+                fonte = pygame.font.Font(None,30)
+                texto = fonte.render(f"Distancia:{distancia}",True,(0,0,0))
+                pygame.display.get_surface().blit(texto,(10,10))
+                pygame.display.update()

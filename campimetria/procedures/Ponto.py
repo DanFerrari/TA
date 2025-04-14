@@ -75,15 +75,15 @@ class Ponto:
         grau = 0
         match self.tamanhoPonto:
             case 1:
-                grau = 0.13
+                grau = 0.33
             case 2:
-                grau = 0.26
+                grau = 0.46
             case 3:
                 grau = 0.72
             case 4:
-                grau = 1.04
+                grau = 1.24
             case 5:
-                grau = 2.08
+                grau = 2.28
         # match self.tamanhoPonto:
         #     case 1:
         #         grau = 0.13

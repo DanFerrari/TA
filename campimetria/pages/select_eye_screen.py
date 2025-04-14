@@ -32,7 +32,7 @@ class SelectEyeScreen:
         
 
         # Opções de olho
-        self.opcoes = ["OLHO ESQUERDO", "OLHO DIREITO"]
+        self.opcoes = ["OLHO ESQUERDO", "OLHO DIREITO","BINOCULAR"]
         self.opcao_selecionada = 0
 
         # Controle de qual item está selecionado:
@@ -105,13 +105,17 @@ class SelectEyeScreen:
                         if DadosExame.exame_selecionado == Constantes.screening:
                             if self.opcao_selecionada == 0:
                                 DadosExame.olho = Constantes.olho_esquerdo
-                            else:
+                            elif self.opcao_selecionada == 1:
                                 DadosExame.olho = Constantes.olho_direito
+                            elif self.opcao_selecionada == 2:
+                                DadosExame.olho = Constantes.binocular
                             DadosExame.atenuacao_screening = self.numero
                             self.config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
                             self.config["distancia_paciente"] = DadosExame.distancia_paciente   
                             self.salvar_config(self.config)                         
                             self.game.change_screen(Screening(self.game))
+                           
+                            
                             
                         elif DadosExame.exame_selecionado == Constantes.fullthreshold:
                             if self.opcao_selecionada == 0:
@@ -128,11 +132,36 @@ class SelectEyeScreen:
                             print("Exame não implementado!")
                 elif self.selecao_atual == "opcoes":
                     if event.key == pygame.K_LEFT:
-                        self.opcao_selecionada = 0
-                        DadosExame.olho = Constantes.olho_esquerdo
+                        if not DadosExame.programa_selecionado == Constantes.esterman:
+                            self.opcao_selecionada = 0
+                            DadosExame.olho = Constantes.olho_esquerdo
+                        else:
+                            match self.opcao_selecionada:
+                                case 0:
+                                    self.opcao_selecionada = 0
+                                    DadosExame.olho = Constantes.olho_esquerdo
+                                case 1:
+                                    self.opcao_selecionada = 2
+                                    DadosExame.olho = Constantes.binocular
+                                case 2:
+                                    self.opcao_selecionada = 0
+                                    DadosExame.olho = Constantes.olho_esquerdo
+                                
                     elif event.key == pygame.K_RIGHT:
-                        self.opcao_selecionada = 1
-                        DadosExame.olho = Constantes.olho_direito
+                        if not DadosExame.programa_selecionado == Constantes.esterman:
+                            self.opcao_selecionada = 1
+                            DadosExame.olho = Constantes.olho_direito
+                        else:
+                            match self.opcao_selecionada:
+                                case 0:
+                                    self.opcao_selecionada = 2
+                                    DadosExame.olho = Constantes.binocular
+                                case 1:
+                                    self.opcao_selecionada = 1
+                                    DadosExame.olho = Constantes.olho_direito
+                                case 2:
+                                    self.opcao_selecionada = 1
+                                    DadosExame.olho = Constantes.olho_direito
                 elif self.selecao_atual == "numero":
                     if event.key == pygame.K_LEFT and self.numero > self.NUMERO_MIN:
                         self.numero -= 1
@@ -184,23 +213,34 @@ class SelectEyeScreen:
             True,
             self.cor_font_olho
         )
-        rect_esquerda = pygame.Rect(self.width * 0.25 - 265, pos_y_opcoes - 35, 530, 100)
-        rect_direita = pygame.Rect(self.width * 0.75 - 265, pos_y_opcoes - 35, 530, 100)
+        texto_binocular = self.fonte.render(
+            self.opcoes[2],
+            True,
+            self.cor_font_olho
+        )
+        rect_esquerda = pygame.Rect(self.width * 0.25 - 180, pos_y_opcoes - 35, 360, 100)
+        rect_direita = pygame.Rect(self.width * 0.75 - 180, pos_y_opcoes - 35, 360, 100)
+        rect_centro = pygame.Rect(1920//2 - 180, pos_y_opcoes - 35, 360, 100)
         
         pygame.draw.rect(surface,self.cor_padrao_botao if self.opcao_selecionada == 0 else self.cor_padrao_botao_fade, rect_esquerda, border_radius=15)
         pygame.draw.rect(surface,self.cor_padrao_botao if self.opcao_selecionada == 1 else self.cor_padrao_botao_fade, rect_direita, border_radius=15)
+        
+        if DadosExame.programa_selecionado == Constantes.esterman:
+            pygame.draw.rect(surface,self.cor_padrao_botao if self.opcao_selecionada == 2 else self.cor_padrao_botao_fade, rect_centro, border_radius=15)
         if self.selecao_atual == "opcoes":
             if self.opcao_selecionada == 0:
                 pygame.draw.rect(surface, self.cor_selecao, rect_esquerda, 5, border_radius=15)
-            else:
+            elif self.opcao_selecionada == 1:
                 pygame.draw.rect(surface, self.cor_selecao, rect_direita, 5, border_radius=15)
-        
+            elif self.opcao_selecionada == 2:
+                pygame.draw.rect(surface, self.cor_selecao, rect_centro, 5, border_radius=15)
         
         
         
         surface.blit(texto_esquerda, (self.width * 0.25 - texto_esquerda.get_width() // 2, pos_y_opcoes))
         surface.blit(texto_direita, (self.width * 0.75 - texto_direita.get_width() // 2, pos_y_opcoes))
-        
+        if DadosExame.programa_selecionado == Constantes.esterman:
+            surface.blit(texto_binocular, (1920//2 - texto_binocular.get_width() // 2, pos_y_opcoes))
         
         # Renderiza a caixa numérica (se o exame selecionado for Screening)
         if DadosExame.exame_selecionado == Constantes.screening:          

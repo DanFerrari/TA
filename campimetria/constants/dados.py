@@ -19,6 +19,7 @@ class Constantes:
     central10 = "central 10°"
     olho_direito = "OD"
     olho_esquerdo = "OE"
+    binocular = "BIN"
     confiavel = "Exame confiavel"
     questionavel = "Exame questionavel"
     ruim = "Exame ruim,impreciso"

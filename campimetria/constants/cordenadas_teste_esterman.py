@@ -7,9 +7,9 @@ y_coords = [y * 0.5 if abs(y) > 0 else y for y in y_coords]
 
 # Vamos criar os pontos com uma distribuição tipo malha, limitando para gerar cerca de 120 pontos
 
-cordenadas_ESTBIN = []
+pontos_esterman = []
 
 for x, y in zip(x_coords, y_coords):
-    cordenadas_ESTBIN.append((x, y))
+    pontos_esterman.append((x, y))
 
-
+print(pontos_esterman)
