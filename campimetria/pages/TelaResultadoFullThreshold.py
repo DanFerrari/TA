@@ -1463,7 +1463,7 @@ class ResultadoFullthreshold:
 
 
 if __name__ == "__main__":
-    from cordenadas_30 import cordenadas_30
+    from cordenadas_24OD import cordenadas_24OD
     from converte_atenuacao_txt import read_file_to_list
 
     atenuacoes = read_file_to_list(
@@ -1483,6 +1483,7 @@ if __name__ == "__main__":
     DadosExame.total_testes_falsos_negativo = 10
 
     DadosExame.exame_selecionado = Constantes.fullthreshold
+    DadosExame.programa_selecionado = Constantes.central24
     DadosExame.olho = Constantes.olho_direito
 
     pygame.init()
@@ -1491,7 +1492,7 @@ if __name__ == "__main__":
     pygame.display.get_surface().fill((255, 255, 255))
     pygame.display.update()
 
-    for (x, y), atenuacao in zip(cordenadas_30, atenuacoes):
+    for (x, y), atenuacao in zip(cordenadas_24OD, atenuacoes):
         ponto = Ponto(x, y, 3, (0, 0, 0), 200)
         ponto.atenuacao = atenuacao
         DadosExame.matriz_pontos.append(ponto)

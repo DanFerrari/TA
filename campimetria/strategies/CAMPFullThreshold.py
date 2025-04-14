@@ -16,7 +16,6 @@ sys.path.append(
 
 from Ponto import Ponto
 from dados import *
-from cordenadas_30 import cordenadas_30
 from ContagemRegressiva import ContagemRegressiva
 from LimiarFoveal import CalcularLimiar
 from TelaResultadoFullThreshold import ResultadoFullthreshold
@@ -32,6 +31,23 @@ from strategy_screen import StrategyScreen
 class FullThreshold:
 
     def __init__(self,game):
+        
+        self.cordenadas = []
+        if DadosExame.programa_selecionado == Constantes.central30:
+            from cordenadas_30 import cordenadas_30
+            self.cordenadas = cordenadas_30
+        elif DadosExame.programa_selecionado == Constantes.central24 and DadosExame.olho == Constantes.olho_direito:
+            from cordenadas_24OD import cordenadas_24OD
+            self.cordenadas = cordenadas_24OD
+        elif DadosExame.programa_selecionado == Constantes.central24 and DadosExame.olho == Constantes.olho_esquerdo:
+            from cordenadas_24OE import cordenadas_24OE
+            self.cordenadas = cordenadas_24OE
+        elif DadosExame.programa_selecionado == Constantes.central10:
+            from cordenadas_10 import cordenadas_10
+            self.cordenadas = cordenadas_10
+        
+    
+        
         self.game = game
         self.pontos = []
         self.indice_atual = 0
@@ -106,7 +122,7 @@ class FullThreshold:
         self.tecla_menu_pressionada = False
         self.tecla_pause_pressionada = False
     def criar_pontos(self):        
-        for x,y in cordenadas_30:
+        for x,y in self.cordenadas:
             ponto = Ponto(x, y,tamanhoPonto = DadosExame.tamanho_estimulo, cor = (255, 255, 255), distancia = DadosExame.distancia_paciente)
             if x < 0 and y > 0:
                 ponto.atenuacao = self.ponto_NO.atenuacao               
