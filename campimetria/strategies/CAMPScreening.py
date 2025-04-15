@@ -303,7 +303,7 @@ class Screening:
                     if not continua:
                         return
                     DadosExame.total_testes_falsos_negativo += 1
-                    if not self.ponto_teste_negativo.response_received:
+                    if not ponto_teste_negativo.response_received:
                         DadosExame.falso_negativo_respondidos += 1
                     self.testenegativo = 0
 
