@@ -35,6 +35,9 @@ class ResultadoFullthreshold:
     def gerar_pontos_mapa_textura():
         matriz = []
         for ponto in DadosExame.matriz_pontos:
+            if DadosExame.programa_selecionado == Constantes.central10:
+                ponto.xg = ponto.xg * 1.5
+                ponto.yg = ponto.yg * 1.5
             ponto_novo = Ponto(
                 ponto.xg, ponto.yg, tamanhoPonto=3, cor=(0, 0, 0), distancia=200
             )
@@ -50,11 +53,15 @@ class ResultadoFullthreshold:
     def gerar_pontos_mapa_limiar():
         matriz = []
         for ponto in DadosExame.matriz_pontos:
+            if DadosExame.programa_selecionado == Constantes.central10:
+                ponto.xg = ponto.xg * 1.5
+                ponto.yg = ponto.yg * 1.5
             ponto_novo = Ponto(
                 ponto.xg, ponto.yg, tamanhoPonto=3, cor=(0, 0, 0), distancia=200
             )
             ponto_novo.raio_ponto = 6
             ponto_novo.pontoPix = 4
+            
             ponto_novo.x = int(ponto_novo.x * 960 / 1920)
             ponto_novo.y = int(ponto_novo.y * 540 / 1080)
             ponto_novo.atenuacao = ponto.atenuacao
@@ -553,10 +560,13 @@ class ResultadoFullthreshold:
             tolerancia_positiva = [valor - 3 for valor in desvio_total]
             tolerancia_negativa = [valor + 3 for valor in desvio_total]
             
+            
             if DadosExame.programa_selecionado == Constantes.central30:
                 step_labels_x = 15
             elif DadosExame.programa_selecionado == Constantes.central24:
                 step_labels_x = 13.25
+            elif DadosExame.programa_selecionado == Constantes.central10:
+                step_labels_x = 16.75
             
             
             quantidade_pontos = np.arange(
@@ -660,6 +670,7 @@ class ResultadoFullthreshold:
 
             # Plota os pontos na superfície
             for ponto in matriz_pontos:
+               
                 if DadosExame.olho == Constantes.olho_direito and (
                     (ponto.xg == 15 and ponto.yg == 3)
                     or (ponto.xg == 15 and ponto.yg == -3)
@@ -670,7 +681,25 @@ class ResultadoFullthreshold:
                     or (ponto.xg == -15 and ponto.yg == -3)
                 ):
                     continue
-                ponto.plotaString(ponto.atenuacao, 20, surface=surface)
+                
+                if DadosExame.programa_selecionado == Constantes.central10:
+                        ponto.xg = ponto.xg * 3
+                        ponto.yg = ponto.yg * 3
+                        ponto_novo = Ponto(
+                            ponto.xg, ponto.yg, tamanhoPonto=3, cor=(0, 0, 0), distancia=200
+                        )
+                        ponto_novo.raio_ponto = 6
+                        ponto_novo.pontoPix = 4
+                        ponto_novo.x = int(ponto_novo.x * 480 / 1920)
+                        ponto_novo.y = int(ponto_novo.y * 270 / 1080)
+                        ponto_novo.x -=  120
+                        ponto_novo.y -= 15
+                        ponto_novo.atenuacao = ponto.atenuacao
+                        ponto_novo.plotaString(ponto.atenuacao, 20, surface=surface)
+                    
+                   
+                else:
+                    ponto.plotaString(ponto.atenuacao, 20, surface=surface)
 
             # Salva a imagem
             pygame.image.save(
@@ -764,15 +793,14 @@ class ResultadoFullthreshold:
         lista_base_atenuacao = verifica_faixa_etaria(DadosExame.faixa_etaria)
         lista_temp = {}
         if DadosExame.programa_selecionado == Constantes.central10:
-            for cordenada in cordenadas_10:
-                
-            
-            
-        
-        
-        keys_to_remove = [list(lista_base_atenuacao.keys())[i] for i in indices_nulos]
-        for key in keys_to_remove:
-            lista_base_atenuacao.pop(key, None)
+            from cordenadas_10 import indices_base_atenuacao
+            for cordenada,indice in zip(cordenadas_10,indices_base_atenuacao):
+                lista_temp[cordenada] = lista_base_atenuacao[list(lista_base_atenuacao.keys())[indice]]
+            lista_base_atenuacao = lista_temp
+        else:        
+            keys_to_remove = [list(lista_base_atenuacao.keys())[i] for i in indices_nulos]
+            for key in keys_to_remove:
+                lista_base_atenuacao.pop(key, None)
     
 
         
@@ -818,6 +846,7 @@ class ResultadoFullthreshold:
                         (ponto.xg == -15 and ponto.yg == 3)
                         or (ponto.xg == -15 and ponto.yg == -3)
                     ):
+                        
                         ponto_desvio = Ponto(
                             ponto.xg,
                             ponto.yg,
@@ -864,6 +893,7 @@ class ResultadoFullthreshold:
         
         elif DadosExame.programa_selecionado == Constantes.central24: 
             desvio_total[-2:] = desvio_total[-3:-1]
+
         # desvio_paciente[:3] = desvio_paciente[3:6]
         desenha_curva_bebie(desvio_total, desvio_paciente)
 
