@@ -40,7 +40,7 @@ class SelectEyeScreen:
         self.selecao_atual = "opcoes"
         
         # Caixa numérica (para exame screening)
-        self.numero = 25
+        self.numero = self.game.config["atenuacao"]
         self.NUMERO_MIN = 0
         self.NUMERO_MAX = 40
         self.faixa_etaria = {1:"0 - 20", 2:"21 - 30", 3:"31 - 40", 4:"41 - 50", 5:"51 - 60", 6:"61 - 70", 7:"71 - 80",8:"81 - 90",9:"ACIMA 90"}
@@ -111,7 +111,8 @@ class SelectEyeScreen:
                                 DadosExame.olho = Constantes.binocular
                             DadosExame.atenuacao_screening = self.numero
                             self.config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
-                            self.config["distancia_paciente"] = DadosExame.distancia_paciente   
+                            self.config["distancia_paciente"] = DadosExame.distancia_paciente  
+                            self.config["atenuacao"] = DadosExame.atenuacao_screening 
                             self.salvar_config(self.config)                         
                             self.game.change_screen(Screening(self.game))
                            

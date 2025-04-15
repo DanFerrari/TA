@@ -92,7 +92,7 @@ class StrategyScreen:
         
         #label exame_id
         fonte_exame = pygame.font.Font(None, 48)
-        label_exame_id_texto = fonte_exame.render(f"EXAME ID {DadosExame.exame_id}", True,self.cor_texto)
+        label_exame_id_texto = fonte_exame.render(f"EXAME ID {DadosExame.exame_id if DadosExame.exame_id != 0 else self.game.config["exame_id"]}", True,self.cor_texto)
         label_exame_id_pos = label_exame_id_texto.get_rect(center=(960,800))
         label_exame_id_pos.y = 303
         surface.blit(label_exame_id_texto,label_exame_id_pos)

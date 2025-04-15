@@ -11,7 +11,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)
 
 PIN_ENTRADA = "PD22"
-GPIO.setup(PIN_ENTRADA, GPIO.IN)
+# GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
@@ -62,22 +62,24 @@ class Campimetria:
             "brightness":90,
             "contrast":50,
             "resolution-w":1920,
-            "resolution-h":1080
+            "resolution-h":1080,
+            "atenuacao":25
         }
+        
         self.config = self.carregar_config()
         self.set_brightness(self.config["brightness"])
         self.set_contrast(self.config["contrast"])
         DadosExame.tamanho_estimulo = self.config["tamanho_estimulo"]
         DadosExame.distancia_paciente = self.config["distancia_paciente"]
         DadosExame.exame_id = self.config["exame_id"]
-
+        print(os.path.abspath(os.path.join(os.path.dirname(__file__),"config.json")))
 
 
 
     def carregar_config(self):
         """Lê as variáveis do arquivo JSON ou usa valores padrão."""
-        if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE))):
-            with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE)), "r") as f:
+        if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__),"config.json"))):
+            with open(os.path.abspath(os.path.join(os.path.dirname(__file__),"config.json")), "r") as f:
                 return json.load(f)
         else:
             return self.DEFAULT_CONFIG

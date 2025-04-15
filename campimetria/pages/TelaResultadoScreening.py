@@ -494,9 +494,15 @@ class ResultadoScreening:
             CONFIG_FILE = "config.json"
 
             DEFAULT_CONFIG = {
-                "distancia_paciente": 200,
+                 "distancia_paciente": 200,
                 "tamanho_estimulo": 3,
                 "exame_id": 1,
+                "background":120,
+                "brightness":90,
+                "contrast":50,
+                "resolution-w":1920,
+                "resolution-h":1080,
+                "atenuacao":25
             }
             config = ResultadoScreening.carregar_config(CONFIG_FILE, DEFAULT_CONFIG)
             DadosExame.exame_id = config["exame_id"]
