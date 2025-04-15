@@ -26,9 +26,7 @@ class ResultadoScreening:
         cor_legenda_moderado = (179, 108, 8)
         cor_legenda_severo = (166, 6, 6)
 
-        def render_texto_colorido(
-            fonte, texto, cor_restante, cor_primeira=(0, 0, 0), largura_max=850
-        ):
+        def render_texto_colorido(fonte, texto, cor_restante, cor_primeira=(0, 0, 0), largura_max=850):
             """
             Renderiza um texto com tudo que estiver antes de ':' em preto
             e o restante em uma cor definida.
