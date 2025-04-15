@@ -128,7 +128,7 @@ class ResultadoScreening:
                 DadosExame.confiabilidade = Constantes.confiavel
             if ruim > 0 and muito_ruim < 2:
                 DadosExame.confiabilidade = Constantes.questionavel
-            if muito_ruim == 2 or ruim == 3 or ruim == 2 and muito_ruim == 1:
+            if muito_ruim == 2 or ruim == 3 or ruim == 2 and muito_ruim == 1 or muito_ruim > 0:
                 DadosExame.confiabilidade = Constantes.ruim
             if muito_ruim == 3:
                 DadosExame.confiabilidade = Constantes.nao_confiavel
@@ -139,14 +139,14 @@ class ResultadoScreening:
                 interpretacao = "Resultado comprometido pela baixa confiabilidade."
             else:
                 if DadosExame.porcentagem_respondidos_screening >= 90:
-                    interpretacao = f"Paciente com visão normal, pontos respondidos: {int(DadosExame.porcentagem_respondidos_screening)}%"
+                    interpretacao = f"Campo visual normal, pontos respondidos: {int(DadosExame.porcentagem_respondidos_screening)}%"
                 elif (
                     DadosExame.porcentagem_respondidos_screening < 90
                     and DadosExame.porcentagem_respondidos_screening >= 80
                 ):
-                    interpretacao = f"Paciente com perda moderada, pontos respondidos: {int(DadosExame.porcentagem_respondidos_screening)}%"
+                    interpretacao = f"Campo visual com perda moderada, pontos respondidos: {int(DadosExame.porcentagem_respondidos_screening)}%"
                 elif DadosExame.porcentagem_respondidos_screening < 80:
-                    interpretacao = f"Paciente com severa perda, ponto de atenção, pontos respondidos: {int(DadosExame.porcentagem_respondidos_screening)}%"
+                    interpretacao = f"Campo visual com perda severa, ponto de atenção, pontos respondidos: {int(DadosExame.porcentagem_respondidos_screening)}%"
             DadosExame.resultado_exame = interpretacao
             return interpretacao
 
@@ -184,7 +184,9 @@ class ResultadoScreening:
             f"Duração (min): {int(minutos)}:{int(segundos)}",
             f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({DadosExame.perda_de_fixacao_percentual:.2f}%)",
             f"Atenuacao:{DadosExame.atenuacao_screening}",
-            f"Total de pontos: {DadosExame.total_de_pontos_testados}",
+            f"Total de pontos: {DadosExame.total_de_pontos_testados}","",
+            f"Pontos Respondidos:{DadosExame.total_pontos_definidos} / { DadosExame.total_de_pontos_testados}","","",
+            f"Pontos Nao Respondidos:{DadosExame.total_de_pontos_testados - DadosExame.total_pontos_definidos} / {DadosExame.total_de_pontos_testados}"
         ]
         labels_valores = [
             f"Confiabilidade:{DadosExame.confiabilidade}",
@@ -204,7 +206,7 @@ class ResultadoScreening:
         espacamento_x_valores = 450
         espacamento_y_valores = 50
         pos_x_inicial_valores = 1020
-        pos_y_inicial_valores = 300
+        pos_y_inicial_valores = 400
         fonte = pygame.font.Font(None, 28)
 
         for i, texto in enumerate(labels_valores):
@@ -418,7 +420,7 @@ class ResultadoScreening:
         respondidos, nao_respondidos = 0, 0
         for ponto in DadosExame.matriz_pontos:
             
-            if DadosExame.programa_selecionado == Constantes.esterman:
+            if DadosExame.programa_selecionado == Constantes.central75:
                 ponto.xg = int(ponto.xg * 0.8) 
                 ponto.yg = int(ponto.yg * 0.8)  
             ponto_novo = Ponto(
@@ -451,7 +453,7 @@ class ResultadoScreening:
         DadosExame.porcentagem_respondidos_screening = (
             respondidos / DadosExame.total_de_pontos_testados
         ) * 100
-
+        DadosExame.total_pontos_definidos = respondidos
         pygame.image.save(
             surface,
             os.path.abspath(
@@ -621,7 +623,7 @@ if __name__ == "__main__":
             ponto.response_received = True
 
 
-    DadosExame.programa_selecionado = Constantes.esterman
+    DadosExame.programa_selecionado = Constantes.central75
     DadosExame.atenuacao_screening = 25
     DadosExame.total_de_pontos_testados = 120
 

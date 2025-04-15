@@ -37,10 +37,10 @@ if __name__ == "__main__":
     from fixacao_central import FixacaoCentral
     FixacaoCentral.plotar_fixacao_central()
 
-    from cordenadas_10 import cordenadas_10
+    from cordenadas_ESTBIN import cordenadas_ESTBIN
     
     
-    for x,y in cordenadas_10:
+    for x,y in cordenadas_ESTBIN:
         Ponto(x,y,3,(0,0,0),distancia).plotarPonto()
     pygame.display.update()
     while running:
@@ -52,13 +52,13 @@ if __name__ == "__main__":
                 if event.key == pygame.K_UP:
                     pygame.display.get_surface().fill((255, 255, 255))
                     distancia += 10
-                    for x,y in cordenadas_10:
+                    for x,y in cordenadas_ESTBIN:
                         Ponto(x,y,3,(0,0,0),distancia).plotarPonto()
                     pygame.display.update()
                 if event.key == pygame.K_DOWN:
                     pygame.display.get_surface().fill((255, 255, 255))
                     distancia -= 10
-                    for x,y in cordenadas_10:
+                    for x,y in cordenadas_ESTBIN:
                         Ponto(x,y,3,(0,0,0),distancia).plotarPonto()
                     pygame.display.update()
                 fonte = pygame.font.Font(None,30)

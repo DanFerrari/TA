@@ -48,13 +48,13 @@ class Screening:
         elif DadosExame.programa_selecionado == Constantes.central24 and DadosExame.olho == Constantes.olho_esquerdo:
             from cordenadas_24OE import cordenadas_24OE
             self.cordenadas = cordenadas_24OE
-        elif DadosExame.programa_selecionado == Constantes.esterman and DadosExame.olho == Constantes.olho_direito:
+        elif DadosExame.programa_selecionado == Constantes.central75 and DadosExame.olho == Constantes.olho_direito:
             from cordenadas_ESTOD import cordenadas_ESTOD
             self.cordenadas = cordenadas_ESTOD
-        elif DadosExame.programa_selecionado == Constantes.esterman and DadosExame.olho == Constantes.olho_esquerdo:
+        elif DadosExame.programa_selecionado == Constantes.central75 and DadosExame.olho == Constantes.olho_esquerdo:
             from cordenadas_ESTOE import cordenadas_ESTOE
             self.cordenadas = cordenadas_ESTOE
-        elif DadosExame.programa_selecionado == Constantes.esterman and DadosExame.olho == Constantes.binocular:
+        elif DadosExame.programa_selecionado == Constantes.central75 and DadosExame.olho == Constantes.binocular:
             from cordenadas_ESTBIN import cordenadas_ESTBIN
             self.cordenadas = cordenadas_ESTBIN
         
@@ -171,7 +171,7 @@ class Screening:
             return True
 
     def draw(self, surface):
-
+        print(DadosExame.olho)
         if self.menu.sair:
             return
 
@@ -180,7 +180,7 @@ class Screening:
             if self.aviso_inicial_respondido == False:
                 self.voltar_ao_menu_inicial = True
             else:
-                if DadosExame.programa_selecionado == Constantes.esterman and DadosExame.olho == Constantes.binocular:
+                if DadosExame.programa_selecionado == Constantes.central75 and DadosExame.olho == Constantes.binocular:
                     self.estado = "exame"
                     self.teste_fixacao = False
                 else: 

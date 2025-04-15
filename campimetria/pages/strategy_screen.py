@@ -50,7 +50,9 @@ class StrategyScreen:
                     if not self.strategy_selected:
                         self.button_strategy_selected = 1
                     if self.strategy_selected:
-                        if self.button_program_selected < 2:
+                        if self.button_program_selected < 2 and self.button_strategy_selected == 0:
+                            self.button_program_selected += 1
+                        elif self.button_program_selected < 1 and self.button_strategy_selected == 1:
                             self.button_program_selected += 1
                 elif event.key == pygame.K_e:  # Confirma a seleção
                     if self.button_strategy_selected == 0:
@@ -63,7 +65,7 @@ class StrategyScreen:
                     elif self.button_program_selected == 1:
                         DadosExame.programa_selecionado = Constantes.central24
                     elif self.button_program_selected == 2 and self.button_strategy_selected == 0:
-                        DadosExame.programa_selecionado = Constantes.esterman
+                        DadosExame.programa_selecionado = Constantes.central75
                     elif self.button_program_selected == 2 and self.button_strategy_selected == 1:
                         DadosExame.programa_selecionado = Constantes.central10                      
                         
@@ -109,9 +111,9 @@ class StrategyScreen:
         self.draw_button(surface, "30°", 1920//2 - largura_botao_programa // 2, 627,largura_botao_programa, altura_botao_programa, self.button_program_selected == 0,self.strategy_selected)
         self.draw_button(surface, "24°", 1920//2 - largura_botao_programa // 2, 762,largura_botao_programa, altura_botao_programa, self.button_program_selected == 1,self.strategy_selected)
         if self.button_strategy_selected == 0:
-            self.draw_button(surface, "ESTERMAN", 1920//2 - largura_botao_programa // 2, 897,largura_botao_programa, altura_botao_programa, self.button_program_selected == 2,self.strategy_selected)
-        elif self.button_strategy_selected == 1:
-            self.draw_button(surface, "10°", 1920//2 - largura_botao_programa // 2, 897,largura_botao_programa, altura_botao_programa, self.button_program_selected == 2,self.strategy_selected)
+            self.draw_button(surface, "75°", 1920//2 - largura_botao_programa // 2, 897,largura_botao_programa, altura_botao_programa, self.button_program_selected == 2,self.strategy_selected)
+        # elif self.button_strategy_selected == 1:
+        #     self.draw_button(surface, "10°", 1920//2 - largura_botao_programa // 2, 897,largura_botao_programa, altura_botao_programa, self.button_program_selected == 2,self.strategy_selected)
 
     def draw_button(self, surface, text,x, y, width, height, selected,visible = True):
         if visible:

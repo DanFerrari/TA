@@ -13,7 +13,7 @@ class Constantes:
     smalldelta = 3
     screening = "screening"
     fullthreshold = "fullthreshold"
-    esterman= "ESTERMAN"
+    central75= "CENTRAL 75°"
     central24 = "CENTRAL 24°"
     central30 = "CENTRAL 30°"
     central10 = "CENTRAL 10°"
