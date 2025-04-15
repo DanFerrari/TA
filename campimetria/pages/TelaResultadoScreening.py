@@ -485,11 +485,11 @@ class ResultadoScreening:
         pygame.display.get_surface().blit(surface_limiar, (-200, 540))
 
     def exibir_resultados():
-        ResultadoScreening.status_resultado(carregado=False)
-        pygame.display.get_surface().fill((255, 255, 255))
+        ResultadoScreening.status_resultado(carregado=False)        
         ResultadoScreening.desenha_pontos()
         ResultadoScreening.desenha_legendas()
         ResultadoScreening.desenha_aviso_pdf()
+        ResultadoScreening.status_resultado(carregado=True)
         pygame.display.flip()
         visualizando = True
         while visualizando:

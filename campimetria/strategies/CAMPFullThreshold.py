@@ -436,26 +436,26 @@ class FullThreshold:
                     
                     if self.testepositivo == 40 and len(self.pontos_vistos) > 0:
                         print("testando falso positivo...")
-                        ponto_teste = Ponto(self.pontos_vistos[-1].xg,self.pontos_vistos[-1].yg,self.pontos_vistos[-1].tamanhoPonto,Colors.BACKGROUND ,self.pontos_vistos[-1].distanciaPacienteTela)
+                        ponto_teste_positivo = Ponto(self.pontos_vistos[-1].xg,self.pontos_vistos[-1].yg,self.pontos_vistos[-1].tamanhoPonto,Colors.BACKGROUND ,self.pontos_vistos[-1].distanciaPacienteTela)
 
-                        continua = self.verifica_testa_ponto(ponto_teste.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        continua = self.verifica_testa_ponto(ponto_teste_positivo.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                         if not continua:
                             return          
                         DadosExame.total_testes_falsos_positivo += 1
-                        if self.pontos_vistos[-1].response_received:
+                        if ponto_teste_positivo.response_received:
                             DadosExame.falso_positivo_respondidos += 1
                         self.testepositivo = 0
                     
                     
                     if self.testenegativo == 45 and len(self.pontos_vistos) > 0:
                         print("testando falso negativo...")
-                        ponto_teste = Ponto(self.pontos_vistos[-1].xg,self.pontos_vistos[-1].yg,self.pontos_vistos[-1].tamanhoPonto,Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0),self.pontos_vistos[-1].distanciaPacienteTela)
+                        ponto_teste_negativo = Ponto(self.pontos_vistos[-1].xg,self.pontos_vistos[-1].yg,self.pontos_vistos[-1].tamanhoPonto,Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0),self.pontos_vistos[-1].distanciaPacienteTela)
                         
-                        continua = self.verifica_testa_ponto(ponto_teste.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        continua = self.verifica_testa_ponto(ponto_teste_negativo.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                         if not continua:
                             return  
                         DadosExame.total_testes_falsos_negativo += 1
-                        if not self.pontos_vistos[-1].response_received:
+                        if not ponto_teste_negativo.response_received:
                             DadosExame.falso_negativo_respondidos += 1
                         self.testenegativo = 0
                     
