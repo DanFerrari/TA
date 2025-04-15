@@ -87,4 +87,4 @@ keys = [
     (-9, -27), (-3, -27), (3, -27), (9, -27)
 ]
 
-lista_valores = {key: int(base[i]) for i, key in enumerate(keys)}
+lista_valores = {key: int(base[i]) + 1  for i, key in enumerate(keys)}
