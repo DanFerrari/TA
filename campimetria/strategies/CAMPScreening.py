@@ -245,6 +245,7 @@ class Screening:
                 self.pontos[self.indice_atual].cor = self.pontos[
                     self.indice_atual
                 ].db_para_intensidade(DadosExame.atenuacao_screening)
+                
                 continua = self.verifica_testa_ponto(
                     self.pontos[self.indice_atual].testaPonto(
                         0.2,
@@ -272,9 +273,10 @@ class Screening:
 
                 if self.testepositivo == 15 and len(self.pontos_vistos) > 1:
                     print("testando falso positivo...")
-                    self.pontos_vistos[-1].cor = Colors.BACKGROUND                                       
+                    ponto_teste = Ponto(self.pontos_vistos[-1].xg,self.pontos_vistos[-1].yg,self.pontos_vistos[-1].tamanhoPonto,Colors.BACKGROUND ,self.pontos_vistos[-1].distanciaPacienteTela)
+                                                          
                     continua = self.verifica_testa_ponto(
-                        self.pontos_vistos[-1].testaPonto(
+                        ponto_teste.testaPonto(
                             0.2,
                             self.tempo_resposta,
                             menu_pressionado=self.verifica_tecla_pressionada_menu(),
@@ -288,9 +290,11 @@ class Screening:
                     self.testepositivo = 0
                 if self.testenegativo == 12 and len(self.pontos_vistos) > 1:
                     print("testando falso negativo...")
-                    self.pontos_vistos[-1].cor = Ponto.db_para_intensidade((DadosExame.atenuacao_screening - 9) if DadosExame.atenuacao_screening >= 9 else 0)
+                    ponto_teste = Ponto(self.pontos_vistos[-1].xg,self.pontos_vistos[-1].yg,self.pontos_vistos[-1].tamanhoPonto,Ponto.db_para_intensidade((DadosExame.atenuacao_screening - 9) if DadosExame.atenuacao_screening >= 9 else 0),self.pontos_vistos[-1].distanciaPacienteTela)
+                    
+                    
                     continua = self.verifica_testa_ponto(
-                        self.pontos_vistos[-1].testaPonto(
+                        ponto_teste.testaPonto(
                             0.2,
                             self.tempo_resposta,
                             menu_pressionado=self.verifica_tecla_pressionada_menu(),

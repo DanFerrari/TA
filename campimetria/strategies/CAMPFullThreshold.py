@@ -436,8 +436,9 @@ class FullThreshold:
                     
                     if self.testepositivo == 40 and len(self.pontos_vistos) > 0:
                         print("testando falso positivo...")
-                        self.pontos_vistos[-1].cor = Colors.BACKGROUND
-                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        ponto_teste = Ponto(self.pontos_vistos[-1].xg,self.pontos_vistos[-1].yg,self.pontos_vistos[-1].tamanhoPonto,Colors.BACKGROUND ,self.pontos_vistos[-1].distanciaPacienteTela)
+
+                        continua = self.verifica_testa_ponto(ponto_teste.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                         if not continua:
                             return          
                         DadosExame.total_testes_falsos_positivo += 1
@@ -448,8 +449,9 @@ class FullThreshold:
                     
                     if self.testenegativo == 45 and len(self.pontos_vistos) > 0:
                         print("testando falso negativo...")
-                        self.pontos_vistos[-1].cor = Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0)
-                        continua = self.verifica_testa_ponto(self.pontos_vistos[-1].testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                        ponto_teste = Ponto(self.pontos_vistos[-1].xg,self.pontos_vistos[-1].yg,self.pontos_vistos[-1].tamanhoPonto,Ponto.db_para_intensidade((self.pontos_vistos[-1].atenuacao - 9) if self.pontos_vistos[-1].atenuacao >= 9 else 0),self.pontos_vistos[-1].distanciaPacienteTela)
+                        
+                        continua = self.verifica_testa_ponto(ponto_teste.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
                         if not continua:
                             return  
                         DadosExame.total_testes_falsos_negativo += 1

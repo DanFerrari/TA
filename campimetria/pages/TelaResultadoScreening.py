@@ -212,7 +212,7 @@ class ResultadoScreening:
         for i, texto in enumerate(labels_valores):
             coluna = i % 1
             linha = i // 1
-
+            color_label_info = (0,0,0)
             if i == 0:
                 if DadosExame.confiabilidade == Constantes.confiavel:
                     color_label_info = cor_legenda_normal
@@ -344,6 +344,27 @@ class ResultadoScreening:
             "w",
         ) as f:
             json.dump(config, f, indent=4)
+            
+    @staticmethod
+    def status_resultado(carregado):
+        """Mostra uma label temporária na tela e depois a apaga"""
+
+        fonte = pygame.font.Font(None, 78)
+        label = fonte.render("CARREGANDO MAPA...", True, (0, 0, 0), (255, 255, 255))
+        label_rect = label.get_rect(center=(960, 540))
+
+        if not carregado:
+            # Desenha a label na tela
+            pygame.display.get_surface().fill((255, 255, 255))
+            pygame.display.get_surface().blit(label, label_rect)
+            pygame.display.update()
+
+        if carregado:
+            pygame.draw.rect(
+                pygame.display.get_surface(), (255, 255, 255), label_rect
+            )  # Fundo preto (ajuste conforme necessário)
+            pygame.display.update()
+
 
     @staticmethod
     def desenha_pontos():
@@ -464,6 +485,7 @@ class ResultadoScreening:
         pygame.display.get_surface().blit(surface_limiar, (-200, 540))
 
     def exibir_resultados():
+        ResultadoScreening.status_resultado(carregado=False)
         pygame.display.get_surface().fill((255, 255, 255))
         ResultadoScreening.desenha_pontos()
         ResultadoScreening.desenha_legendas()

@@ -793,7 +793,8 @@ class ResultadoFullthreshold:
         lista_base_atenuacao = verifica_faixa_etaria(DadosExame.faixa_etaria)
         lista_temp = {}
         if DadosExame.programa_selecionado == Constantes.central10:
-            from cordenadas_10 import indices_base_atenuacao
+            from cordenadas_10 import indices_base_atenuacao,cordenadas_10
+            
             for cordenada,indice in zip(cordenadas_10,indices_base_atenuacao):
                 lista_temp[cordenada] = lista_base_atenuacao[list(lista_base_atenuacao.keys())[indice]]
             lista_base_atenuacao = lista_temp
@@ -1386,6 +1387,7 @@ class ResultadoFullthreshold:
 
     @staticmethod
     def exibir_resultados():
+        ResultadoFullthreshold.status_resultado(carregado=False)
         ResultadoFullthreshold.gerar_mapa_desvios_e_curva_de_bebie()
         CONFIG_FILE = "config.json"
 
@@ -1400,7 +1402,6 @@ class ResultadoFullthreshold:
 
         ResultadoFullthreshold.inicializar_matrizes()
         pygame.font.init()
-        ResultadoFullthreshold.status_resultado(carregado=False)
         tempo_inicial = pygame.time.get_ticks()
         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=True)
         tempo_final = pygame.time.get_ticks() - tempo_inicial

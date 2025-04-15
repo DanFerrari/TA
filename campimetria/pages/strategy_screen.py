@@ -65,7 +65,7 @@ class StrategyScreen:
                     elif self.button_program_selected == 2 and self.button_strategy_selected == 0:
                         DadosExame.programa_selecionado = Constantes.esterman
                     elif self.button_program_selected == 2 and self.button_strategy_selected == 1:
-                        DadosExame.programa_selecionado = Constantes.central10                       
+                        DadosExame.programa_selecionado = Constantes.central10                      
                         
                     if self.strategy_selected:                                                                                   
                         from select_eye_screen import SelectEyeScreen
