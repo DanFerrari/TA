@@ -16,5 +16,23 @@ keys = [
     (-9, -27), (-3, -27), (3, -27), (9, -27)
 ]
 
-lista_valores = {key: int(base[i]) + 1 for i, key in enumerate(keys)}
-print(lista_valores)
+lista_valores = {key: int(base[i])  for i, key in enumerate(keys)}
+
+cordenadas_reduzir = [(3,27),(-3,27),(9,27),(-9,27),(3,-27),(-3,-27),(9,-27),(-9,-27)]
+cordenadas_mancha = [(15,3),(15,-3)]
+
+
+for cordenada, atenuacao in lista_valores.items():
+    if cordenada in cordenadas_reduzir:
+        lista_valores[cordenada] = atenuacao - 1
+        continue
+    
+    if cordenada in cordenadas_mancha:
+        continue
+    
+    
+    lista_valores[cordenada] = atenuacao + 1
+    
+
+
+

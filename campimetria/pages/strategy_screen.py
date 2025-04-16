@@ -28,7 +28,8 @@ class StrategyScreen:
         self.cor_botao_hover = game.cor_botao_hover
         self.cor_texto = game.cor_texto
         self.strategy_selected = False
-        
+        self.angulo = 0
+        self.carregando = False
     
 
 
@@ -67,9 +68,10 @@ class StrategyScreen:
                     elif self.button_program_selected == 2 and self.button_strategy_selected == 0:
                         DadosExame.programa_selecionado = Constantes.central75
                     elif self.button_program_selected == 2 and self.button_strategy_selected == 1:
-                        DadosExame.programa_selecionado = Constantes.central10                      
+                        DadosExame.programa_selecionado = Constantes.central10                     
                         
-                    if self.strategy_selected:                                                                                   
+                    if self.strategy_selected:
+                        self.carregando = True                                                                                   
                         from select_eye_screen import SelectEyeScreen
                         self.game.change_screen(SelectEyeScreen(self.game))
                     self.strategy_selected = True
@@ -82,6 +84,7 @@ class StrategyScreen:
         pass
 
     def draw(self, surface):
+        
         surface.fill(self.cor_fundo)
         # Renderiza o título centralizado
         label_text = self.font.render("SELECIONE UMA ESTRATEGIA", True, self.cor_texto)
