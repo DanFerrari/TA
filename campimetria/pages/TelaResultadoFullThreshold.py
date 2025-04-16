@@ -894,7 +894,7 @@ class ResultadoFullthreshold:
             desvio_total[-2:] = desvio_total[-4:-2]
         
         elif DadosExame.programa_selecionado == Constantes.central24: 
-            desvio_total[-2:] = desvio_total[-3:-1]
+            desvio_total[-4:] = desvio_total[-6:-2]
 
         # desvio_paciente[:3] = desvio_paciente[3:6]
         desenha_curva_bebie(desvio_total, desvio_paciente)
@@ -979,11 +979,12 @@ class ResultadoFullthreshold:
             9: "ACIMA 90",
         }
         faixa_md_chosen = 0
-        faixa_md = [
+        faixa_md = [            
             "Normal ou alteração mínima",
             "Perda leve",
             "Perda moderada, ponto de atenção",
             "Perda severa",
+            "Acima do normal",
         ]
         faixa_psd_chosen = 0
         faixa_psd = [
@@ -994,6 +995,7 @@ class ResultadoFullthreshold:
         ]
         estimulo = {1: "I", 2: "II", 3: "III", 4: "IV", 5: "V"}
 
+
         if DadosExame.md >= -2.0:
             faixa_md_chosen = 0
         if DadosExame.md >= -6.0 and DadosExame.md < -2.0:
@@ -1002,6 +1004,8 @@ class ResultadoFullthreshold:
             faixa_md_chosen = 2
         if DadosExame.md < -10.0:
             faixa_md_chosen = 3
+        if DadosExame.md > 0:
+            faixa_md_chosen = 4
 
         if DadosExame.psd <= 2.0:
             faixa_psd_chosen = 0
@@ -1063,11 +1067,12 @@ class ResultadoFullthreshold:
             if DadosExame.confiabilidade == Constantes.nao_confiavel:
                 interpretacao = "Resultado comprometido pela baixa confiabilidade."
             else:
-                if faixa_md_chosen == 0 and faixa_psd_chosen == 0:
+                
+                if (faixa_md_chosen == 0 or faixa_md_chosen == 4) and faixa_psd_chosen == 0:
                     interpretacao = "Campo visual dentro dos padrões de normalidade."
-                elif faixa_md_chosen != 0 and faixa_psd_chosen == 0:
+                elif (faixa_md_chosen != 0 or faixa_md_chosen != 4) and faixa_psd_chosen == 0:
                     interpretacao = f"Alteração difusa: {faixa_md[faixa_md_chosen]}."
-                elif faixa_md_chosen == 0 and faixa_psd_chosen != 0:
+                elif (faixa_md_chosen == 0 or faixa_md_chosen == 4) and faixa_psd_chosen != 0:
                     interpretacao = f"Presença de defeitos localizados: {faixa_psd[faixa_psd_chosen]}."
                 else:
                     interpretacao = f"Alterações difusas e localizadas, MD: {faixa_md[faixa_md_chosen]}, PSD :{faixa_psd[faixa_psd_chosen]}."
@@ -1130,9 +1135,9 @@ class ResultadoFullthreshold:
         pos_y_inicial = 50  # Posição inicial da primeira linha
         
         cor_resultado = (0,0,0)
-        if faixa_md_chosen == 0 and faixa_psd_chosen == 0:
+        if (faixa_md_chosen == 0 or faixa_md_chosen == 4) and faixa_psd_chosen == 0:
             cor_resultado = cor_legenda_normal
-        if faixa_md_chosen != 0 or faixa_psd_chosen != 0:
+        if (faixa_md_chosen != 0 and faixa_md_chosen != 4) or faixa_psd_chosen != 0:
             cor_resultado = cor_legenda_moderado
         if faixa_md_chosen == 3 or faixa_psd_chosen == 3:
             cor_resultado = cor_legenda_severo
@@ -1156,7 +1161,7 @@ class ResultadoFullthreshold:
             
             if i == 0:
                 match faixa_md_chosen:
-                    case 0:
+                    case 0 | 4:  # Handles both cases 0 and 4
                         color_label_info = cor_legenda_normal
                     case 1:
                         color_label_info = cor_legenda_leve
@@ -1538,14 +1543,14 @@ class ResultadoFullthreshold:
 
 
 if __name__ == "__main__":
-    from cordenadas_30 import cordenadas_30
+    from cordenadas_24OD import cordenadas_24OD
     from cordenadas_10 import cordenadas_10
     from converte_atenuacao_txt import read_file_to_list
 
     atenuacoes = read_file_to_list(
         os.path.abspath(
             os.path.join(
-                os.path.dirname(__file__), "..", "atenuacao_teste", "teste.txt"
+                os.path.dirname(__file__), "..", "atenuacao_teste", "teste24.txt"
             )
         ),
         7,
@@ -1559,7 +1564,7 @@ if __name__ == "__main__":
     DadosExame.total_testes_falsos_negativo = 10
 
     DadosExame.exame_selecionado = Constantes.fullthreshold
-    DadosExame.programa_selecionado = Constantes.central30
+    DadosExame.programa_selecionado = Constantes.central24
     DadosExame.olho = Constantes.olho_direito
 
     pygame.init()
@@ -1568,7 +1573,7 @@ if __name__ == "__main__":
     pygame.display.get_surface().fill((255, 255, 255))
     pygame.display.update()
 
-    for (x, y), atenuacao in zip(cordenadas_30, atenuacoes):
+    for (x, y), atenuacao in zip(cordenadas_24OD, atenuacoes):
         ponto = Ponto(x, y, 3, (0, 0, 0), 200)
         ponto.atenuacao = atenuacao
         DadosExame.matriz_pontos.append(ponto)
