@@ -70,7 +70,7 @@ class GerarPdf():
         c.drawString(226, altura - 38, f"Programa:{DadosExame.programa_selecionado}")
         c.drawString(226, altura - 85, f"Tamanho Estímulo:{estimulo.get(DadosExame.tamanho_estimulo)}")
         c.drawString(413, altura - 38, f"Falso positivo: {int(DadosExame.falso_positivo_respondidos)} / {int(DadosExame.total_testes_falsos_positivo)} ({DadosExame.falso_positivo_respondidos_percentual:.2f}%)")
-        c.drawString(226, altura - 131, f"Duração (min): {int(minutos)}:{int(segundos)}")
+        c.drawString(226, altura - 131, f"Duração (min): {int(minutos):02d}:{int(segundos):02d}")
         c.drawString(413, altura - 85, f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)")
         c.drawString(413, altura -131, f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({perda_fixacao:.2f}%)")
         c.drawString(226, altura - 176, f"Total de pontos: {DadosExame.total_de_pontos_testados}")
@@ -102,7 +102,7 @@ class GerarPdf():
             
             c.drawString(38, altura - 540, "Desvio Total")
             c.drawString(195, altura -540, "Desvio Padrão")
-            c.setFont("Helvetica-Bold", 7)
+            c.setFont("Helvetica-Bold", 6)
             c.drawString(30,160,(f"MD: {DadosExame.md:.2f} ({DadosExame.resultado_md})").upper())
             c.drawString(30,145,(f"PSD: {DadosExame.psd:.2f} ({DadosExame.resultado_psd})").upper())
             c.drawString(30,130,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())

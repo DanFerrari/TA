@@ -1108,7 +1108,7 @@ class ResultadoFullthreshold:
             f"Falso negativo: {int(DadosExame.falso_negativo_respondidos)} / {int(DadosExame.total_testes_falsos_negativo)} ({DadosExame.falso_negativo_respondidos_percentual:.2f}%)",
             
             f"Exame: {DadosExame.exame_selecionado.upper()}",
-            f"Duração (min): {int(minutos)}:{int(segundos)}",
+            f"Duração (min): {int(minutos):02d}:{int(segundos):02d}",
             f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({DadosExame.perda_de_fixacao_percentual:.2f}%)",
             
             f"Faixa etária: {faixa_etaria.get(DadosExame.faixa_etaria)}",           
