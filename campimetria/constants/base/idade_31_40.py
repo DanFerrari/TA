@@ -18,9 +18,12 @@ cordenadas_mancha = [(15,3),(15,-3)]
 
 
 for cordenada, atenuacao in lista_valores.items():
-    if cordenada in cordenadas_reduzir:        
+    if cordenada in cordenadas_reduzir:
+        lista_valores[cordenada] = atenuacao - 1
         continue
     
     if cordenada in cordenadas_mancha:
         continue
+    
+    
     lista_valores[cordenada] = atenuacao + 1
