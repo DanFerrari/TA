@@ -4,11 +4,12 @@ MOUNT_LABEL="EXAMES"
 DEVICE_PATH="/dev/disk/by-label/$MOUNT_LABEL"
 DESIRED_MOUNT="/media/eyetec/$MOUNT_LABEL"
 
+sudo rm -rf "$DESIRED_MOUNT"
 # Verifica se já existe algo montado no ponto de montagem desejado
 if mountpoint -q "$DESIRED_MOUNT"; then
     echo "Já existe algo montado em $DESIRED_MOUNT. Desmontando..."
     sudo umount "$DESIRED_MOUNT"
-    sudo rm -rf "$DESIRED_MOUNT"
+    
     if [ $? -eq 0 ]; then
         echo "Desmontado com sucesso."
     else

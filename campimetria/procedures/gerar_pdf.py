@@ -167,10 +167,10 @@ class GerarPdf():
         
         pasta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp"))
 
-        # for arquivo in os.listdir(pasta):
-        #     caminho_arquivo = os.path.join(pasta, arquivo)
-        #     if os.path.isfile(caminho_arquivo):
-        #         os.remove(caminho_arquivo)  
+        for arquivo in os.listdir(pasta):
+            caminho_arquivo = os.path.join(pasta, arquivo)
+            if os.path.isfile(caminho_arquivo):
+                os.remove(caminho_arquivo)  
 
 
 

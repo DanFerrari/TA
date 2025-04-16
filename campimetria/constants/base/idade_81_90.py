@@ -13,3 +13,11 @@ keys = [
 lista_valores = {key: int(base[i]) for i, key in enumerate(keys)}
 
 print(lista_valores)
+
+for cordenada, atenuacao in lista_valores.items():
+    if cordenada in cordenadas_reduzir:        
+        continue
+    
+    if cordenada in cordenadas_mancha:
+        continue
+    lista_valores[cordenada] = atenuacao + 1
