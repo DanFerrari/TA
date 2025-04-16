@@ -984,7 +984,7 @@ class ResultadoFullthreshold:
             "Perda leve",
             "Perda moderada, ponto de atenção",
             "Perda severa",
-            "Acima do normal",
+            "Acima da média",
         ]
         faixa_psd_chosen = 0
         faixa_psd = [
