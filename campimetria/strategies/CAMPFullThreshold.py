@@ -257,8 +257,8 @@ class FullThreshold:
 
     def media_de_tempo_de_resposta_paciente(self, tempos):
         tempo_medio = sum(tempos) / len(tempos)
-        if tempo_medio < 1.5:
-            tempo_medio = 1.5
+        if tempo_medio < 1.0:
+            tempo_medio = 1.0
         if tempo_medio > 2.0:
             tempo_medio = 2.0
         return tempo_medio
