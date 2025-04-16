@@ -825,7 +825,6 @@ class ResultadoFullthreshold:
             x, y = cordenada
             for ponto in DadosExame.matriz_pontos:
                 if (x, y) == (ponto.xg, ponto.yg):
-                    curva_paciente.append(ponto.atenuacao)
                     if DadosExame.olho == Constantes.olho_direito and (
                         (ponto.xg == 15 and ponto.yg == 3)
                         or (ponto.xg == 15 and ponto.yg == -3)
@@ -840,7 +839,8 @@ class ResultadoFullthreshold:
                         )
                         ponto_desvio.x = int(ponto_desvio.x * 480 / 1920)
                         ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
-                        ponto_desvio.atenuacao = -99
+                        ponto_desvio.atenuacao = -1
+                        curva_paciente.append( ponto_desvio.atenuacao)
                         matriz_desvio_total.append(ponto_desvio)
                         continue
                     if DadosExame.olho == Constantes.olho_esquerdo and (
@@ -857,13 +857,14 @@ class ResultadoFullthreshold:
                         )
                         ponto_desvio.x = int(ponto_desvio.x * 480 / 1920)
                         ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
-                        ponto_desvio.atenuacao = -99
-                        matriz_desvio_total.append(ponto_desvio)
+                        ponto_desvio.atenuacao = -1
+                        matriz_desvio_total.append( ponto_desvio.atenuacao)
                         continue
 
                     ponto_desvio = Ponto(
                         ponto.xg, ponto.yg, tamanhoPonto=3, cor=(0, 0, 0), distancia=200
                     )
+                    curva_paciente.append(ponto.atenuacao)
 
                     ponto_desvio.x = int(ponto_desvio.x * 480 / 1920)
                     ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
@@ -1537,14 +1538,14 @@ class ResultadoFullthreshold:
 
 
 if __name__ == "__main__":
-    from cordenadas_24OD import cordenadas_24OD
+    from cordenadas_30 import cordenadas_30
     from cordenadas_10 import cordenadas_10
     from converte_atenuacao_txt import read_file_to_list
 
     atenuacoes = read_file_to_list(
         os.path.abspath(
             os.path.join(
-                os.path.dirname(__file__), "..", "atenuacao_teste", "exame2.txt"
+                os.path.dirname(__file__), "..", "atenuacao_teste", "teste.txt"
             )
         ),
         7,
@@ -1558,7 +1559,7 @@ if __name__ == "__main__":
     DadosExame.total_testes_falsos_negativo = 10
 
     DadosExame.exame_selecionado = Constantes.fullthreshold
-    DadosExame.programa_selecionado = Constantes.central10
+    DadosExame.programa_selecionado = Constantes.central30
     DadosExame.olho = Constantes.olho_direito
 
     pygame.init()
@@ -1567,7 +1568,7 @@ if __name__ == "__main__":
     pygame.display.get_surface().fill((255, 255, 255))
     pygame.display.update()
 
-    for (x, y), atenuacao in zip(cordenadas_10, atenuacoes):
+    for (x, y), atenuacao in zip(cordenadas_30, atenuacoes):
         ponto = Ponto(x, y, 3, (0, 0, 0), 200)
         ponto.atenuacao = atenuacao
         DadosExame.matriz_pontos.append(ponto)
