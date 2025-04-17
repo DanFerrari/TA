@@ -57,8 +57,8 @@ class FullThreshold:
         self.NC = 0
         self.Delta = 0
         self.viu = 0
-        self.Dbig = 6
-        self.Dsmall = 3
+        self.Dbig = 4
+        self.Dsmall = 2
         self.limiarok = False
         self.limiar_status = ""
         self.limiar = 0
