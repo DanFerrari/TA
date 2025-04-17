@@ -15,6 +15,7 @@ sys.path.append(
 )
 
 from dados import *  # Supondo que esses módulos estejam configurados
+from select_eye_screen import SelectEyeScreen
 
 
 class StrategyScreen:
@@ -71,8 +72,7 @@ class StrategyScreen:
                         DadosExame.programa_selecionado = Constantes.central10                     
                         
                     if self.strategy_selected:
-                        self.carregando = True                                                                                   
-                        from select_eye_screen import SelectEyeScreen
+                        self.carregando = True
                         self.game.change_screen(SelectEyeScreen(self.game))
                     self.strategy_selected = True
                 elif event.key == pygame.K_j:
