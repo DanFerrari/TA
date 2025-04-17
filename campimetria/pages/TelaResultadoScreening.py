@@ -18,6 +18,35 @@ from gerar_pdf import GerarPdf
 
 
 class ResultadoScreening:
+    
+
+
+    
+    @staticmethod
+    def plota_barra_indicativa_psd_md_confiabilidade():
+        def gera_imagem_barra_indicador_colorido(min,max,valor,nome):
+            from termometro import gerar_barra_com_indicador
+            valor_normalizado = ((valor - min) / (max - min)) * 100
+            if valor_normalizado > 96:
+                valor_normalizado = 96
+            elif valor_normalizado < 4:
+                valor_normalizado = 4
+                
+            gerar_barra_com_indicador(valor_normalizado,nome)           
+        
+   
+        caminho_indicador_conf = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","indicador_confiabilidade.png"))
+        gera_imagem_barra_indicador_colorido(0,100,DadosExame.confiabilidade,caminho_indicador_conf)
+       
+        image_confiabilidade = pygame.image.load(caminho_indicador_conf)
+        image_confiabilidade = pygame.transform.scale(image_confiabilidade, (210, 25)) 
+        
+        return image_confiabilidade
+    
+    
+    
+    
+    
     @staticmethod
     def desenha_legendas():
 
@@ -124,14 +153,48 @@ class ResultadoScreening:
             elif DadosExame.perda_de_fixacao_percentual > 20:
                 muito_ruim += 1
 
-            if bom == 3:
-                DadosExame.confiabilidade = Constantes.confiavel
-            if ruim > 0 and muito_ruim < 2:
-                DadosExame.confiabilidade = Constantes.questionavel
-            if muito_ruim == 2 or ruim == 3 or ruim == 2 and muito_ruim == 1 or muito_ruim > 0:
-                DadosExame.confiabilidade = Constantes.ruim
-            if muito_ruim == 3:
-                DadosExame.confiabilidade = Constantes.nao_confiavel
+            # if bom == 3:
+            #     DadosExame.confiabilidade = Constantes.confiavel
+            # if ruim > 0 and muito_ruim < 2:
+            #     DadosExame.confiabilidade = Constantes.questionavel
+            # if muito_ruim == 2 or ruim == 3 or ruim == 2 and muito_ruim == 1 or muito_ruim > 0:
+            #     DadosExame.confiabilidade = Constantes.ruim
+            # if muito_ruim == 3:
+            #     DadosExame.confiabilidade = Constantes.nao_confiavel
+            
+            def confiabilidade_invertida():
+                def pontuar(valor, lim_bom, lim_ruim):
+                    if valor <= lim_bom:
+                        return 0  # bom
+                    elif valor <= lim_ruim:
+                        return 50  # ruim
+                    else:
+                        return 100  # muito ruim
+
+                pontos = []
+                muito_ruim_flag = False
+
+                # Calcula os pontos individuais
+                for valor, lim_bom, lim_ruim in [
+                    (DadosExame.falso_positivo_respondidos_percentual, 15, 33),
+                    (DadosExame.falso_negativo_respondidos_percentual, 15, 33),
+                    (DadosExame.perda_de_fixacao_percentual, 10, 20),
+                ]:
+                    p = pontuar(valor, lim_bom, lim_ruim)
+                    pontos.append(p)
+                    if p == 100:
+                        muito_ruim_flag = True
+
+                media = sum(pontos) / len(pontos)
+
+                # Aumenta o peso da média se houver algum valor muito ruim
+                if muito_ruim_flag:
+                    media = media * 2.5  # aumenta a média em 25%
+                    media = min(media, 100)  # limita a 100
+
+                return round(media, 2)
+
+            DadosExame.confiabilidade = confiabilidade_invertida()
 
         def gerar_resultado_final():
 
@@ -189,8 +252,8 @@ class ResultadoScreening:
             f"Pontos Nao Respondidos:{DadosExame.total_de_pontos_testados - DadosExame.total_pontos_definidos} / {DadosExame.total_de_pontos_testados}"
         ]
         labels_valores = [
-            f"Confiabilidade:{DadosExame.confiabilidade}",
-            f"RESULTADO: {(gerar_resultado_final()).upper()}",
+            f"Confiabilidade:{int(100 - DadosExame.confiabilidade)}%",  
+            # f"RESULTADO: {(gerar_resultado_final()).upper()}",
         ]
 
         # Configuração para desenhar labels em colunas de 3 com 4 linhas
@@ -205,34 +268,38 @@ class ResultadoScreening:
 
         espacamento_x_valores = 450
         espacamento_y_valores = 50
-        pos_x_inicial_valores = 1020
+        pos_x_inicial_valores = 1300   #1020
         pos_y_inicial_valores = 400
         fonte = pygame.font.Font(None, 28)
-
+        image_conf = ResultadoScreening.plota_barra_indicativa_psd_md_confiabilidade()
         for i, texto in enumerate(labels_valores):
             coluna = i % 1
             linha = i // 1
+            image = fonte.render("",True,(0,0,0))
             color_label_info = (0,0,0)
             if i == 0:
-                if DadosExame.confiabilidade == Constantes.confiavel:
-                    color_label_info = cor_legenda_normal
-                if DadosExame.confiabilidade == Constantes.questionavel:
-                    color_label_info = cor_legenda_leve
-                if DadosExame.confiabilidade == Constantes.ruim:
-                    color_label_info = cor_legenda_moderado
-                if DadosExame.confiabilidade == Constantes.nao_confiavel:
-                    color_label_info = cor_legenda_severo
+                # if DadosExame.confiabilidade == Constantes.confiavel:
+                #     color_label_info = cor_legenda_normal
+                # if DadosExame.confiabilidade == Constantes.questionavel:
+                #     color_label_info = cor_legenda_leve
+                # if DadosExame.confiabilidade == Constantes.ruim:
+                #     color_label_info = cor_legenda_moderado
+                # if DadosExame.confiabilidade == Constantes.nao_confiavel:
+                #     color_label_info = cor_legenda_severo
+                image = image_conf
+                    
+                    
 
-            if i == 1:
-                if DadosExame.porcentagem_respondidos_screening >= 90:
-                    color_label_info = cor_legenda_normal
-                elif (
-                    DadosExame.porcentagem_respondidos_screening < 90
-                    and DadosExame.porcentagem_respondidos_screening >= 80
-                ):
-                   color_label_info = cor_legenda_moderado
-                elif DadosExame.porcentagem_respondidos_screening < 80:
-                    color_label_info = cor_legenda_severo
+            # if i == 1:
+            #     if DadosExame.porcentagem_respondidos_screening >= 90:
+            #         color_label_info = cor_legenda_normal
+            #     elif (
+            #         DadosExame.porcentagem_respondidos_screening < 90
+            #         and DadosExame.porcentagem_respondidos_screening >= 80
+            #     ):
+            #        color_label_info = cor_legenda_moderado
+            #     elif DadosExame.porcentagem_respondidos_screening < 80:
+            #         color_label_info = cor_legenda_severo
 
             pos_x = pos_x_inicial_valores + coluna * espacamento_x_valores
             pos_y = pos_y_inicial_valores + linha * espacamento_y_valores
@@ -243,6 +310,7 @@ class ResultadoScreening:
                 fonte, texto.upper(), color_label_info
             )
             pygame.display.get_surface().blit(texto_renderizado, (pos_x, pos_y))
+            pygame.display.get_surface().blit(image, (pos_x , pos_y + 20))
 
         fonte = pygame.font.Font(None, 26)
         for i, texto in enumerate(labels):

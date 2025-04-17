@@ -46,7 +46,9 @@ class GerarPdf():
         largura, altura = A4  # Tamanho da página (595x842 pontos)
         faixa_etaria = {1:"0-20", 2:"21-30", 3:"31-40", 4:"41-50", 5:"51-60", 6:"61-70", 7:"71-80"}
         estimulo = {1:"I",2:"II",3:"III",4:"IV",5:"V"}
-      
+        caminho_indicador_md = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","indicador_md.png"))
+        caminho_indicador_psd = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","indicador_psd.png"))
+        caminho_indicador_conf = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","indicador_confiabilidade.png"))
         
         perda_fixacao = 0
 
@@ -99,14 +101,17 @@ class GerarPdf():
             c.drawImage(caminho_image_desvio_padrao, 180, altura - 540 - 110, width=100, height=100)
             c.drawImage(caminho_image_desvio_total,20 , altura - 540 - 110, width=100, height=100)
             c.drawImage(caminho_imagem_curva_bebie, 300, altura - 540 - 180, width= 320, height=240)
+            c.drawImage(caminho_indicador_md,20,145, width=105, height=12.5)
+            c.drawImage(caminho_indicador_psd,20,105, width=105, height=12.5)
+            c.drawImage(caminho_indicador_conf,20,65, width=105, height=12.5)
             
             c.drawString(38, altura - 540, "Desvio Total")
             c.drawString(195, altura -540, "Desvio Padrão")
-            c.setFont("Helvetica-Bold", 9)
-            c.drawString(10,160,(f"MD: {DadosExame.md:.2f} ({DadosExame.resultado_md})").upper())
-            c.drawString(10,145,(f"PSD: {DadosExame.psd:.2f} ({DadosExame.resultado_psd})").upper())
-            c.drawString(10,130,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
-            c.drawString(5,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
+            c.setFont("Helvetica-Bold", 10)
+            c.drawString(20,160,(f"MD: {DadosExame.md:.2f} ").upper())
+            c.drawString(20,120,(f"PSD: {DadosExame.psd:.2f}").upper())
+            c.drawString(20,80,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
+            # c.drawString(5,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
          
         elif DadosExame.exame_selecionado == Constantes.screening:
             c.drawString(26, altura - 176, f"Atenuação (dB):{DadosExame.atenuacao_screening}")
@@ -123,10 +128,12 @@ class GerarPdf():
             
             c.drawImage(caminho_imagem_logo, 0,-26, width=156, height=110)
             c.drawImage(caminho_imagem_pontos, largura / 2 - nova_altura,420, width=nova_largura, height=nova_altura)
-            c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura,150, width=nova_largura, height=nova_altura)  
-            c.setFont("Helvetica-Bold", 9)
-            c.drawString(30,90,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
-            c.drawString(5,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
+            c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura,150, width=nova_largura, height=nova_altura) 
+            c.drawImage(caminho_indicador_conf,20,145, width=105, height=12.5) 
+            c.setFont("Helvetica-Bold", 10)
+            c.drawString(20,160,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
+            
+            # c.drawString(5,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
 
         
 
@@ -171,10 +178,10 @@ class GerarPdf():
         
         pasta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp"))
 
-        for arquivo in os.listdir(pasta):
-            caminho_arquivo = os.path.join(pasta, arquivo)
-            if os.path.isfile(caminho_arquivo):
-                os.remove(caminho_arquivo)  
+        # for arquivo in os.listdir(pasta):
+        #     caminho_arquivo = os.path.join(pasta, arquivo)
+        #     if os.path.isfile(caminho_arquivo):
+        #         os.remove(caminho_arquivo)  
 
 
 
@@ -186,7 +193,7 @@ if __name__ == "__main__":
     from atenuacao_daniel import atenuacao_daniel
     from cordenadas_30 import cordenadas_30
     from Ponto import Ponto
-    DadosExame.exame_selecionado = Constantes.fullthreshold
+    DadosExame.exame_selecionado = Constantes.screening
     DadosExame.atenuacao_screening = 25
     DadosExame.matriz_pontos = [Ponto(x,y,tamanhoPonto = 3,cor = (0,0,0), distancia = 100) for x,y in cordenadas_30]
     for i,ponto in enumerate(DadosExame.matriz_pontos):
@@ -200,7 +207,7 @@ if __name__ == "__main__":
     DadosExame.resultado_psd ="Campo visual normal ou muito próximo do normal" 
     DadosExame.resultado_md = 'Perda moderada, ponto de atenção',
     DadosExame.resultado_exame = f"Alterações difusas e localizadas, MD: {DadosExame.resultado_md},\n PSD :{DadosExame.resultado_psd}."
-    DadosExame.confiabilidade = "Exame não confiavél,totalmente impreciso"
+
     caminho_pdf = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "pdfs", f"relatorio-id-exame-{DadosExame.exame_id}.pdf"))
     pdf = GerarPdf()
     pdf.gerar_relatorio(caminho_pdf)

@@ -1636,7 +1636,7 @@ if __name__ == "__main__":
         ),
         7,
     )
-    DadosExame.faixa_etaria = 2
+    DadosExame.faixa_etaria = 4
 
 
     DadosExame.perda_de_fixacao = 1
@@ -1647,7 +1647,7 @@ if __name__ == "__main__":
     DadosExame.total_testes_falsos_negativo = 10
 
     DadosExame.exame_selecionado = Constantes.fullthreshold
-    DadosExame.programa_selecionado = Constantes.central30
+    DadosExame.programa_selecionado = Constantes.central24
     DadosExame.olho = Constantes.olho_direito
 
     pygame.init()
@@ -1655,7 +1655,7 @@ if __name__ == "__main__":
 
     pygame.display.get_surface().fill((255, 255, 255))
     pygame.display.update()
-    gerar_barra_com_indicador(50)
+    
     for (x, y), atenuacao in zip(cordenadas_24OD, atenuacoes):
         ponto = Ponto(x, y, 3, (0, 0, 0), 200)
         ponto.atenuacao = atenuacao
