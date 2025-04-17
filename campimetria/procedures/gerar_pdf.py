@@ -164,13 +164,17 @@ class GerarPdf():
 
         
         c.save() 
+        with open(nome_arquivo_pdf, 'rb+') as f:
+            f.flush()
+            os.fsync(f.fileno())
+        subprocess.run(["sync"])
         
         pasta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp"))
 
-        # for arquivo in os.listdir(pasta):
-        #     caminho_arquivo = os.path.join(pasta, arquivo)
-        #     if os.path.isfile(caminho_arquivo):
-        #         os.remove(caminho_arquivo)  
+        for arquivo in os.listdir(pasta):
+            caminho_arquivo = os.path.join(pasta, arquivo)
+            if os.path.isfile(caminho_arquivo):
+                os.remove(caminho_arquivo)  
 
 
 

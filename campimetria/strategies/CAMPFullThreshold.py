@@ -57,7 +57,7 @@ class FullThreshold:
         self.NC = 0
         self.Delta = 0
         self.viu = 0
-        self.Dbig = 4
+        self.Dbig = 3
         self.Dsmall = 2
         self.limiarok = False
         self.limiar_status = ""
@@ -121,6 +121,9 @@ class FullThreshold:
         
         self.tecla_menu_pressionada = False
         self.tecla_pause_pressionada = False
+        self.primeira_varredura = True
+        self.pontos_primeira_varredura = []
+        self.cordenadas_primeira_varredura = [(3,3),(9,3),(3,9),(9,9),(15,3),(15,9),(15,15),(9,15),(3,15)]
         
     
     def criar_pontos(self):        
@@ -144,11 +147,15 @@ class FullThreshold:
                 ponto.atenuacao -= 4
             elif (abs(ponto.xg) == 27 and  abs(ponto.yg) == 3 or abs(ponto.xg) == 27 and  abs(ponto.yg) == 9 or abs(ponto.xg) == 21 and  abs(ponto.yg) == 15 or abs(ponto.xg) == 15 and  abs(ponto.yg) == 21 or abs(ponto.xg) == 9 and  abs(ponto.yg) == 27 or abs(ponto.xg) == 3 and  abs(ponto.yg) == 27):
                 ponto.atenuacao -= 6
+            if (abs(ponto.xg),abs(ponto.yg)) in self.cordenadas_primeira_varredura:
+                self.pontos_primeira_varredura.append(ponto)
+                
+            
             
             self.pontos.append(ponto)
         self.total_pontos_exame = len(self.pontos)
         random.shuffle(self.pontos)
-       
+
         
     
 
@@ -391,6 +398,26 @@ class FullThreshold:
             
         elif self.estado == "exame":
             
+            
+            if self.primeira_varredura:
+                ponto = self.pontos_primeira_varredura[self.indice_atual]
+                ponto.cor = Ponto.db_para_intensidade(ponto.atenuacao)
+                continua = self.verifica_testa_ponto(ponto.testaPonto(0.2, self.tempo_resposta, menu_pressionado = self.verifica_tecla_pressionada_menu()))
+                if not continua:
+                    return            
+                if ponto.response_received:
+                    self.pontos_vistos.append(ponto)
+                    self.tempos.append(ponto.tempo_resposta)
+
+                    paciente_viu = 2
+                else:
+                    paciente_viu = 1
+                self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto)
+                self.indice_atual += 1
+                if self.indice_atual == 35:
+                    self.indice_atual = 0 
+                    self.primeira_varredura = False
+                
             self.indice_atual += 1
             if self.indice_atual >= len(self.pontos):
                 self.indice_atual = 0

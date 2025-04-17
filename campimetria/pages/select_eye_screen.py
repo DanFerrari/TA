@@ -49,31 +49,8 @@ class SelectEyeScreen:
         #estimulo
         self.estimulo = {1:"I",2:"II",3:"III",4:"IV",5:"V"}
         
-        self.CONFIG_FILE = "config.json"
 
-        self.DEFAULT_CONFIG ={
-            "distancia_paciente":200,
-            "tamanho_estimulo":3,
-            "exame_id":1
-        }
-        self.config = self.carregar_config()
-        DadosExame.tamanho_estimulo = self.config["tamanho_estimulo"]
-        DadosExame.distancia_paciente = self.config["distancia_paciente"]
-        DadosExame.exame_id = self.config["exame_id"]
 
-    def carregar_config(self):
-        """Lê as variáveis do arquivo JSON ou usa valores padrão."""
-        if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE))):
-            with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE)), "r") as f:
-                return json.load(f)
-        else:
-            return self.DEFAULT_CONFIG
-
-    def salvar_config(self,config):
-        """Salva as variáveis no arquivo JSON."""
-        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE)), "w") as f:
-            json.dump(config, f, indent=4)
-    
     def handle_events(self, events):
         for event in events:
             if event.type == pygame.QUIT:
@@ -110,10 +87,10 @@ class SelectEyeScreen:
                             elif self.opcao_selecionada == 2:
                                 DadosExame.olho = Constantes.binocular
                             DadosExame.atenuacao_screening = self.numero
-                            self.config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
-                            self.config["distancia_paciente"] = DadosExame.distancia_paciente  
-                            self.config["atenuacao"] = DadosExame.atenuacao_screening 
-                            self.salvar_config(self.config)                         
+                            self.game.config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
+                            self.game.config["distancia_paciente"] = DadosExame.distancia_paciente  
+                            self.game.config["atenuacao"] = DadosExame.atenuacao_screening 
+                            self.game.salvar_config(self.game.config)                         
                             self.game.change_screen(Screening(self.game))
                            
                             
@@ -124,9 +101,9 @@ class SelectEyeScreen:
                             else:
                                 DadosExame.olho = Constantes.olho_direito
                             DadosExame.faixa_etaria = self.escolha_faixa
-                            self.config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
-                            self.config["distancia_paciente"] = DadosExame.distancia_paciente 
-                            self.salvar_config(self.config) 
+                            self.game.config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
+                            self.game.config["distancia_paciente"] = DadosExame.distancia_paciente 
+                            self.game.salvar_config(self.game.config) 
                             self.game.change_screen(FullThreshold(self.game))
                          
                         else:

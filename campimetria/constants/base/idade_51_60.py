@@ -31,7 +31,7 @@ for cordenada, atenuacao in lista_valores.items():
         continue
     
     
-    lista_valores[cordenada] = atenuacao + 1
+    lista_valores[cordenada] = atenuacao + 2
     
 
 

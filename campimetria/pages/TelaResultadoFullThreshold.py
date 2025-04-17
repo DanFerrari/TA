@@ -858,7 +858,7 @@ class ResultadoFullthreshold:
                         ponto_desvio.x = int(ponto_desvio.x * 480 / 1920)
                         ponto_desvio.y = int(ponto_desvio.y * 270 / 1080)
                         ponto_desvio.atenuacao = -1
-                        matriz_desvio_total.append( ponto_desvio.atenuacao)
+                        matriz_desvio_total.append( ponto_desvio)
                         continue
 
                     ponto_desvio = Ponto(
@@ -890,11 +890,11 @@ class ResultadoFullthreshold:
 
         desvio_total.sort(reverse=False)
         desvio_paciente.sort(reverse=False)
-        if DadosExame.programa_selecionado == Constantes.central30:
-            desvio_total[-2:] = desvio_total[-4:-2]
+
+            
+        desvio_total[-2:] = [desvio_total[-3]] * 2
         
-        elif DadosExame.programa_selecionado == Constantes.central24: 
-            desvio_total[-4:] = desvio_total[-6:-2]
+
 
         # desvio_paciente[:3] = desvio_paciente[3:6]
         desenha_curva_bebie(desvio_total, desvio_paciente)
@@ -1631,11 +1631,13 @@ if __name__ == "__main__":
     atenuacoes = read_file_to_list(
         os.path.abspath(
             os.path.join(
-                os.path.dirname(__file__), "..", "atenuacao_teste", "teste24.txt"
+                os.path.dirname(__file__), "..", "atenuacao_teste", "exame.txt"
             )
         ),
         7,
     )
+    DadosExame.faixa_etaria = 2
+
 
     DadosExame.perda_de_fixacao = 1
     DadosExame.total_testes_mancha = 5
@@ -1645,7 +1647,7 @@ if __name__ == "__main__":
     DadosExame.total_testes_falsos_negativo = 10
 
     DadosExame.exame_selecionado = Constantes.fullthreshold
-    DadosExame.programa_selecionado = Constantes.central24
+    DadosExame.programa_selecionado = Constantes.central30
     DadosExame.olho = Constantes.olho_direito
 
     pygame.init()

@@ -83,6 +83,11 @@ class Campimetria:
                 return json.load(f)
         else:
             return self.DEFAULT_CONFIG
+        
+    def salvar_config(self,config):
+        """Salva as variáveis no arquivo JSON."""
+        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE)), "w") as f:
+            json.dump(config, f, indent=4)
     def get_brightness(self): return self.get_vcp_value("10")
     def set_brightness(self,val): self.set_vcp_value("10", val)
 
