@@ -21,9 +21,9 @@ class Constantes:
     olho_esquerdo = "OE"
     binocular = "BIN"
     confiavel = "Exame confiavel"
-    questionavel = "Exame questionavel"
-    ruim = "Exame ruim,impreciso"
-    nao_confiavel = "Exame não confiavél,totalmente impreciso"
+    questionavel = "Exame com alterações"
+    ruim = "Exame impreciso"
+    nao_confiavel = "Exame não confiavél"
 
 
 class Colors:

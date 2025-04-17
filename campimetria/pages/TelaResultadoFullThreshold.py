@@ -898,9 +898,51 @@ class ResultadoFullthreshold:
 
         # desvio_paciente[:3] = desvio_paciente[3:6]
         desenha_curva_bebie(desvio_total, desvio_paciente)
+    
+    @staticmethod
+    def gera_imagem_barra_indicador_colorido(min,max,valor,nome):
+        from termometro import gerar_barra_com_indicador
+        valor_normalizado = ((valor - min) / (max - min)) * 100
+        if valor_normalizado > 96:
+            valor_normalizado = 96
+        elif valor_normalizado < 4:
+            valor_normalizado = 4
+            
+        gerar_barra_com_indicador(valor_normalizado,nome)
+    
+    @staticmethod
+    def plota_barra_indicativa_psd_md_confiabilidade():
+        
+        caminho_indicador_md = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","indicador_md.png"))
+        caminho_indicador_psd = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","indicador_psd.png"))
+        caminho_indicador_conf = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","indicador_confiabilidade.png"))
+        
+        
+
+        
+        
+        ResultadoFullthreshold.gera_imagem_barra_indicador_colorido(0,100,DadosExame.confiabilidade,caminho_indicador_conf)
+        ResultadoFullthreshold.gera_imagem_barra_indicador_colorido(0,-15,DadosExame.md,caminho_indicador_md)
+        ResultadoFullthreshold.gera_imagem_barra_indicador_colorido(0,10,DadosExame.psd,caminho_indicador_psd)
+        
+       
+        image_indicador_md = pygame.image.load(caminho_indicador_md)
+        image_indicador_psd = pygame.image.load(caminho_indicador_psd)
+        image_confiabilidade = pygame.image.load(caminho_indicador_conf)
+
+        # Redimensiona as imagens
+        image_indicador_md = pygame.transform.scale(image_indicador_md, (210, 25))  
+        image_indicador_psd = pygame.transform.scale(image_indicador_psd, (210, 25)) 
+        image_confiabilidade = pygame.transform.scale(image_confiabilidade, (210, 25)) 
+        
+        return image_indicador_md, image_indicador_psd,image_confiabilidade
+        
+ 
 
     @staticmethod
     def desenha_legendas_exame():
+        
+        
         
         cor_legenda_normal = (9,92,12)
         cor_legenda_leve = (161,156,14)
@@ -1052,14 +1094,48 @@ class ResultadoFullthreshold:
             elif DadosExame.perda_de_fixacao_percentual > 20:
                 muito_ruim += 1
 
-            if bom == 3:
-                DadosExame.confiabilidade = Constantes.confiavel
-            if ruim > 0 and muito_ruim < 2:
-                DadosExame.confiabilidade = Constantes.questionavel
-            if muito_ruim == 2 or ruim == 3 or ruim == 2 and muito_ruim == 1:
-                DadosExame.confiabilidade = Constantes.ruim
-            if muito_ruim == 3:
-                DadosExame.confiabilidade = Constantes.nao_confiavel
+            # if bom == 3:
+            #     DadosExame.confiabilidade = Constantes.confiavel
+            # if ruim > 0 and muito_ruim < 2:
+            #     DadosExame.confiabilidade = Constantes.questionavel
+            # if muito_ruim == 2 or ruim == 3 or ruim == 2 and muito_ruim == 1:
+            #     DadosExame.confiabilidade = Constantes.ruim
+            # if muito_ruim == 3:
+            #     DadosExame.confiabilidade = Constantes.nao_confiavel
+            def confiabilidade_invertida():
+                def pontuar(valor, lim_bom, lim_ruim):
+                    if valor <= lim_bom:
+                        return 0  # bom
+                    elif valor <= lim_ruim:
+                        return 50  # ruim
+                    else:
+                        return 100  # muito ruim
+
+                pontos = []
+                muito_ruim_flag = False
+
+                # Calcula os pontos individuais
+                for valor, lim_bom, lim_ruim in [
+                    (DadosExame.falso_positivo_respondidos_percentual, 15, 33),
+                    (DadosExame.falso_negativo_respondidos_percentual, 15, 33),
+                    (DadosExame.perda_de_fixacao_percentual, 10, 20),
+                ]:
+                    p = pontuar(valor, lim_bom, lim_ruim)
+                    pontos.append(p)
+                    if p == 100:
+                        muito_ruim_flag = True
+
+                media = sum(pontos) / len(pontos)
+
+                # Aumenta o peso da média se houver algum valor muito ruim
+                if muito_ruim_flag:
+                    media = media * 2.5  # aumenta a média em 25%
+                    media = min(media, 100)  # limita a 100
+
+                return round(media, 2)
+
+            DadosExame.confiabilidade = confiabilidade_invertida()
+
             
 
         def gerar_resultado_final(faixa_psd,faixa_md,faixa_md_chosen,faixa_psd_chosen):         
@@ -1121,10 +1197,12 @@ class ResultadoFullthreshold:
             f"Total de pontos: {DadosExame.total_de_pontos_testados}",
             f"Limiar Foveal: {int(DadosExame.LimiarFoveal)} (dB)",
         ]
-        labels_valores = [ f"MD:{DadosExame.md:.2f}  ({faixa_md[faixa_md_chosen]})",           
-            f"Confiabilidade:{DadosExame.confiabilidade}",        
-            f"PSD:{DadosExame.psd:.2f}  ({faixa_psd[faixa_psd_chosen]})",
-            f"RESULTADO: {(gerar_resultado_final(faixa_psd,faixa_md,faixa_md_chosen,faixa_psd_chosen)).upper()}"]
+        labels_valores = [ 
+            f"MD:{DadosExame.md:.2f}", #f"MD:{DadosExame.md:.2f}  ({faixa_md[faixa_md_chosen]})",           
+            f"Confiabilidade:{int(100 - DadosExame.confiabilidade)}%",        
+            f"PSD:{DadosExame.psd:.2f}", #f"PSD:{DadosExame.psd:.2f}  ({faixa_psd[faixa_psd_chosen]})",
+            # f"RESULTADO: {(gerar_resultado_final(faixa_psd,faixa_md,faixa_md_chosen,faixa_psd_chosen)).upper()}"
+            ]
 
         # Configuração para desenhar labels em colunas de 3 com 4 linhas
         colunas = 3
@@ -1141,57 +1219,56 @@ class ResultadoFullthreshold:
             cor_resultado = cor_legenda_moderado
         if faixa_md_chosen == 3 or faixa_psd_chosen == 3:
             cor_resultado = cor_legenda_severo
-
-        
-        
-  
-        
-    
- 
-        
+            
         espacamento_x_valores = 450
-        espacamento_y_valores = 50
-        pos_x_inicial_valores = 1020
+        espacamento_y_valores = 80
+        pos_x_inicial_valores = 1300  #1020
         pos_y_inicial_valores = 300
         fonte = pygame.font.Font(None, 28)
-        
+        image_md,image_psd,image_conf = ResultadoFullthreshold.plota_barra_indicativa_psd_md_confiabilidade()
         for i,texto in enumerate(labels_valores):
             coluna = i % 1
             linha = i // 1
+            image = fonte.render("",True,(0,0,0))
+            color_label_info = (0,0,0)
             
             if i == 0:
-                match faixa_md_chosen:
-                    case 0 | 4:  # Handles both cases 0 and 4
-                        color_label_info = cor_legenda_normal
-                    case 1:
-                        color_label_info = cor_legenda_leve
-                    case 2:
-                        color_label_info = cor_legenda_moderado
-                    case 3:
-                        color_label_info = cor_legenda_severo
+                # match faixa_md_chosen:
+                #     case 0 | 4:  # Handles both cases 0 and 4
+                #         color_label_info = cor_legenda_normal
+                #     case 1:
+                #         color_label_info = cor_legenda_leve
+                #     case 2:
+                #         color_label_info = cor_legenda_moderado
+                #     case 3:
+                #         color_label_info = cor_legenda_severo
+                image = image_md
                 
 
             if i == 1:
-                if DadosExame.confiabilidade == Constantes.confiavel:
-                    color_label_info = cor_legenda_normal
-                if DadosExame.confiabilidade == Constantes.questionavel:
-                    color_label_info = cor_legenda_leve
-                if DadosExame.confiabilidade == Constantes.ruim:
-                    color_label_info = cor_legenda_moderado
-                if DadosExame.confiabilidade == Constantes.nao_confiavel:
-                    color_label_info = cor_legenda_severo
+                # if DadosExame.confiabilidade == Constantes.confiavel:
+                #     color_label_info = cor_legenda_normal
+                # if DadosExame.confiabilidade == Constantes.questionavel:
+                #     color_label_info = cor_legenda_leve
+                # if DadosExame.confiabilidade == Constantes.ruim:
+                #     color_label_info = cor_legenda_moderado
+                # if DadosExame.confiabilidade == Constantes.nao_confiavel:
+                #     color_label_info = cor_legenda_severo
+                
+                image = image_conf
             if i == 2:
-                match faixa_psd_chosen:
-                    case 0:
-                        color_label_info = cor_legenda_normal
-                    case 1:
-                        color_label_info = cor_legenda_leve
-                    case 2:
-                        color_label_info = cor_legenda_moderado
-                    case 3:
-                        color_label_info = cor_legenda_severo
-            if i == 3:
-                color_label_info = cor_resultado
+                # match faixa_psd_chosen:
+                #     case 0:
+                #         color_label_info = cor_legenda_normal
+                #     case 1:
+                #         color_label_info = cor_legenda_leve
+                #     case 2:
+                #         color_label_info = cor_legenda_moderado
+                #     case 3:
+                #         color_label_info = cor_legenda_severo
+                image = image_psd
+            # if i == 3:
+            #     color_label_info = cor_resultado
             
             pos_x = pos_x_inicial_valores + coluna * espacamento_x_valores
             pos_y = pos_y_inicial_valores + linha * espacamento_y_valores
@@ -1199,7 +1276,9 @@ class ResultadoFullthreshold:
             # Renderiza a label
 
             texto_renderizado = render_texto_colorido(fonte,texto.upper(),color_label_info)
+            pygame.display.get_surface().blit(image, (pos_x , pos_y + 20))
             pygame.display.get_surface().blit(texto_renderizado, (pos_x, pos_y))
+           
 
         fonte = pygame.font.Font(None, 26)
         for i, texto in enumerate(labels):
@@ -1219,7 +1298,8 @@ class ResultadoFullthreshold:
                     color_label_info = cor_legenda_moderado
                 elif DadosExame.falso_positivo_respondidos_percentual > 20:
                     color_label_info = cor_legenda_severo
-
+            
+            
             if i == 5:
                 if DadosExame.falso_negativo_respondidos_percentual <= 15:
                     color_label_info = (0, 0, 0)
@@ -1421,6 +1501,7 @@ class ResultadoFullthreshold:
         ResultadoFullthreshold.plota_mapas()
         ResultadoFullthreshold.desenha_legendas_exame()
         ResultadoFullthreshold.desenha_aviso_pdf()
+
         pygame.display.flip()
         visualizando = True
         while visualizando:
@@ -1546,7 +1627,7 @@ if __name__ == "__main__":
     from cordenadas_24OD import cordenadas_24OD
     from cordenadas_10 import cordenadas_10
     from converte_atenuacao_txt import read_file_to_list
-
+    from termometro import gerar_barra_com_indicador
     atenuacoes = read_file_to_list(
         os.path.abspath(
             os.path.join(
@@ -1556,10 +1637,10 @@ if __name__ == "__main__":
         7,
     )
 
-    DadosExame.perda_de_fixacao = 5
-    DadosExame.total_testes_mancha = 10
-    DadosExame.falso_positivo_respondidos = 3
-    DadosExame.falso_negativo_respondidos = 3
+    DadosExame.perda_de_fixacao = 1
+    DadosExame.total_testes_mancha = 5
+    DadosExame.falso_positivo_respondidos = 1
+    DadosExame.falso_negativo_respondidos = 5
     DadosExame.total_testes_falsos_positivo = 10
     DadosExame.total_testes_falsos_negativo = 10
 
@@ -1572,7 +1653,7 @@ if __name__ == "__main__":
 
     pygame.display.get_surface().fill((255, 255, 255))
     pygame.display.update()
-
+    gerar_barra_com_indicador(50)
     for (x, y), atenuacao in zip(cordenadas_24OD, atenuacoes):
         ponto = Ponto(x, y, 3, (0, 0, 0), 200)
         ponto.atenuacao = atenuacao

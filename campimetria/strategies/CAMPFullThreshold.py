@@ -148,7 +148,7 @@ class FullThreshold:
             self.pontos.append(ponto)
         self.total_pontos_exame = len(self.pontos)
         random.shuffle(self.pontos)
-        print(f"Pontos criados: {len(self.pontos)}")
+       
         
     
 
@@ -266,7 +266,7 @@ class FullThreshold:
 
     def update(self):
         self.menu.fixacao = "diamante" if self.estado == "limiar_foveal"  else "central"
-        print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {self.pontos_fechados},  total de pontos: {self.total_pontos_exame}, limiar foveal: {DadosExame.LimiarFoveal}")
+        print(f"indice atual: {self.indice_atual} estado: {self.estado} pontos encontrados: {len(self.pontos_fechados)},  total de pontos: {self.total_pontos_exame}, limiar foveal: {DadosExame.LimiarFoveal}")
         print(f"pontoNO:{self.ponto_NO.atenuacao}  pontoNE:{self.ponto_NE.atenuacao} pontoSO: {self.ponto_SO.atenuacao} pontoSE:{self.ponto_SE.atenuacao}")
         pygame.display.update()
         if self.voltar_ao_menu_inicial:
@@ -466,9 +466,7 @@ class FullThreshold:
                     print(
                         f"Ponto: ({ponto.x}, {ponto.y}), Atenuacao: {ponto.atenuacao}, Cor: {ponto.cor}"
                     )
-                    print(
-                        f"Ponto definidos: {DadosExame.total_pontos_definidos} Mancha: {self.testemancha}"
-                    )
+                   
                     DadosExame.total_de_pontos_testados += 1
 
             
