@@ -113,23 +113,29 @@ class DadosExame:
 
     @staticmethod
     def reset():
-        DadosExame.faixa_etaria = 0
+        DadosExame.exame_id = 0
+        DadosExame.faixa_etaria = 2
+        DadosExame.distancia_paciente = 200
+        DadosExame.tamanho_estimulo = 3
         DadosExame.olho = ""
         DadosExame.exame_selecionado = ""
+        DadosExame.programa_selecionado = ""
         DadosExame.atenuacao_screening = 0
+        DadosExame.porcentagem_respondidos_screening = 0
         DadosExame.duracao_do_exame = 0
         DadosExame.gContIgual = 0
-        DadosExame.gFlutuacao = False 
-        DadosExame.LimQuad = False 
+        DadosExame.gFlutuacao = False  # Ajuste conforme necessário
+        DadosExame.LimQuad = False  # Ajuste conforme necessário
         DadosExame.LF = False
         DadosExame.ThrRel = False
         DadosExame.gExame = []
         DadosExame.LimiarFoveal = 0
         DadosExame.total_pontos_definidos = 0
-        DadosExame.matriz_pontos = []
+        DadosExame.matriz_pontos = []    
         DadosExame.total_de_pontos_testados = 0
         DadosExame.posicao_mancha_cega = (0, 0)
         DadosExame.perda_de_fixacao = 0.0
+        DadosExame.perda_de_fixacao_percentual = 0.0
         DadosExame.total_testes_mancha = 0    
         DadosExame.falso_positivo_respondidos = 0.0
         DadosExame.falso_negativo_respondidos = 0.0
@@ -137,5 +143,10 @@ class DadosExame:
         DadosExame.total_testes_falsos_negativo = 0
         DadosExame.falso_negativo_respondidos_percentual = 0.0
         DadosExame.falso_positivo_respondidos_percentual = 0.0
-        
+        DadosExame.md = 0
+        DadosExame.psd = 0
+        DadosExame.resultado_md = ""
+        DadosExame.resultado_psd = ""    
+        DadosExame.resultado_exame = ""
+        DadosExame.confiabilidade = ""
         
