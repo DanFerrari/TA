@@ -11,7 +11,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)
 
 PIN_ENTRADA = "PD22"
-GPIO.setup(PIN_ENTRADA, GPIO.IN)
+# GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
@@ -87,7 +87,7 @@ class Campimetria:
         
     def salvar_config(self,config):
         """Salva as variáveis no arquivo JSON."""
-        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",self.CONFIG_FILE)), "w") as f:
+        with open(os.path.abspath(os.path.join(os.path.dirname(__file__),self.CONFIG_FILE)), "w") as f:
             json.dump(config, f, indent=4)
     def get_brightness(self): return self.get_vcp_value("10")
     def set_brightness(self,val): self.set_vcp_value("10", val)

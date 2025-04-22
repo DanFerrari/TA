@@ -165,7 +165,7 @@ class SelectEyeScreen:
                     elif event.key == pygame.K_RIGHT and DadosExame.tamanho_estimulo < 5:
                         DadosExame.tamanho_estimulo += 1
 
-        print(f"estimulo: {DadosExame.tamanho_estimulo}, distancia:{DadosExame.distancia_paciente}, ")
+
                         
 
     def update(self):
