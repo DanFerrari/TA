@@ -1509,7 +1509,7 @@ class ResultadoFullthreshold:
                             if DadosExame.exame_id < 999
                             else 1
                         )         
-        DadosExame.exame_id = config["exame_id"] 
+
         while visualizando:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
