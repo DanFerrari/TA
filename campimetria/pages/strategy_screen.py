@@ -36,7 +36,7 @@ class StrategyScreen:
         self.strategy_selected = False
         self.angulo = 0
         self.carregando = False
-    
+        self.game.config = self.game.carregar_config()
 
 
 
@@ -100,8 +100,10 @@ class StrategyScreen:
         largura_botao = 502
         altura_botao = 129
         espacamento = 510
+       
         exame_id = DadosExame.exame_id if DadosExame.exame_id != 0 else self.game.config["exame_id"]
-        
+        DadosExame.exame_id = exame_id
+    
         #label exame_id
         fonte_exame = pygame.font.Font(None, 48)
         label_exame_id_texto = fonte_exame.render(f"EXAME ID {exame_id}", True,self.cor_texto)

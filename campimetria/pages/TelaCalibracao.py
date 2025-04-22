@@ -20,7 +20,7 @@ class Config:
         self.estimulo = 5
      
         self.atenuacao = 0
-        self.ponto_calibracao = Ponto(0,0,self.estimulo,Ponto.db_para_intensidade(self.atenuacao),200)
+      
         
         self.background = Colors.ERASE_INTENSITY
         self.CONFIG_FILE = "config.json"
@@ -111,6 +111,7 @@ class Config:
     def draw(self,surface):
         surface.fill(Colors.BACKGROUND)
         font = pygame.font.SysFont(None, 36)
+        self.ponto_calibracao = Ponto(0,0,self.estimulo,Ponto.db_para_intensidade(self.atenuacao),200)
         self.ponto_calibracao.plotarPonto()
         fundo = font.render(f"Fundo: {self.background}", True, (26, 45, 254))
         brilho = font.render(f"Brilho: {self.brightness}", True, (26, 45, 254))

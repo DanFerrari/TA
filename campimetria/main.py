@@ -37,8 +37,9 @@ class Campimetria:
 
     def __init__(self):
         pygame.init()
+        info = pygame.display.Info()
         # Configura a tela em FULLSCREEN e captura dimensões
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.NOFRAME)
         self.width, self.height = self.screen.get_size()
         pygame.display.set_caption("Seleção de Estratégia")
         self.clock = pygame.time.Clock()

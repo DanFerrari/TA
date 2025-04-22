@@ -51,7 +51,7 @@ class Colors:
 
 
     
-    config = carregar_config()
+    config = carregar_config()   
     ERASE_INTENSITY = config["background"]
     YELLOW_SIGHT = (251,244,19)
     BACKGROUND = (ERASE_INTENSITY, ERASE_INTENSITY, ERASE_INTENSITY)

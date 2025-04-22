@@ -2,4 +2,4 @@ __pycache__/
 pdfs
 *.pyc
 config.json
-
+utils/images/temp/*

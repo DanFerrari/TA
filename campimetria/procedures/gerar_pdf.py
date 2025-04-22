@@ -110,7 +110,7 @@ class GerarPdf():
             c.setFont("Helvetica-Bold", 10)
             c.drawString(20,160,(f"MD: {DadosExame.md:.2f} ").upper())
             c.drawString(20,120,(f"PSD: {DadosExame.psd:.2f}").upper())
-            c.drawString(20,80,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
+            c.drawString(20,80,(f"CONFIABILIDADE: {int(100 -DadosExame.confiabilidade)}%").upper())
             # c.drawString(5,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
          
         elif DadosExame.exame_selecionado == Constantes.screening:
@@ -131,11 +131,13 @@ class GerarPdf():
             c.drawImage(caminho_imagem_limiares, largura / 2 - nova_altura,150, width=nova_largura, height=nova_altura) 
             c.drawImage(caminho_indicador_conf,20,145, width=105, height=12.5) 
             c.setFont("Helvetica-Bold", 10)
-            c.drawString(20,160,(f"CONFIABILIDADE: {DadosExame.confiabilidade}").upper())
+            c.drawString(20,160,(f"CONFIABILIDADE: {int(100 - DadosExame.confiabilidade)}%").upper())
+            c.drawString(20,120,(f"Pontos Respondidos:{DadosExame.total_pontos_definidos} / { DadosExame.total_de_pontos_testados}").upper())
+            c.drawString(20,80,(f"Pontos Nao Respondidos:{DadosExame.total_de_pontos_testados - DadosExame.total_pontos_definidos} / {DadosExame.total_de_pontos_testados}").upper())
             
             # c.drawString(5,70,(f"RESULTADO: {DadosExame.resultado_exame}").upper())
-
-        
+            
+            
 
         
        
@@ -178,10 +180,10 @@ class GerarPdf():
         
         pasta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp"))
 
-        # for arquivo in os.listdir(pasta):
-        #     caminho_arquivo = os.path.join(pasta, arquivo)
-        #     if os.path.isfile(caminho_arquivo):
-        #         os.remove(caminho_arquivo)  
+        for arquivo in os.listdir(pasta):
+            caminho_arquivo = os.path.join(pasta, arquivo)
+            if os.path.isfile(caminho_arquivo):
+                os.remove(caminho_arquivo)  
 
 
 

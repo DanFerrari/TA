@@ -1490,7 +1490,7 @@ class ResultadoFullthreshold:
         }
         config = ResultadoFullthreshold.carregar_config(CONFIG_FILE, DEFAULT_CONFIG)
 
-        DadosExame.exame_id = config["exame_id"]
+        
 
         ResultadoFullthreshold.inicializar_matrizes()
         pygame.font.init()

@@ -553,6 +553,7 @@ class ResultadoScreening:
         pygame.display.get_surface().blit(surface_limiar, (-200, 540))
 
     def exibir_resultados():
+
         ResultadoScreening.status_resultado(carregado=False)        
         ResultadoScreening.desenha_pontos()
         ResultadoScreening.desenha_legendas()
@@ -574,7 +575,7 @@ class ResultadoScreening:
                 "atenuacao":25
             }
         config = ResultadoScreening.carregar_config(CONFIG_FILE, DEFAULT_CONFIG)
-        DadosExame.exame_id = config["exame_id"]
+  
         config["exame_id"] = (
                             (DadosExame.exame_id + 1)
                             if DadosExame.exame_id < 999
