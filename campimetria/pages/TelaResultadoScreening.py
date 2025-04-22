@@ -560,16 +560,9 @@ class ResultadoScreening:
         ResultadoScreening.status_resultado(carregado=True)
         pygame.display.flip()
         visualizando = True
-        config["exame_id"] = (
-                            (DadosExame.exame_id + 1)
-                            if DadosExame.exame_id < 999
-                            else 1
-                        )
-        DadosExame.exame_id = config["exame_id"]
-        while visualizando:
-            CONFIG_FILE = "config.json"
+        CONFIG_FILE = "config.json"
 
-            DEFAULT_CONFIG = {
+        DEFAULT_CONFIG = {
                  "distancia_paciente": 200,
                 "tamanho_estimulo": 3,
                 "exame_id": 1,
@@ -580,8 +573,16 @@ class ResultadoScreening:
                 "resolution-h":1080,
                 "atenuacao":25
             }
-            config = ResultadoScreening.carregar_config(CONFIG_FILE, DEFAULT_CONFIG)
-            DadosExame.exame_id = config["exame_id"]
+        config = ResultadoScreening.carregar_config(CONFIG_FILE, DEFAULT_CONFIG)
+        DadosExame.exame_id = config["exame_id"]
+        config["exame_id"] = (
+                            (DadosExame.exame_id + 1)
+                            if DadosExame.exame_id < 999
+                            else 1
+                        )
+        DadosExame.exame_id = config["exame_id"]
+        while visualizando:
+           
 
             for evento in pygame.event.get():
                 if evento.type == pygame.KEYDOWN:
