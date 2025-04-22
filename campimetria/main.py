@@ -11,7 +11,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)
 
 PIN_ENTRADA = "PD22"
-# GPIO.setup(PIN_ENTRADA, GPIO.IN)
+GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
@@ -29,6 +29,7 @@ sys.path.append(
 
 from constants.dados import *
 from pages.strategy_screen import StrategyScreen
+from pages.select_eye_screen import SelectEyeScreen
 
 
 
@@ -42,7 +43,7 @@ class Campimetria:
         pygame.display.set_caption("Seleção de Estratégia")
         self.clock = pygame.time.Clock()
         self.running = True
-
+        
         # Definições de cores e fontes
         self.cor_fundo = (20, 20, 20)
         self.cor_botao = (122, 122, 122)

@@ -1,9 +1,13 @@
-import pygame,os,json
+import pygame,os,json,importlib
 from dados import DadosExame, Constantes
 from CAMPScreening import Screening
 from CAMPFullThreshold import FullThreshold
-from strategy_screen import StrategyScreen
 
+if 'strategy_screen' not in globals():
+    strategy_screen = importlib.import_module("pages.strategy_screen")
+    globals()['strategy_screen'] = strategy_screen
+else:
+    strategy_screen = globals()['strategy_screen']
 
 
 
@@ -57,7 +61,7 @@ class SelectEyeScreen:
                 self.game.running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_j:  # Volta para o menu ou sai
-                    self.game.change_screen(StrategyScreen(self.game))
+                    self.game.change_screen(strategy_screen.StrategyScreen(self.game))
                 elif event.key == pygame.K_r:
                     if self.selecao_atual == "numero":
                         self.selecao_atual = "distancia"

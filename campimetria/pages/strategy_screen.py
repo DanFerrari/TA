@@ -1,4 +1,4 @@
-import pygame,os,sys,json
+import pygame,os,sys,json,importlib
 
 
 
@@ -15,8 +15,13 @@ sys.path.append(
 )
 
 from dados import *  # Supondo que esses módulos estejam configurados
-from select_eye_screen import SelectEyeScreen
 
+if 'select_eye_screen' not in globals():
+    select_eye_screen = importlib.import_module("pages.select_eye_screen")
+    globals()['select_eye_screen'] = select_eye_screen
+else:
+    select_eye_screen = globals()['select_eye_screen']
+    
 
 class StrategyScreen:
     def __init__(self, game):
@@ -73,7 +78,8 @@ class StrategyScreen:
                         
                     if self.strategy_selected:
                         self.carregando = True
-                        self.game.change_screen(SelectEyeScreen(self.game))
+                        
+                        self.game.change_screen(select_eye_screen.SelectEyeScreen(self.game))
                     self.strategy_selected = True
                 elif event.key == pygame.K_j:
                     self.game.running = False
