@@ -414,7 +414,7 @@ class FullThreshold:
                     paciente_viu = 1
                 if self.teste_fullthreshold(paciente_viu=paciente_viu, ponto=ponto) == 1:
                     self.total_pontos_fechados += 1                        
-                    self.pontos_fechados.append(self.pontos.pop(self.indice_atual))
+                    self.pontos_fechados.append(self.pontos.pop(self.pontos.index(self.pontos_primeira_varredura[self.indice_atual])))
                 self.indice_atual += 1
                 if self.indice_atual == 35:
                     self.indice_atual = 0 
