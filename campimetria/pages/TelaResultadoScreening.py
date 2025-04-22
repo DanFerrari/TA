@@ -560,6 +560,12 @@ class ResultadoScreening:
         ResultadoScreening.status_resultado(carregado=True)
         pygame.display.flip()
         visualizando = True
+        config["exame_id"] = (
+                            (DadosExame.exame_id + 1)
+                            if DadosExame.exame_id < 999
+                            else 1
+                        )
+        DadosExame.exame_id = config["exame_id"]
         while visualizando:
             CONFIG_FILE = "config.json"
 
@@ -580,26 +586,14 @@ class ResultadoScreening:
             for evento in pygame.event.get():
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_j:
-                        visualizando = False
-                        DadosExame.reset()
-                        config["exame_id"] = (
-                            (DadosExame.exame_id + 1)
-                            if DadosExame.exame_id < 999
-                            else 1
-                        )
+                        visualizando = False                       
                         config["distancia_paciente"] = DadosExame.distancia_paciente
                         config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
                         ResultadoScreening.salvar_config(config, CONFIG_FILE)
+                        DadosExame.reset()
 
                     if evento.key == pygame.K_e:
-                        config["exame_id"] = (
-                            (DadosExame.exame_id + 1)
-                            if DadosExame.exame_id < 999
-                            else 1
-                        )
-                        config["distancia_paciente"] = DadosExame.distancia_paciente
-                        config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
-                        ResultadoScreening.salvar_config(config, CONFIG_FILE)
+                       
                         pdf = GerarPdf()
                         pdf.verifica_e_monta_pendrive()
                         caminho_pdf = f"/media/eyetec/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
@@ -630,7 +624,7 @@ class ResultadoScreening:
                                 text_info_pdf = fonte.render(
                                     "PDF GERADO!", True, (0, 0, 0)
                                 )
-                                visualizando = False
+                                
                             else:
                                 fonte = pygame.font.Font(None, 45)
                                 text_info_pdf = fonte.render(
