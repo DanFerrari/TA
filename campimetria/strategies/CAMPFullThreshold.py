@@ -408,7 +408,6 @@ class FullThreshold:
                 if ponto.response_received:
                     self.pontos_vistos.append(ponto)
                     self.tempos.append(ponto.tempo_resposta)
-
                     paciente_viu = 2
                 else:
                     paciente_viu = 1
@@ -419,6 +418,11 @@ class FullThreshold:
                 if self.indice_atual == 35:
                     self.indice_atual = 0 
                     self.primeira_varredura = False
+                if len(self.tempos) >= 2:
+                        self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(
+                            self.tempos
+                        )
+                        self.tempos = []
                 
             self.indice_atual += 1
             if self.indice_atual >= len(self.pontos):
@@ -456,7 +460,7 @@ class FullThreshold:
                         self.testemancha = 0
                         DadosExame.total_testes_mancha += 1
             
-                    if len(self.tempos) == 2:
+                    if len(self.tempos) >= 2:
                         self.tempo_resposta = self.media_de_tempo_de_resposta_paciente(
                             self.tempos
                         )
