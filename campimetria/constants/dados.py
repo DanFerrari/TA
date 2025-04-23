@@ -35,11 +35,12 @@ class Colors:
             "tamanho_estimulo": 3,
             "exame_id": 1,
             "background":120,
+            "max_intensity": 255,
             "brightness":90,
             "contrast":50,
             "resolution-w":1920,
             "resolution-h":1080,
-            "atenuacao":25
+            "atenuacao":25,
         }   
         """Lê as variáveis do arquivo JSON ou usa valores padrão."""
         if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..",CONFIG_FILE))):
@@ -52,7 +53,8 @@ class Colors:
 
     
     config = carregar_config()   
-    ERASE_INTENSITY = config["background"]
+    ERASE_INTENSITY = config["background"]    
+    MAX_INTENSITY = config["max_intensity"]
     YELLOW_SIGHT = (251,244,19)
     BACKGROUND = (ERASE_INTENSITY, ERASE_INTENSITY, ERASE_INTENSITY)
     DEFAULT = (53, 43, 54)

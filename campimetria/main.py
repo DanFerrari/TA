@@ -11,7 +11,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)
 
 PIN_ENTRADA = "PD22"
-GPIO.setup(PIN_ENTRADA, GPIO.IN)
+# GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
@@ -56,17 +56,7 @@ class Campimetria:
         self.current_screen = StrategyScreen(self)
         self.CONFIG_FILE = "config.json"
 
-        self.DEFAULT_CONFIG ={
-            "distancia_paciente": 200,
-            "tamanho_estimulo": 3,
-            "exame_id": 1,
-            "background":120,
-            "brightness":90,
-            "contrast":50,
-            "resolution-w":1920,
-            "resolution-h":1080,
-            "atenuacao":25
-        }
+       
         
         self.config = self.carregar_config()
         self.set_brightness(self.config["brightness"])
@@ -80,6 +70,18 @@ class Campimetria:
 
     def carregar_config(self):
         """Lê as variáveis do arquivo JSON ou usa valores padrão."""
+        self.DEFAULT_CONFIG ={
+            "distancia_paciente": 200,
+            "tamanho_estimulo": 3,
+            "exame_id": 1,
+            "background":120,
+            "max_intensity": 255,
+            "brightness":90,
+            "contrast":50,
+            "resolution-w":1920,
+            "resolution-h":1080,
+            "atenuacao":25,
+        }
         if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__),"config.json"))):
             with open(os.path.abspath(os.path.join(os.path.dirname(__file__),"config.json")), "r") as f:
                 return json.load(f)

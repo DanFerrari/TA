@@ -24,7 +24,6 @@ class Config:
         self.atenuacao = 0
       
         
-        self.background = Colors.ERASE_INTENSITY
         self.CONFIG_FILE = "config.json"
 
         self.DEFAULT_CONFIG ={
@@ -32,16 +31,22 @@ class Config:
             "tamanho_estimulo": 3,
             "exame_id": 1,
             "background":120,
+            "max_intensity": 255,
             "brightness":90,
             "contrast":50,
             "resolution-w":1920,
-            "resolution-h":1080
+            "resolution-h":1080,
+            "atenuacao":25,
         }
         self.config = self.carregar_config()
         self.set_brightness(self.config["brightness"])
         self.set_contrast(self.config["contrast"])
         self.brightness = (self.config["brightness"])
         self.contrast = (self.config["contrast"])
+        self.background = self.config["background"]
+        self.max_intensity = self.config["max_intensity"]
+
+        
         
 
     def carregar_config(self):
@@ -71,9 +76,11 @@ class Config:
                     elif self.modo == "estimulo":
                         self.modo = "info"
                 if event.key == pygame.K_e:                    
-                    self.config["brightness"] = self.brightness
+                    
                     self.config["background"] = self.background
-                    self.config["contrast"] = self.contrast
+                    self.config["max_intensity"] = self.max_intensity
+                   
+                    
                     Colors.ERASE_INTENSITY = self.background
                     Colors.BACKGROUND = (self.background,self.background,self.background)
                     self.salvar_config(self.config)   
@@ -83,49 +90,47 @@ class Config:
                     from strategy_screen import StrategyScreen
                     self.game.change_screen(StrategyScreen(self.game))
                 if event.key == pygame.K_RIGHT:
-                    if self.modo == "info":
-                        if self.background < 255:
-                            self.background += 1   
-                            Colors.ERASE_INTENSITY = self.background
-                            Colors.BACKGROUND = (self.background,self.background,self.background)   
-                    if self.modo == "estimulo":
-                        if self.estimulo < 5:
-                            self.estimulo += 1       
+                    
+                    if self.background < 255:
+                        self.background += 1   
+                        Colors.ERASE_INTENSITY = self.background
+                        Colors.BACKGROUND = (self.background,self.background,self.background)   
+                    
                 if event.key == pygame.K_LEFT:
-                    if self.modo == "info":
-                        if self.background > 0:
-                            self.background -= 1                
-                            Colors.ERASE_INTENSITY = self.background
-                            Colors.BACKGROUND = (self.background,self.background,self.background)
-                    if self.modo == "estimulo":
-                        if self.estimulo > 0:
-                            self.estimulo -= 1
-                if event.key == pygame.K_l:
-                    if self.modo == "info":
-                        self.contrast += 1
-                        self.set_contrast(self.contrast)
+                   
+                    if self.background > 0:
+                        self.background -= 1                
+                        Colors.ERASE_INTENSITY = self.background
+                        Colors.BACKGROUND = (self.background,self.background,self.background)
+                 
+                if event.key == pygame.K_l:   
+                    if self.estimulo < 5:
+                        self.estimulo += 1                 
+                    
+                   
                 if event.key == pygame.K_k:
-                    if self.modo == "info":
-                        self.contrast -= 1
-                        self.set_contrast(self.contrast)
+                    if self.estimulo > 0:
+                        self.estimulo -= 1
+                    
+                        
                 if event.key == pygame.K_DOWN:
-                    if self.modo == "info":
-                        self.brightness += 1
-                        self.set_brightness(self.brightness)
+                    if self.max_intensity < 255:
+                        self.max_intensity += 1
+                       
                 if event.key == pygame.K_UP:         
-                    if self.modo == "info":           
-                        self.brightness -= 1
-                        self.set_brightness(self.brightness)
+                    if self.max_intensity > 0:
+                        self.max_intensity -= 1                    
+                        
                 if event.key == pygame.K_F1:
-                    if self.modo == "info":
-                        if self.atenuacao != 40:
-                            self.atenuacao += 1
-                        self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
+                  
+                    if self.atenuacao != 40:
+                        self.atenuacao += 1
+                    self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
                 if event.key == pygame.K_F2:
-                    if self.modo == "info":
-                        if self.atenuacao != 0:
-                            self.atenuacao -= 1
-                        self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
+                 
+                    if self.atenuacao != 0:
+                        self.atenuacao -= 1
+                    self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
                                     
                     
     def update(self):
@@ -144,6 +149,7 @@ class Config:
         resolutionH = self.config["resolution-h"]
         resolution = font.render(f"Resolucao:{resolutionW} x {resolutionH}",True,(26, 45, 254))
         atenuacao_estimulo = font.render(f"Atenuacao do estimulo:{self.atenuacao}",True,(26, 45, 254))
+        intensidade_maxima = font.render(f"Intensidade maxima:{self.max_intensity}",True,(26, 45, 254))
         if self.modo == "info":
             surface.fill(Colors.BACKGROUND)
             self.ponto_calibracao.plotarPonto()
@@ -152,12 +158,19 @@ class Config:
             surface.blit(estimulo, (80, 200))  
             surface.blit(contraste, (80, 250))            
             surface.blit(brilho,(80,300))          
-            surface.blit(resolution,(80,350))       
+            surface.blit(resolution,(80,350))   
+            surface.blit(intensidade_maxima,(80,400))    
         elif self.modo == "fundo":
             surface.fill(Colors.BACKGROUND)
         elif self.modo == "estimulo":
             surface.fill((0,0,0))
-            self.ponto_calibracao.plotarPonto()
+            square_size = 300
+            square_color = Ponto.db_para_intensidade(self.ponto_calibracao.atenuacao)
+            square_x = (surface.get_width() - square_size) // 2
+            square_y = (surface.get_height() - square_size) // 2
+            pygame.draw.rect(surface, square_color, (square_x, square_y, square_size, square_size))
+            
+            
             estimulo = font.render(f"Estimulo: {self.estimulo}", True, (50, 50, 50))
             surface.blit(estimulo, (80, 200)) 
                

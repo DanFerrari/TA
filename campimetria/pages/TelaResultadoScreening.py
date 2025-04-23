@@ -571,12 +571,13 @@ class ResultadoScreening:
             "distancia_paciente": 200,
             "tamanho_estimulo": 3,
             "exame_id": 1,
-            "background": 120,
-            "brightness": 90,
-            "contrast": 50,
-            "resolution-w": 1920,
-            "resolution-h": 1080,
-            "atenuacao": 25,
+            "background":120,
+            "max_intensity": 255,
+            "brightness":90,
+            "contrast":50,
+            "resolution-w":1920,
+            "resolution-h":1080,
+            "atenuacao":25,
         }
         config = ResultadoScreening.carregar_config(CONFIG_FILE, DEFAULT_CONFIG)
 

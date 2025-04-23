@@ -105,7 +105,7 @@ class Ponto:
 
     @staticmethod
     def db_para_intensidade(
-        db, db_min=Constantes.dbMax, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=255
+        db, db_min=Constantes.dbMax, db_max=0, i_min=Colors.ERASE_INTENSITY, i_max=Colors.MAX_INTENSITY
     ):
         """Converte dB para intensidade de cor (escala logarítmica)."""
         norm_db = (db - db_min) / (db_max - db_min)  # Normaliza dB entre 0 e 1

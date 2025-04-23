@@ -1478,15 +1478,16 @@ class ResultadoFullthreshold:
         CONFIG_FILE = "config.json"
 
         DEFAULT_CONFIG = {
-             "distancia_paciente": 200,
+            "distancia_paciente": 200,
             "tamanho_estimulo": 3,
             "exame_id": 1,
             "background":120,
+            "max_intensity": 255,
             "brightness":90,
             "contrast":50,
             "resolution-w":1920,
             "resolution-h":1080,
-            "atenuacao":25
+            "atenuacao":25,
         }
         config = ResultadoFullthreshold.carregar_config(CONFIG_FILE, DEFAULT_CONFIG)
 
