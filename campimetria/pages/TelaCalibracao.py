@@ -74,6 +74,8 @@ class Config:
                     elif self.modo == "fundo":
                         self.modo = "estimulo"
                     elif self.modo == "estimulo":
+                        self.modo = "fundo_preto"
+                    elif self.modo == "fundo_preto":
                         self.modo = "info"
                 if event.key == pygame.K_e:                    
                     
@@ -173,7 +175,8 @@ class Config:
             
             estimulo = font.render(f"Estimulo: {self.estimulo}", True, (50, 50, 50))
             surface.blit(estimulo, (80, 200)) 
-               
+        elif self.modo == "fundo_preto":
+            surface.fill((0,0,0))
         
     def get_brightness(self): return self.get_vcp_value("10")
     def set_brightness(self,val): self.set_vcp_value("10", val)

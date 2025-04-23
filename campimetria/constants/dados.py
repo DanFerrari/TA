@@ -1,11 +1,4 @@
 import pygame,os,sys,json
-
-
-
-
-
-
-
 class Constantes:
     dbMin = 0
     dbMax = 40
