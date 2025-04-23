@@ -18,7 +18,9 @@ class Config:
     def __init__(self,game):
         self.game = game
         self.estimulo = 5
-     
+      
+        self.modo = "info"
+        
         self.atenuacao = 0
       
         
@@ -61,6 +63,13 @@ class Config:
             if event.type == pygame.QUIT:
                 self.game.running = False
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    if self.modo == "info":
+                        self.modo = "fundo"
+                    elif self.modo == "fundo":
+                        self.modo = "estimulo"
+                    elif self.modo == "estimulo":
+                        self.modo = "info"
                 if event.key == pygame.K_e:                    
                     self.config["brightness"] = self.brightness
                     self.config["background"] = self.background
@@ -74,45 +83,59 @@ class Config:
                     from strategy_screen import StrategyScreen
                     self.game.change_screen(StrategyScreen(self.game))
                 if event.key == pygame.K_RIGHT:
-                    if self.background < 255:
-                        self.background += 1   
-                        Colors.ERASE_INTENSITY = self.background
-                        Colors.BACKGROUND = (self.background,self.background,self.background)          
+                    if self.modo == "info":
+                        if self.background < 255:
+                            self.background += 1   
+                            Colors.ERASE_INTENSITY = self.background
+                            Colors.BACKGROUND = (self.background,self.background,self.background)   
+                    if self.modo == "estimulo":
+                        if self.estimulo < 5:
+                            self.estimulo += 1       
                 if event.key == pygame.K_LEFT:
-                    if self.background > 0:
-                        self.background -= 1                
-                        Colors.ERASE_INTENSITY = self.background
-                        Colors.BACKGROUND = (self.background,self.background,self.background)
+                    if self.modo == "info":
+                        if self.background > 0:
+                            self.background -= 1                
+                            Colors.ERASE_INTENSITY = self.background
+                            Colors.BACKGROUND = (self.background,self.background,self.background)
+                    if self.modo == "estimulo":
+                        if self.estimulo > 0:
+                            self.estimulo -= 1
                 if event.key == pygame.K_l:
-                    self.contrast += 1
-                    self.set_contrast(self.contrast)
+                    if self.modo == "info":
+                        self.contrast += 1
+                        self.set_contrast(self.contrast)
                 if event.key == pygame.K_k:
-                    self.contrast -= 1
-                    self.set_contrast(self.contrast)
+                    if self.modo == "info":
+                        self.contrast -= 1
+                        self.set_contrast(self.contrast)
                 if event.key == pygame.K_DOWN:
-                    self.brightness += 1
-                    self.set_brightness(self.brightness)
-                if event.key == pygame.K_UP:                    
-                    self.brightness -= 1
-                    self.set_brightness(self.brightness)
+                    if self.modo == "info":
+                        self.brightness += 1
+                        self.set_brightness(self.brightness)
+                if event.key == pygame.K_UP:         
+                    if self.modo == "info":           
+                        self.brightness -= 1
+                        self.set_brightness(self.brightness)
                 if event.key == pygame.K_F1:
-                    if self.atenuacao != 40:
-                        self.atenuacao += 1
-                    self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
+                    if self.modo == "info":
+                        if self.atenuacao != 40:
+                            self.atenuacao += 1
+                        self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
                 if event.key == pygame.K_F2:
-                    if self.atenuacao != 0:
-                        self.atenuacao -= 1
-                    self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
+                    if self.modo == "info":
+                        if self.atenuacao != 0:
+                            self.atenuacao -= 1
+                        self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
                                     
                     
     def update(self):
         pygame.display.update()
     
     def draw(self,surface):
-        surface.fill(Colors.BACKGROUND)
+        
         font = pygame.font.SysFont(None, 36)
         self.ponto_calibracao = Ponto(0,0,self.estimulo,Ponto.db_para_intensidade(self.atenuacao),200)
-        self.ponto_calibracao.plotarPonto()
+        
         fundo = font.render(f"Fundo: {self.background}", True, (26, 45, 254))
         brilho = font.render(f"Brilho: {self.brightness}", True, (26, 45, 254))
         contraste = font.render(f"Contraste: {self.contrast}", True, (26, 45, 254))
@@ -121,12 +144,23 @@ class Config:
         resolutionH = self.config["resolution-h"]
         resolution = font.render(f"Resolucao:{resolutionW} x {resolutionH}",True,(26, 45, 254))
         atenuacao_estimulo = font.render(f"Atenuacao do estimulo:{self.atenuacao}",True,(26, 45, 254))
-        surface.blit(fundo, (80, 100))
-        surface.blit(atenuacao_estimulo, (80, 150))
-        surface.blit(estimulo, (80, 200))  
-        surface.blit(contraste, (80, 250))            
-        surface.blit(brilho,(80,300))          
-        surface.blit(resolution,(80,350))          
+        if self.modo == "info":
+            surface.fill(Colors.BACKGROUND)
+            self.ponto_calibracao.plotarPonto()
+            surface.blit(fundo, (80, 100))
+            surface.blit(atenuacao_estimulo, (80, 150))
+            surface.blit(estimulo, (80, 200))  
+            surface.blit(contraste, (80, 250))            
+            surface.blit(brilho,(80,300))          
+            surface.blit(resolution,(80,350))       
+        elif self.modo == "fundo":
+            surface.fill(Colors.BACKGROUND)
+        elif self.modo == "estimulo":
+            surface.fill((0,0,0))
+            self.ponto_calibracao.plotarPonto()
+            estimulo = font.render(f"Estimulo: {self.estimulo}", True, (50, 50, 50))
+            surface.blit(estimulo, (80, 200)) 
+               
         
     def get_brightness(self): return self.get_vcp_value("10")
     def set_brightness(self,val): self.set_vcp_value("10", val)
