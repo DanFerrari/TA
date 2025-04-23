@@ -209,6 +209,7 @@ if __name__ == "__main__":
     DadosExame.resultado_psd ="Campo visual normal ou muito próximo do normal" 
     DadosExame.resultado_md = 'Perda moderada, ponto de atenção',
     DadosExame.resultado_exame = f"Alterações difusas e localizadas, MD: {DadosExame.resultado_md},\n PSD :{DadosExame.resultado_psd}."
+    DadosExame.confiabilidade = 90
 
     caminho_pdf = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "pdfs", f"relatorio-id-exame-{DadosExame.exame_id}.pdf"))
     pdf = GerarPdf()

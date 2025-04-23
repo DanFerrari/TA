@@ -18,35 +18,39 @@ from gerar_pdf import GerarPdf
 
 
 class ResultadoScreening:
-    
 
-
-    
     @staticmethod
     def plota_barra_indicativa_psd_md_confiabilidade():
-        def gera_imagem_barra_indicador_colorido(min,max,valor,nome):
+        def gera_imagem_barra_indicador_colorido(min, max, valor, nome):
             from termometro import gerar_barra_com_indicador
+
             valor_normalizado = ((valor - min) / (max - min)) * 100
             if valor_normalizado > 96:
                 valor_normalizado = 96
             elif valor_normalizado < 4:
                 valor_normalizado = 4
-                
-            gerar_barra_com_indicador(valor_normalizado,nome)           
-        
-   
-        caminho_indicador_conf = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "images","temp","indicador_confiabilidade.png"))
-        gera_imagem_barra_indicador_colorido(0,100,DadosExame.confiabilidade,caminho_indicador_conf)
-       
+
+            gerar_barra_com_indicador(valor_normalizado, nome)
+
+        caminho_indicador_conf = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "utils",
+                "images",
+                "temp",
+                "indicador_confiabilidade.png",
+            )
+        )
+        gera_imagem_barra_indicador_colorido(
+            0, 100, DadosExame.confiabilidade, caminho_indicador_conf
+        )
+
         image_confiabilidade = pygame.image.load(caminho_indicador_conf)
-        image_confiabilidade = pygame.transform.scale(image_confiabilidade, (210, 25)) 
-        
+        image_confiabilidade = pygame.transform.scale(image_confiabilidade, (210, 25))
+
         return image_confiabilidade
-    
-    
-    
-    
-    
+
     @staticmethod
     def desenha_legendas():
 
@@ -55,7 +59,9 @@ class ResultadoScreening:
         cor_legenda_moderado = (179, 108, 8)
         cor_legenda_severo = (166, 6, 6)
 
-        def render_texto_colorido(fonte, texto, cor_restante, cor_primeira=(0, 0, 0), largura_max=850):
+        def render_texto_colorido(
+            fonte, texto, cor_restante, cor_primeira=(0, 0, 0), largura_max=850
+        ):
             """
             Renderiza um texto com tudo que estiver antes de ':' em preto
             e o restante em uma cor definida.
@@ -161,7 +167,7 @@ class ResultadoScreening:
             #     DadosExame.confiabilidade = Constantes.ruim
             # if muito_ruim == 3:
             #     DadosExame.confiabilidade = Constantes.nao_confiavel
-            
+
             def confiabilidade_invertida():
                 def pontuar(valor, lim_bom, lim_ruim):
                     if valor <= lim_bom:
@@ -247,12 +253,15 @@ class ResultadoScreening:
             f"Duração (min): {int(minutos):02d}:{int(segundos):02d}",
             f"Perda de fixacao: {int(DadosExame.perda_de_fixacao)} / {int(DadosExame.total_testes_mancha)} ({DadosExame.perda_de_fixacao_percentual:.2f}%)",
             f"Atenuacao:{DadosExame.atenuacao_screening}",
-            f"Total de pontos: {DadosExame.total_de_pontos_testados}","",
-            f"Pontos Respondidos:{DadosExame.total_pontos_definidos} / { DadosExame.total_de_pontos_testados}","","",
-            f"Pontos Nao Respondidos:{DadosExame.total_de_pontos_testados - DadosExame.total_pontos_definidos} / {DadosExame.total_de_pontos_testados}"
+            f"Total de pontos: {DadosExame.total_de_pontos_testados}",
+            "",
+            f"Pontos Respondidos:{DadosExame.total_pontos_definidos} / { DadosExame.total_de_pontos_testados}",
+            "",
+            "",
+            f"Pontos Nao Respondidos:{DadosExame.total_de_pontos_testados - DadosExame.total_pontos_definidos} / {DadosExame.total_de_pontos_testados}",
         ]
         labels_valores = [
-            f"Confiabilidade:{int(100 - DadosExame.confiabilidade)}%",  
+            f"Confiabilidade:{int(100 - DadosExame.confiabilidade)}%",
             # f"RESULTADO: {(gerar_resultado_final()).upper()}",
         ]
 
@@ -268,15 +277,15 @@ class ResultadoScreening:
 
         espacamento_x_valores = 450
         espacamento_y_valores = 50
-        pos_x_inicial_valores = 1300   #1020
+        pos_x_inicial_valores = 1300  # 1020
         pos_y_inicial_valores = 400
         fonte = pygame.font.Font(None, 28)
         image_conf = ResultadoScreening.plota_barra_indicativa_psd_md_confiabilidade()
         for i, texto in enumerate(labels_valores):
             coluna = i % 1
             linha = i // 1
-            image = fonte.render("",True,(0,0,0))
-            color_label_info = (0,0,0)
+            image = fonte.render("", True, (0, 0, 0))
+            color_label_info = (0, 0, 0)
             if i == 0:
                 # if DadosExame.confiabilidade == Constantes.confiavel:
                 #     color_label_info = cor_legenda_normal
@@ -287,8 +296,6 @@ class ResultadoScreening:
                 # if DadosExame.confiabilidade == Constantes.nao_confiavel:
                 #     color_label_info = cor_legenda_severo
                 image = image_conf
-                    
-                    
 
             # if i == 1:
             #     if DadosExame.porcentagem_respondidos_screening >= 90:
@@ -310,7 +317,7 @@ class ResultadoScreening:
                 fonte, texto.upper(), color_label_info
             )
             pygame.display.get_surface().blit(texto_renderizado, (pos_x, pos_y))
-            pygame.display.get_surface().blit(image, (pos_x , pos_y + 20))
+            pygame.display.get_surface().blit(image, (pos_x, pos_y + 20))
 
         fonte = pygame.font.Font(None, 26)
         for i, texto in enumerate(labels):
@@ -412,7 +419,7 @@ class ResultadoScreening:
             "w",
         ) as f:
             json.dump(config, f, indent=4)
-            
+
     @staticmethod
     def status_resultado(carregado):
         """Mostra uma label temporária na tela e depois a apaga"""
@@ -432,7 +439,6 @@ class ResultadoScreening:
                 pygame.display.get_surface(), (255, 255, 255), label_rect
             )  # Fundo preto (ajuste conforme necessário)
             pygame.display.update()
-
 
     @staticmethod
     def desenha_pontos():
@@ -487,10 +493,10 @@ class ResultadoScreening:
 
         respondidos, nao_respondidos = 0, 0
         for ponto in DadosExame.matriz_pontos:
-            
+
             if DadosExame.programa_selecionado == Constantes.central75:
-                ponto.xg = int(ponto.xg * 0.8) 
-                ponto.yg = int(ponto.yg * 0.8)  
+                ponto.xg = int(ponto.xg * 0.8)
+                ponto.yg = int(ponto.yg * 0.8)
             ponto_novo = Ponto(
                 ponto.xg, ponto.yg, tamanhoPonto=5, cor=(0, 0, 0), distancia=200
             )
@@ -500,8 +506,6 @@ class ResultadoScreening:
             ponto.x = ponto_novo.x
             ponto.y = ponto_novo.y
 
- 
-    
             ponto.x = int(ponto.x * nova_largura / LARGURA)  # Reduzindo a coordenada X
             ponto.y = int(ponto.y * nova_altura / ALTURA)  # Reduzindo a coordenada Y
 
@@ -554,7 +558,7 @@ class ResultadoScreening:
 
     def exibir_resultados():
 
-        ResultadoScreening.status_resultado(carregado=False)        
+        ResultadoScreening.status_resultado(carregado=False)
         ResultadoScreening.desenha_pontos()
         ResultadoScreening.desenha_legendas()
         ResultadoScreening.desenha_aviso_pdf()
@@ -564,38 +568,36 @@ class ResultadoScreening:
         CONFIG_FILE = "config.json"
 
         DEFAULT_CONFIG = {
-                 "distancia_paciente": 200,
-                "tamanho_estimulo": 3,
-                "exame_id": 1,
-                "background":120,
-                "brightness":90,
-                "contrast":50,
-                "resolution-w":1920,
-                "resolution-h":1080,
-                "atenuacao":25
-            }
+            "distancia_paciente": 200,
+            "tamanho_estimulo": 3,
+            "exame_id": 1,
+            "background": 120,
+            "brightness": 90,
+            "contrast": 50,
+            "resolution-w": 1920,
+            "resolution-h": 1080,
+            "atenuacao": 25,
+        }
         config = ResultadoScreening.carregar_config(CONFIG_FILE, DEFAULT_CONFIG)
-  
-        config["exame_id"] = (
-                            (DadosExame.exame_id + 1)
-                            if DadosExame.exame_id < 999
-                            else 1
-                        )
-       
+
         while visualizando:
-           
 
             for evento in pygame.event.get():
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_j:
-                        visualizando = False                       
+                        visualizando = False
+                        config["exame_id"] = (
+                            (DadosExame.exame_id + 1)
+                            if DadosExame.exame_id < 999
+                            else 1
+                        )
                         config["distancia_paciente"] = DadosExame.distancia_paciente
                         config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
                         ResultadoScreening.salvar_config(config, CONFIG_FILE)
                         DadosExame.reset()
 
                     if evento.key == pygame.K_e:
-                       
+
                         pdf = GerarPdf()
                         pdf.verifica_e_monta_pendrive()
                         caminho_pdf = f"/media/eyetec/EXAMES/relatorio-id-exame-{DadosExame.exame_id}.pdf"
@@ -626,7 +628,7 @@ class ResultadoScreening:
                                 text_info_pdf = fonte.render(
                                     "PDF GERADO!", True, (0, 0, 0)
                                 )
-                                
+
                             else:
                                 fonte = pygame.font.Font(None, 45)
                                 text_info_pdf = fonte.render(
@@ -685,7 +687,6 @@ if __name__ == "__main__":
     for i, ponto in enumerate(DadosExame.matriz_pontos):
         if i % 2 == 0:
             ponto.response_received = True
-
 
     DadosExame.programa_selecionado = Constantes.central75
     DadosExame.atenuacao_screening = 25

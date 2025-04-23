@@ -1503,12 +1503,7 @@ class ResultadoFullthreshold:
         ResultadoFullthreshold.desenha_aviso_pdf()
 
         pygame.display.flip()
-        visualizando = True
-        config["exame_id"] = (
-                            (DadosExame.exame_id + 1)
-                            if DadosExame.exame_id < 999
-                            else 1
-                        )         
+        visualizando = True              
 
         while visualizando:
             for event in pygame.event.get():
@@ -1531,6 +1526,11 @@ class ResultadoFullthreshold:
                         pygame.display.update()
                     elif event.key == pygame.K_j:  # Tecla ESC para sair
                         visualizando = False
+                        config["exame_id"] = (
+                            (DadosExame.exame_id + 1)
+                            if DadosExame.exame_id < 999
+                            else 1
+                        )  
                         config["distancia_paciente"] = DadosExame.distancia_paciente
                         config["tamanho_estimulo"] = DadosExame.tamanho_estimulo
                         ResultadoFullthreshold.salvar_config(config, CONFIG_FILE)
