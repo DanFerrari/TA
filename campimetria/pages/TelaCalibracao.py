@@ -70,20 +70,16 @@ class Config:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     if self.modo == "info":
-                        self.modo = "fundo"
-                    elif self.modo == "fundo":
-                        self.modo = "estimulo"
+                        self.modo = "estimulo"                  
                     elif self.modo == "estimulo":
-                        self.modo = "fundo_preto"
-                    elif self.modo == "fundo_preto":
                         self.modo = "info"
+                    
                 if event.key == pygame.K_e:                    
                     
                     self.config["background"] = self.background
                     self.config["max_intensity"] = self.max_intensity
                     self.config["brightness"] = self.brightness
-                    self.config["contrast"] = self.contrast
-                   
+                    self.config["contrast"] = self.contrast                   
                     
                     Colors.ERASE_INTENSITY = self.background
                     Colors.BACKGROUND = (self.background,self.background,self.background)
@@ -145,48 +141,37 @@ class Config:
     def draw(self,surface):
         
         font = pygame.font.SysFont(None, 36)
-        self.ponto_calibracao = Ponto(0,0,self.estimulo,Ponto.db_para_intensidade(self.atenuacao),200)
-        
+        self.ponto_calibracao = Ponto(0,0,self.estimulo,Ponto.db_para_intensidade(self.atenuacao),200)        
         fundo = font.render(f"Intensidade fundo: {self.background}", True, (26, 45, 254))
         brilho = font.render(f"Brilho: {self.brightness}", True, (26, 45, 254))
         contraste = font.render(f"Contraste: {self.contrast}", True, (26, 45, 254))
-        estimulo = font.render(f"Estimulo: {self.estimulo}", True, (26, 45, 254))
         resolutionW = self.config["resolution-w"]
         resolutionH = self.config["resolution-h"]
-        resolution = font.render(f"Resolucao:{resolutionW} x {resolutionH}",True,(26, 45, 254))
-        atenuacao_estimulo = font.render(f"Atenuacao do estimulo:{self.atenuacao}",True,(26, 45, 254))
+        resolution = font.render(f"Resolucao:{resolutionW} x {resolutionH}",True,(26, 45, 254))       
         intensidade_maxima = font.render(f"Intensidade maxima:{self.max_intensity}",True,(26, 45, 254))
-        corrente_padrao_fundo = font.render("Corrente Padrao Fundo: 1.556 e-07",True,(26, 45,254 ))
-        corrente_padrao_estimulo = font.render("Corrente Padrao estimulo: 4.920 e-07",True,(26, 45,254 ))
-        corrente_padrao_tela_apagada = font.render("Corrente Padrao Tela preta: 1.920 e-09",True,(26, 45,254 ))
+        lumens_padrao_fundo = font.render("Lumens Padrao Fundo: 6.000 e-00 (LM/FT²)",True,(26, 45,254 ))
+        lumens_padrao_estimulo = font.render("Lumens Padrao estimulo: 2.000 e-01 (LM/FT²)",True,(26, 45,254 ))
+        lumens_padrao_tela_apagada = font.render("Corrente Padrao Tela preta: 8.500 e-02 (LM/FT²)",True,(26, 45,254 ))
+        
+        
         if self.modo == "info":
-            surface.fill(Colors.BACKGROUND)
-            self.ponto_calibracao.plotarPonto()
+            surface.fill(Colors.BACKGROUND)            
             surface.blit(fundo, (80, 100))
-            surface.blit(atenuacao_estimulo, (80, 150))
-            surface.blit(estimulo, (80, 200))  
-            surface.blit(contraste, (80, 250))            
-            surface.blit(brilho,(80,300))          
-            surface.blit(resolution,(80,350))   
-            surface.blit(intensidade_maxima,(80,400))    
-            surface.blit(corrente_padrao_fundo,(80,450))
-            surface.blit(corrente_padrao_estimulo,(80,500))
-            surface.blit(corrente_padrao_tela_apagada,(80,550))
-        elif self.modo == "fundo":
-            surface.fill(Colors.BACKGROUND)
+            surface.blit(contraste, (80, 200))            
+            surface.blit(brilho,(80,250))          
+            surface.blit(resolution,(80,300))   
+            surface.blit(intensidade_maxima,(80,350))    
+            surface.blit(lumens_padrao_fundo,(80,400))
+            surface.blit(lumens_padrao_estimulo,(80,450))
+            surface.blit(lumens_padrao_tela_apagada,(80,500))        
         elif self.modo == "estimulo":
             surface.fill((0,0,0))
             square_size = 300
-            square_color = Ponto.db_para_intensidade(self.atenuacao)
+            square_color = Ponto.db_para_intensidade(0)
             square_x = (surface.get_width() - square_size) // 2
             square_y = (surface.get_height() - square_size) // 2
             pygame.draw.rect(surface, square_color, (square_x, square_y, square_size, square_size))
-            
-            
-            estimulo = font.render(f"Estimulo: {self.estimulo}", True, (50, 50, 50))
-            surface.blit(estimulo, (80, 200)) 
-        elif self.modo == "fundo_preto":
-            surface.fill((0,0,0))
+
         
     def get_brightness(self): return self.get_vcp_value("10")
     def set_brightness(self,val): self.set_vcp_value("10", val)

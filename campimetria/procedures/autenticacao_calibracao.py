@@ -49,9 +49,12 @@ class Autenticacao():
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     rodando = False
-                if evento.type == pygame.KEYDOWN and evento.key == pygame.K_j:
+                elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_j:
                     self.modo_autenticado = False
                     rodando = False
+                elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_r:
+                    if self.entrada_usuario!= []:
+                        self.entrada_usuario.pop()
 
                 elif (
                     evento.type == pygame.KEYDOWN
