@@ -81,6 +81,8 @@ class Config:
                     
                     self.config["background"] = self.background
                     self.config["max_intensity"] = self.max_intensity
+                    self.config["brightness"] = self.brightness
+                    self.config["contrast"] = self.contrast
                    
                     
                     Colors.ERASE_INTENSITY = self.background
@@ -124,16 +126,18 @@ class Config:
                         self.max_intensity -= 1                    
                         
                 if event.key == pygame.K_F1:
-                  
-                    if self.atenuacao != 40:
-                        self.atenuacao += 1
-                    self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
+                    if self.brightness < 100:
+                        self.brightness += 1
+                                         
                 if event.key == pygame.K_F2:
-                 
-                    if self.atenuacao != 0:
-                        self.atenuacao -= 1
-                    self.ponto_calibracao.cor = Ponto.db_para_intensidade(self.atenuacao)
-                                    
+                    if self.brightness > 0:
+                        self.brightness -= 1
+                if event.key == pygame.K_F3:
+                    if self.contrast < 100:
+                        self.contrast += 1
+                if event.key == pygame.K_F4:
+                    if self.contrast > 0:
+                        self.contrast -= 1
                     
     def update(self):
         pygame.display.update()
@@ -143,7 +147,7 @@ class Config:
         font = pygame.font.SysFont(None, 36)
         self.ponto_calibracao = Ponto(0,0,self.estimulo,Ponto.db_para_intensidade(self.atenuacao),200)
         
-        fundo = font.render(f"Fundo: {self.background}", True, (26, 45, 254))
+        fundo = font.render(f"Intensidade fundo: {self.background}", True, (26, 45, 254))
         brilho = font.render(f"Brilho: {self.brightness}", True, (26, 45, 254))
         contraste = font.render(f"Contraste: {self.contrast}", True, (26, 45, 254))
         estimulo = font.render(f"Estimulo: {self.estimulo}", True, (26, 45, 254))
@@ -152,6 +156,9 @@ class Config:
         resolution = font.render(f"Resolucao:{resolutionW} x {resolutionH}",True,(26, 45, 254))
         atenuacao_estimulo = font.render(f"Atenuacao do estimulo:{self.atenuacao}",True,(26, 45, 254))
         intensidade_maxima = font.render(f"Intensidade maxima:{self.max_intensity}",True,(26, 45, 254))
+        corrente_padrao_fundo = font.render("Corrente Padrao Fundo: 1.556 e-07",True,(26, 45,254 ))
+        corrente_padrao_estimulo = font.render("Corrente Padrao estimulo: 4.920 e-07",True,(26, 45,254 ))
+        corrente_padrao_tela_apagada = font.render("Corrente Padrao Tela preta: 1.920 e-09",True,(26, 45,254 ))
         if self.modo == "info":
             surface.fill(Colors.BACKGROUND)
             self.ponto_calibracao.plotarPonto()
@@ -162,6 +169,9 @@ class Config:
             surface.blit(brilho,(80,300))          
             surface.blit(resolution,(80,350))   
             surface.blit(intensidade_maxima,(80,400))    
+            surface.blit(corrente_padrao_fundo,(80,450))
+            surface.blit(corrente_padrao_estimulo,(80,500))
+            surface.blit(corrente_padrao_tela_apagada,(80,550))
         elif self.modo == "fundo":
             surface.fill(Colors.BACKGROUND)
         elif self.modo == "estimulo":
