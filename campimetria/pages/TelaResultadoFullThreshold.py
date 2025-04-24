@@ -1515,15 +1515,18 @@ class ResultadoFullthreshold:
                         ResultadoFullthreshold.mapa_cor = True
                         ResultadoFullthreshold.mapa_cinza = True
                         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
+                        ResultadoFullthreshold.plota_mapas()
                         pygame.display.update()
                     elif event.key == pygame.K_g:  # Mover para baixo
                         ResultadoFullthreshold.mapa_cor = True
                         ResultadoFullthreshold.mapa_cinza = False
                         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
+                        ResultadoFullthreshold.plota_mapas()
                         pygame.display.update()
                     elif event.key == pygame.K_0:
                         ResultadoFullthreshold.mapa_cor = False
                         ResultadoFullthreshold.desenhar_mapa_texturas(firstload=False)
+                        ResultadoFullthreshold.plota_mapas()
                         pygame.display.update()
                     elif event.key == pygame.K_j:  # Tecla ESC para sair
                         visualizando = False

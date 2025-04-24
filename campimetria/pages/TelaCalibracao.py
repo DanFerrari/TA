@@ -156,7 +156,7 @@ class Config:
         
         if self.modo == "info":
             surface.fill(Colors.BACKGROUND)            
-            surface.blit(fundo, (80, 100))
+            surface.blit(fundo, (80, 150))
             surface.blit(contraste, (80, 200))            
             surface.blit(brilho,(80,250))          
             surface.blit(resolution,(80,300))   
