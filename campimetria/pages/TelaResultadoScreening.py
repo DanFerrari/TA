@@ -629,6 +629,14 @@ class ResultadoScreening:
                                 text_info_pdf = fonte.render(
                                     "PDF GERADO!", True, (0, 0, 0)
                                 )
+                                pygame.display.update()
+                                pygame.time.delay(3000)
+                                pygame.draw.rect(
+                                    pygame.display.get_surface(),
+                                    pygame.Color("white"),
+                                    rect_dash,
+                                )
+                                pygame.display.update()
 
                             else:
                                 fonte = pygame.font.Font(None, 45)

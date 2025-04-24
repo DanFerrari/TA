@@ -15,6 +15,7 @@ sys.path.append(
 )
 
 from dados import *  # Supondo que esses módulos estejam configurados
+from autenticacao_calibracao import Autenticacao
 
 if 'select_eye_screen' not in globals():
     select_eye_screen = importlib.import_module("pages.select_eye_screen")
@@ -44,8 +45,11 @@ class StrategyScreen:
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
-                    from TelaCalibracao import Config
-                    self.game.change_screen(Config(self.game))
+                    autenticar = Autenticacao()
+                    if autenticar.verificar_senha():
+                        from TelaCalibracao import Config
+                        self.game.change_screen(Config(self.game))
+                    
                 if event.key == pygame.K_LEFT:
                     if not self.strategy_selected:
                         self.button_strategy_selected = 0

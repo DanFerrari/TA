@@ -167,7 +167,7 @@ class Config:
         elif self.modo == "estimulo":
             surface.fill((0,0,0))
             square_size = 300
-            square_color = Ponto.db_para_intensidade(self.ponto_calibracao.atenuacao)
+            square_color = Ponto.db_para_intensidade(self.atenuacao)
             square_x = (surface.get_width() - square_size) // 2
             square_y = (surface.get_height() - square_size) // 2
             pygame.draw.rect(surface, square_color, (square_x, square_y, square_size, square_size))
