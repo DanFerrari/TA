@@ -4,6 +4,7 @@ import sys
 import OPi.GPIO as GPIO
 import time
 import subprocess
+import signal
 import json
 
 
@@ -11,7 +12,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)
 
 PIN_ENTRADA = "PD22"
-GPIO.setup(PIN_ENTRADA, GPIO.IN)
+# GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
@@ -38,21 +39,19 @@ class Campimetria:
     def __init__(self):
         pygame.init()
         info = pygame.display.Info()
-        # Configura a tela em FULLSCREEN e captura dimensões
         self.screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.NOFRAME)
         self.width, self.height = self.screen.get_size()
         pygame.display.set_caption("Seleção de Estratégia")
         self.clock = pygame.time.Clock()
         self.running = True
+        self.FLAG_FILE = "/tmp/xscreensaver_was_running.flag"
         
-        # Definições de cores e fontes
         self.cor_fundo = (20, 20, 20)
         self.cor_botao = (122, 122, 122)
         self.cor_botao_hover = (255, 255, 255)
         self.cor_texto = (255, 255, 255)
         self.font_main = pygame.font.Font(None, int(self.height * 0.07))
 
-        # Estado inicial: tela de seleção de estratégia
         self.current_screen = StrategyScreen(self)
         self.CONFIG_FILE = "config.json"
 
@@ -114,26 +113,8 @@ class Campimetria:
             subprocess.run(["ddcutil", "setvcp", code, str(value)])
         except Exception as e:
             print(f"Erro ao definir VCP {code}:", e)
-    def get_screen_settings(self):
-        """Obtém as configurações atuais de tempo de espera da tela"""
-        try:
-            output = subprocess.check_output("xset q", shell=True, text=True)
-            for line in output.split("\n"):
-                if "timeout" in line:
-                    return line.strip()
-        except Exception as e:
-            print(f"Erro ao obter configurações: {e}")
-        return None
-
-    def disable_screen_sleep(self):
-        """Desativa o descanso de tela e modo de espera"""
-        os.system("xset s off")  # Desativa proteção de tela
-        os.system("xset -dpms")  # Desativa gerenciamento de energia
-
-    def enable_screen_sleep(self):
-        """Ativa o descanso de tela e modo de espera"""
-        os.system("xset s on")  # Ativa proteção de tela
-        os.system("xset +dpms")  # Ativa gerenciamento de energia
+ 
+  
 
     def run(self):
         while self.running:
@@ -151,25 +132,56 @@ class Campimetria:
 
     def change_screen(self, new_screen):
         self.current_screen = new_screen
+    def is_xscreensaver_running(self):
+        try:
+            subprocess.check_output(["pidof", "xscreensaver"])
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
+    def stop_xscreensaver(self):
+        os.system("killall xscreensaver")
+
+    def start_xscreensaver(self):
+        os.system("xscreensaver -nosplash &")
+
+    def save_flag(self):
+        with open(self.FLAG_FILE, "w") as f:
+            f.write("running")
+
+    def clear_flag(self):
+        if os.path.exists(self.FLAG_FILE):
+            os.remove(self.FLAG_FILE)
+
+    def was_running_before(self):
+        return os.path.exists(self.FLAG_FILE)
 
 
 if __name__ == "__main__":
 
     game = Campimetria()
-    # Obtém as configurações atuais antes de desativar
-    original_settings = game.get_screen_settings()
-    # Desativa o stand-by e descanso de tela
-    game.disable_screen_sleep()
-    print("Stand-by e descanso de tela desativados!")
-
-    game.run()
-    caminho = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "..", "lib", "mainTA.py")
-    )
-    # Após o app fechar, restaura a configuração anterior
-    if original_settings and "timeout: 0" not in original_settings:
-        game.enable_screen_sleep()
-        print("Configurações restauradas!")
+    if game.is_xscreensaver_running():
+        print("xscreensaver está rodando. Parando e salvando estado...")
+        game.save_flag()
+        game.stop_xscreensaver()
     else:
-        print("Stand-by já estava desativado, mantendo assim.")
-    os.execvp("python", ["python", caminho])
+        print("xscreensaver não está rodando.")
+        game.clear_flag()
+
+    # Simula execução do app
+    try:
+        game.run()
+    finally:
+        caminho = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "lib", "mainTA.py")
+        )        
+        if game.was_running_before():
+            print("xscreensaver estava rodando antes. Reiniciando...")
+            game.start_xscreensaver()
+            game.clear_flag()
+        else:
+            print("xscreensaver não estava rodando antes. Nada a fazer.")
+        os.execvp("python", ["python", caminho])
+
+
+    
