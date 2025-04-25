@@ -150,7 +150,7 @@ class Config:
         resolution = font.render(f"Resolucao:{resolutionW} x {resolutionH}",True,(26, 45, 254))       
         intensidade_maxima = font.render(f"Intensidade maxima:{self.max_intensity}",True,(26, 45, 254))
         lumens_padrao_fundo = font.render("Lumens Padrao Fundo: 6.000 e-00 (LM/FT²)",True,(26, 45,254 ))
-        lumens_padrao_estimulo = font.render("Lumens Padrao estimulo: 2.000 e-01 (LM/FT²)",True,(26, 45,254 ))
+        lumens_padrao_estimulo = font.render("Lumens Padrao estimulo: 1.900 e-01 (LM/FT²)",True,(26, 45,254 ))
         lumens_padrao_tela_apagada = font.render("Corrente Padrao Tela preta: 8.500 e-02 (LM/FT²)",True,(26, 45,254 ))
         
         

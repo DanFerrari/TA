@@ -12,7 +12,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.SUNXI)
 
 PIN_ENTRADA = "PD22"
-# GPIO.setup(PIN_ENTRADA, GPIO.IN)
+GPIO.setup(PIN_ENTRADA, GPIO.IN)
 
 
 # Adiciona os caminhos (suas pastas de constantes, páginas, procedimentos, etc.)
@@ -44,7 +44,8 @@ class Campimetria:
         pygame.display.set_caption("Seleção de Estratégia")
         self.clock = pygame.time.Clock()
         self.running = True
-        self.FLAG_FILE = "/tmp/xscreensaver_was_running.flag"
+        self.FLAG_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__),"utils","temp","xscreensaver_was_running.flag"))
+        self.ATIVA_SCREENSAVER = os.path.abspath(os.path.join(os.path.dirname(__file__),"scripts","ativa_xscreensaver.sh"))
         
         self.cor_fundo = (20, 20, 20)
         self.cor_botao = (122, 122, 122)
@@ -142,8 +143,8 @@ class Campimetria:
     def stop_xscreensaver(self):
         os.system("killall xscreensaver")
 
-    def start_xscreensaver(self):
-        os.system("xscreensaver -nosplash &")
+    def start_xscreensaver(self):       
+        subprocess.Popen([self.ATIVA_SCREENSAVER])
 
     def save_flag(self):
         with open(self.FLAG_FILE, "w") as f:
