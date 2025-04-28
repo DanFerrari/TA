@@ -23,6 +23,12 @@ if 'select_eye_screen' not in globals():
 else:
     select_eye_screen = globals()['select_eye_screen']
     
+if 'index' not in globals():
+    index = importlib.import_module("pages.index")
+    globals()['index'] = index
+else:
+    index = globals()['index']
+    
 
 class StrategyScreen:
     def __init__(self, game):
@@ -86,7 +92,7 @@ class StrategyScreen:
                         self.game.change_screen(select_eye_screen.SelectEyeScreen(self.game))
                     self.strategy_selected = True
                 elif event.key == pygame.K_j:
-                    self.game.running = False
+                    self.game.change_screen(index.Index(self.game))
                 elif event.key == pygame.K_r:
                     self.strategy_selected = False
 

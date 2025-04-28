@@ -31,7 +31,7 @@ sys.path.append(
 from constants.dados import *
 from pages.strategy_screen import StrategyScreen
 from pages.select_eye_screen import SelectEyeScreen
-
+from pages.index import Index
 
 
 class Campimetria:
@@ -53,7 +53,7 @@ class Campimetria:
         self.cor_texto = (255, 255, 255)
         self.font_main = pygame.font.Font(None, int(self.height * 0.07))
 
-        self.current_screen = StrategyScreen(self)
+        self.current_screen = Index(self)
         self.CONFIG_FILE = "config.json"
 
        
