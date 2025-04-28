@@ -5,6 +5,7 @@ import pygame,os,sys,importlib,subprocess,time
 
 
 
+
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "constants"))
 )
@@ -63,9 +64,12 @@ class ConfigScreen:
                         if subprocess.run(["pgrep", "teamviewer"], stdout=subprocess.PIPE):                            # subprocess.Popen([self.inicia_team])
                             os.system("killall teamviewer")                        
                       
+                      
                         subprocess.Popen(["teamviewer", "--allowRoot"])
+                        
                         time.sleep(2)
-                        subprocess.run(["wmctrl","-a","campimetria"])                     
+                        os.system("wmctrl -a campimetria")                            
+                      
                 
                 elif event.key == pygame.K_j:
                     self.game.change_screen(index.Index(self.game))
@@ -81,7 +85,6 @@ class ConfigScreen:
 
         label_text = self.font.render("CONFIGURAÇÕES", True, self.cor_texto)
         surface.blit(label_text, (self.game.width // 2 - label_text.get_width() // 2, int(self.game.height * 0.2)))
-        
 
         largura_botao = 502
         altura_botao = 129
