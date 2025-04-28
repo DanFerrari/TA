@@ -1,4 +1,4 @@
-import pygame,os,sys,importlib,subprocess
+import pygame,os,sys,importlib,subprocess,time
 
 
 
@@ -62,8 +62,10 @@ class ConfigScreen:
                     elif self.button_selected == 1:
                         if subprocess.run(["pgrep", "teamviewer"], stdout=subprocess.PIPE):                            # subprocess.Popen([self.inicia_team])
                             os.system("killall teamviewer")                        
-                        # os.system("teamviewer --allowRoot")
+                      
                         subprocess.Popen(["teamviewer", "--allowRoot"])
+                        time.sleep(2)
+                        subprocess.run(["wmctrl","-a","campimetria"])                     
                 
                 elif event.key == pygame.K_j:
                     self.game.change_screen(index.Index(self.game))

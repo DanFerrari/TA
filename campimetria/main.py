@@ -41,7 +41,7 @@ class Campimetria:
         info = pygame.display.Info()
         self.screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.NOFRAME)
         self.width, self.height = self.screen.get_size()
-        pygame.display.set_caption("Seleção de Estratégia")
+        pygame.display.set_caption("campimetria")
         self.clock = pygame.time.Clock()
         self.running = True
         self.FLAG_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__),"utils","temp","xscreensaver_was_running.flag"))
