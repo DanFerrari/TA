@@ -42,7 +42,7 @@ class ConfigScreen:
         self.cor_botao = game.cor_botao
         self.cor_botao_hover = game.cor_botao_hover
         self.cor_texto = game.cor_texto 
-        self.inicia_team = os.path.abspath(os.path.join(os.path.dirname(__file__),"scripts","inicia_teamviewer.sh"))
+ 
 
 
 
@@ -60,12 +60,17 @@ class ConfigScreen:
                     if self.button_selected == 0:
                         self.game.change_screen(testar_joystick.TestarJoystick(self.game))
                     elif self.button_selected == 1:
-                        subprocess.Popen([self.inicia_team])                    
+                        if subprocess.run(["pgrep", "teamviewer"], stdout=subprocess.PIPE):                            # subprocess.Popen([self.inicia_team])
+                            os.system("killall teamviewer")                        
+                        # os.system("teamviewer --allowRoot")
+                        subprocess.Popen(["teamviewer", "--allowRoot"])
+                
                 elif event.key == pygame.K_j:
                     self.game.change_screen(index.Index(self.game))
      
 
     def update(self):
+       
         pass
 
     def draw(self, surface):

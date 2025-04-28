@@ -46,22 +46,22 @@ class TestarJoystick:
                     self.desenhar_botao = True                    
                 elif event.key == pygame.K_j:
                     self.game.change_screen(config_screen.ConfigScreen(self.game))
-        if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
-              self.desenhar_botao = True
+        
 
     def update(self):
         pass
 
     def draw(self, surface):
-        
+        if GPIO.input(PIN_ENTRADA) == GPIO.HIGH:
+              self.desenhar_botao = True        
         surface.fill(self.cor_fundo)
         label_text = self.font.render("APERTE O JOYSTICK PARA TESTAR, CASO APARECA O PONTO AZUL O JOYSTICK ESTÁ FUNCIONANDO", True, self.cor_texto)
         surface.blit(label_text, (self.game.width // 2 - label_text.get_width() // 2, int(self.game.height * 0.2)))
         if self.desenhar_botao:
             pygame.draw.circle(surface, (0, 0, 255), (self.game.width // 2, self.game.height // 2), 100)
+            pygame.display.update()
+            pygame.time.delay(150)
         pygame.display.update()
-        pygame.time.delay(150)
- 
         
 
         
