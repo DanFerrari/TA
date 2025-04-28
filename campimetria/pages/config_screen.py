@@ -62,13 +62,10 @@ class ConfigScreen:
                         self.game.change_screen(testar_joystick.TestarJoystick(self.game))
                     elif self.button_selected == 1:
                         if subprocess.run(["pgrep", "teamviewer"], stdout=subprocess.PIPE):                            # subprocess.Popen([self.inicia_team])
-                            os.system("killall teamviewer")                        
-                      
-                      
-                        subprocess.Popen(["teamviewer", "--allowRoot"])
-                        
-                        time.sleep(2)
-                        os.system("wmctrl -a campimetria")                            
+                            os.system("killall teamviewer")
+                        subprocess.Popen(["teamviewer", "--allowRoot"])                        
+                       
+                                      
                       
                 
                 elif event.key == pygame.K_j:
