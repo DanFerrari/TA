@@ -9,11 +9,11 @@ wget https://download.teamviewer.com/download/linux/teamviewer_arm64.deb -O /tmp
 
 # Instalar o pacote
 echo "Instalando TeamViewer..."
-sudo apt install -y /tmp/teamviewer_amd64.deb
+sudo apt install -y /tmp/teamviewer_arm64.deb
 
 # Resolver dependências quebradas (caso existam)
 sudo apt --fix-broken install -y
 
 # Abrir o TeamViewer
 echo "Abrindo TeamViewer..."
-teamviewer &
+teamviewer

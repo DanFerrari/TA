@@ -5,7 +5,7 @@ sudo apt update
 
 # Instalar o TeamViewer a partir do pendrive
 echo "Instalando TeamViewer..."
-sudo apt install -y "$(dirname "$0")/teamviewer_arm64.deb"
+sudo apt install -y "/media/eyetec/ORANGE/teamviewer_arm64.deb"
 
 # Resolver dependências quebradas (caso existam)
 sudo apt --fix-broken install -y
